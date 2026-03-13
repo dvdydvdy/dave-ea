@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#fafafa">
+<title>Follow-Ups - Dave's EA</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  ::-webkit-scrollbar { display: none; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro", "Segoe UI", Roboto, sans-serif;
+    background: #fafafa; color: #111827;
+    max-width: 480px; margin: 0 auto;
+    min-height: 100vh; padding-bottom: 32px; overflow-x: hidden;
+  }
+  .card { background: #fff; border-radius: 14px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,.04); margin-bottom: 10px; }
+  .header { padding: 20px 20px 0; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .back-btn { background: none; border: none; cursor: pointer; font-size: 14px; color: #4f46e5; font-weight: 600; font-family: inherit; display: flex; align-items: center; gap: 4px; }
+  .section { padding: 0 16px; margin-bottom: 24px; }
+
+  .stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding: 0 16px; margin-bottom: 20px; }
+  .stat { padding: 14px; text-align: center; }
+  .stat .num { font-size: 24px; font-weight: 800; }
+  .stat .lbl { font-size: 11px; color: #6b7280; margin-top: 2px; }
+
+  .group-header { font-size: 14px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .group-badge { font-size: 11px; background: #f3f4f6; padding: 2px 8px; border-radius: 10px; color: #6b7280; font-weight: 600; }
+
+  .fu-card { padding: 14px 16px; }
+  .fu-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .fu-person { font-size: 14px; font-weight: 600; }
+  .fu-context { font-size: 12px; color: #6b7280; margin-top: 2px; }
+  .fu-urgency { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 6px; }
+  .urgency-overdue { background: #fef2f2; color: #ef4444; }
+  .urgency-today { background: #fffbeb; color: #d97706; }
+  .urgency-upcoming { background: #eef2ff; color: #4f46e5; }
+  .urgency-scheduled { background: #f0fdf4; color: #16a34a; }
+  .fu-action { font-size: 13px; font-weight: 500; margin-top: 8px; padding: 8px 0; border-top: 1px solid #f3f4f6; color: #111827; }
+  .fu-meta { display: flex; gap: 12px; margin-top: 6px; font-size: 11px; color: #9ca3af; }
+  .fu-btns { display: flex; gap: 8px; margin-top: 10px; }
+  .fu-btn { padding: 6px 14px; border-radius: 8px; border: 1px solid #e5e7eb; background: #fff; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all .15s; }
+  .fu-btn:hover { background: #f9fafb; }
+  .fu-btn.primary { background: #4f46e5; color: #fff; border-color: #4f46e5; }
+
+  .tip-card { padding: 12px 16px; margin: 0 16px 16px; background: #eef2ff; border-color: #c7d2fe; }
+  .tip-card p { font-size: 12px; color: #4f46e5; font-weight: 500; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <button class="back-btn" onclick="window.location.href='index.html'">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    EA Home
+  </button>
+</div>
+
+<div style="padding:0 16px;margin-bottom:20px">
+  <h1 style="font-size:24px;font-weight:800">Follow-Ups</h1>
+  <p style="font-size:13px;color:#6b7280;margin-top:4px">Track who needs a response & when</p>
+</div>
+
+<div class="stats-row" id="stats"></div>
+<div id="groups"></div>
+
+<div class="card tip-card">
+  <p>Ask your EA in Cowork to draft follow-up emails, reschedule meetings, or snooze reminders.</p>
+</div>
+
+<script>
+const FOLLOWUPS = [
+  { person: 'Sarah Chen', context: 'Sequoia Capital \u00b7 LP prospect', action: 'Send Fund I performance deck before SF trip', due: '2026-03-14', channel: 'Email', category: 'investor', snoozed: false },
+  { person: 'Rachel Kim', context: 'HealthBridge \u00b7 Pre-seed deal', action: 'Schedule 45-min deep dive call', due: '2026-03-13', channel: 'Email', category: 'deal', snoozed: false },
+  { person: 'Marcus Thompson', context: 'DataMesh AI \u00b7 Portfolio', action: 'Intro to VP Eng candidates (3 profiles)', due: '2026-03-13', channel: 'Email', category: 'portfolio', snoozed: false },
+  { person: 'Yuki Tanaka', context: 'SoftBank Ventures \u00b7 Tokyo meeting', action: 'Confirm Apr 8 meeting time & send agenda', due: '2026-03-15', channel: 'Email', category: 'investor', snoozed: false },
+  { person: 'Alex Rivera', context: 'NexaFlow \u00b7 Portfolio', action: 'Review Q1 metrics and provide feedback', due: '2026-03-15', channel: 'Slack', category: 'portfolio', snoozed: false },
+  { person: 'James Liu', context: 'a16z Crypto \u00b7 Co-invest', action: 'Reconnect re: DeFi co-investment thesis', due: '2026-03-18', channel: 'LinkedIn', category: 'investor', snoozed: false },
+  { person: 'Tom Walsh', context: 'Bridgepoint Capital \u00b7 LP', action: 'Send Fund II teaser deck', due: '2026-03-20', channel: 'Email', category: 'lp', snoozed: false },
+  { person: 'Priya Sharma', context: 'CloudKitchen Asia \u00b7 Series B', action: 'Connect with Goldman Sachs team for lead', due: '2026-03-11', channel: 'WhatsApp', category: 'deal', snoozed: false },
+  { person: 'Wei Zhang', context: 'TechFlow \u00b7 Portfolio', action: 'Discuss pivot strategy & new positioning', due: '2026-03-10', channel: 'Zoom', category: 'portfolio', snoozed: false },
+  { person: 'Emma Larsson', context: 'GreenRoute \u00b7 Seed deal', action: 'Complete 3 customer reference calls', due: '2026-03-16', channel: 'Email', category: 'deal', snoozed: false }
+];
+
+const STORAGE_KEY = 'dave_followups_v1';
+
+function getState() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { return {}; }
+}
+function saveState(s) { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
+
+function daysDiff(d) {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const target = new Date(d); target.setHours(0,0,0,0);
+  return Math.round((target - today) / 86400000);
+}
+
+function urgencyInfo(d) {
+  const diff = daysDiff(d);
+  if (diff < 0) return { label: `${Math.abs(diff)}d overdue`, cls: 'urgency-overdue', priority: 0 };
+  if (diff === 0) return { label: 'Due today', cls: 'urgency-today', priority: 1 };
+  if (diff <= 3) return { label: `In ${diff}d`, cls: 'urgency-upcoming', priority: 2 };
+  return { label: `In ${diff}d`, cls: 'urgency-scheduled', priority: 3 };
+}
+
+function render() {
+  const state = getState();
+  const completed = Object.keys(state).filter(k => state[k] === 'done');
+  const snoozed = Object.keys(state).filter(k => state[k] === 'snoozed');
+  const active = FOLLOWUPS.filter((f,i) => !state[i]);
+
+  // Stats
+  const overdue = active.filter(f => daysDiff(f.due) < 0).length;
+  const today = active.filter(f => daysDiff(f.due) === 0).length;
+  document.getElementById('stats').innerHTML = `
+    <div class="card stat"><div class="num" style="color:${overdue > 0 ? '#ef4444' : '#16a34a'}">${overdue}</div><div class="lbl">Overdue</div></div>
+    <div class="card stat"><div class="num" style="color:#d97706">${today}</div><div class="lbl">Due Today</div></div>
+    <div class="card stat"><div class="num" style="color:#4f46e5">${active.length}</div><div class="lbl">Active</div></div>
+  `;
+
+  // Group by urgency
+  const groups = { 0: [], 1: [], 2: [], 3: [] };
+  const groupNames = { 0: '\ud83d\udea8 Overdue', 1: '\u26a0\ufe0f Due Today', 2: '\ud83d\udcc5 This Week', 3: '\ud83d\udccc Upcoming' };
+
+  FOLLOWUPS.forEach((f, i) => {
+    if (state[i]) return;
+    const u = urgencyInfo(f.due);
+    groups[u.priority].push({ ...f, idx: i, urgency: u });
+  });
+
+  let h = '';
+  [0,1,2,3].forEach(p => {
+    if (groups[p].length === 0) return;
+    h += `<div class="section">
+      <div class="group-header">${groupNames[p]} <span class="group-badge">${groups[p].length}</span></div>`;
+    groups[p].forEach(f => {
+      h += `<div class="card fu-card">
+        <div class="fu-top">
+          <div>
+            <div class="fu-person">${f.person}</div>
+            <div class="fu-context">${f.context}</div>
+          </div>
+          <span class="fu-urgency ${f.urgency.cls}">${f.urgency.label}</span>
+        </div>
+        <div class="fu-action">\u26a1 ${f.action}</div>
+        <div class="fu-meta">
+          <span>\ud83d\udce8 ${f.channel}</span>
+          <span>\ud83d\udcc5 Due: ${f.due}</span>
+        </div>
+        <div class="fu-btns">
+          <button class="fu-btn primary" onclick="markDone(${f.idx})">Done</button>
+          <button class="fu-btn" onclick="snooze(${f.idx})">Snooze 3d</button>
+        </div>
+      </div>`;
+    });
+    h += '</div>';
+  });
+
+  if (completed.length > 0) {
+    h += `<div class="section"><div class="group-header" style="color:#16a34a">\u2705 Completed <span class="group-badge">${completed.length}</span></div>
+      <div class="card" style="padding:12px 16px;font-size:12px;color:#6b7280">${completed.length} follow-ups completed. <button onclick="clearDone()" style="background:none;border:none;color:#4f46e5;cursor:pointer;font-size:12px;font-weight:600;font-family:inherit">Clear</button></div>
+    </div>`;
+  }
+
+  document.getElementById('groups').innerHTML = h;
+}
+
+function markDone(idx) {
+  const s = getState(); s[idx] = 'done'; saveState(s); render();
+}
+
+function snooze(idx) {
+  const f = FOLLOWUPS[idx];
+  const newDate = new Date(f.due);
+  newDate.setDate(newDate.getDate() + 3);
+  f.due = newDate.toISOString().split('T')[0];
+  render();
+}
+
+function clearDone() {
+  const s = getState();
+  Object.keys(s).forEach(k => { if (s[k] === 'done') delete s[k]; });
+  saveState(s); render();
+}
+
+render();
+</script>
+</body>
+</html>
