@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#fafafa">
+<title>To-Do List â Dave's EA</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  ::-webkit-scrollbar { display: none; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro", "Segoe UI", Roboto, sans-serif;
+    background: #fafafa; color: #111827;
+    max-width: 480px; margin: 0 auto;
+    min-height: 100vh; padding-bottom: 80px; overflow-x: hidden;
+  }
+  .header { padding: 20px 20px 0; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .back-btn { background: none; border: none; cursor: pointer; font-size: 14px; color: #4f46e5; font-weight: 600; font-family: inherit; display: flex; align-items: center; gap: 4px; }
+  .card { background: #fff; border-radius: 14px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,.04); margin-bottom: 10px; }
+  .section { padding: 0 16px; }
+
+  /* Filters */
+  .filter-bar { display: flex; gap: 8px; overflow-x: auto; padding: 0 16px 16px; }
+  .filter-btn { padding: 6px 14px; border-radius: 20px; border: 1px solid #e5e7eb; background: #fff; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; font-family: inherit; }
+  .filter-btn.active { background: #4f46e5; color: #fff; border-color: #4f46e5; }
+
+  /* Add form */
+  .add-bar { padding: 0 16px 16px; }
+  .add-card { padding: 14px; }
+  .add-card input { width: 100%; border: 1px solid #e5e7eb; border-radius: 10px; padding: 10px 14px; font-size: 14px; font-family: inherit; outline: none; margin-bottom: 10px; }
+  .add-card input:focus { border-color: #4f46e5; }
+  .add-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .add-row input { flex: 1; min-width: 100px; margin-bottom: 0; font-size: 12px; padding: 8px 10px; }
+  .pri-btn { padding: 5px 12px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 11px; font-weight: 700; cursor: pointer; text-transform: uppercase; font-family: inherit; background: transparent; }
+  .add-submit { padding: 8px 20px; border-radius: 10px; background: #4f46e5; color: #fff; border: none; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
+
+  /* Todo items */
+  .todo-item { padding: 14px 16px; display: flex; align-items: flex-start; gap: 12px; border-bottom: 1px solid #f3f4f6; }
+  .todo-item:last-child { border-bottom: none; }
+  .todo-check { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #d1d5db; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-top: 1px; }
+  .todo-check.high { border-color: #ef4444; }
+  .todo-check.medium { border-color: #f59e0b; }
+  .todo-check.low { border-color: #6b7280; }
+  .todo-check:hover { background: #f3f4f6; }
+  .todo-text { font-size: 14px; font-weight: 500; }
+  .todo-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+  .todo-meta span { font-size: 11px; color: #6b7280; }
+  .todo-done .todo-text { text-decoration: line-through; color: #9ca3af; }
+  .todo-actions { display: flex; gap: 4px; flex-shrink: 0; }
+  .todo-actions button { background: none; border: none; cursor: pointer; padding: 4px; border-radius: 6px; color: #9ca3af; font-size: 16px; }
+  .todo-actions button:hover { background: #f3f4f6; color: #6b7280; }
+
+  .pri-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 7px; }
+
+  .empty { padding: 40px 16px; text-align: center; color: #9ca3af; font-size: 14px; }
+  .count-badge { font-size: 12px; font-weight: 700; padding: 2px 10px; border-radius: 10px; }
+
+  /* Stats */
+  .stats { display: flex; gap: 10px; padding: 0 16px 16px; }
+  .stat-card { flex: 1; padding: 14px; text-align: center; }
+  .stat-num { font-size: 22px; font-weight: 800; }
+  .stat-label { font-size: 11px; color: #6b7280; font-weight: 500; margin-top: 2px; }
+
+  /* Completed section */
+  .completed-header { padding: 16px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 13px; font-weight: 600; color: #6b7280; }
+
+  /* FAB */
+  .fab { position: fixed; bottom: 24px; right: 24px; width: 56px; height: 56px; border-radius: 50%; background: #4f46e5; color: #fff; border: none; font-size: 28px; cursor: pointer; box-shadow: 0 4px 12px rgba(79,70,229,.4); display: flex; align-items: center; justify-content: center; z-index: 10; }
+  .fab:active { transform: scale(0.95); }
+
+  @media (min-width: 481px) { .fab { right: calc(50% - 240px + 24px); } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <button class="back-btn" onclick="window.location.href='index.html'">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    EA Home
+  </button>
+  <span style="font-size:14px;font-weight:700">ð To-Do List</span>
+</div>
+
+<div id="app"></div>
+<button class="fab" onclick="toggleAdd()">+</button>
+
+<script>
+const STORAGE_KEY = "dave_todos_v6";
+let filter = "all"; // all, high, medium, low, done
+let showAdd = false;
+let showCompleted = false;
+let newText = "", newPerson = "", newDeadline = "", newNextStep = "", newCategory = "", newPriority = "medium";
+
+function load() {
+  try { const raw = localStorage.getItem(STORAGE_KEY); return raw ? JSON.parse(raw) : []; }
+  catch(e) { return []; }
+}
+function save(todos) { localStorage.setItem(STORAGE_KEY, JSON.stringify(todos)); }
+
+function toggleAdd() { showAdd = !showAdd; render(); if (showAdd) setTimeout(() => { const i = document.getElementById('inp-text'); if(i) i.focus(); }, 50); }
+
+function addTodo() {
+  if (!newText.trim()) return;
+  const todos = load();
+  const maxId = todos.reduce((m, t) => Math.max(m, t.id || 0), 200);
+  todos.push({
+    id: maxId + 1,
+    text: newText.trim(),
+    priority: newPriority,
+    done: false,
+    person: newPerson.trim() || undefined,
+    deadline: newDeadline.trim() || undefined,
+    nextStep: newNextStep.trim() || undefined,
+    category: newCategory.trim() || undefined,
+    created: new Date().toISOString()
+  });
+  save(todos);
+  newText = ""; newPerson = ""; newDeadline = ""; newNextStep = ""; newCategory = ""; newPriority = "medium";
+  showAdd = false;
+  render();
+}
+
+function toggleDone(id) {
+  const todos = load();
+  const t = todos.find(x => x.id === id);
+  if (t) { t.done = !t.done; t.completedAt = t.done ? new Date().toISOString() : undefined; }
+  save(todos);
+  render();
+}
+
+function deleteTodo(id) {
+  let todos = load();
+  todos = todos.filter(x => x.id !== id);
+  save(todos);
+  render();
+}
+
+function priColor(p) {
+  if (p === 'high') return '#ef4444';
+  if (p === 'medium') return '#f59e0b';
+  return '#6b7280';
+}
+function priBg(p) {
+  if (p === 'high') return '#fef2f2';
+  if (p === 'medium') return '#fffbeb';
+  return '#f9fafb';
+}
+
+function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+function render() {
+  const todos = load();
+  const pending = todos.filter(t => !t.done);
+  const completed = todos.filter(t => t.done);
+  const highCount = pending.filter(t => t.priority === 'high').length;
+  const medCount = pending.filter(t => t.priority === 'medium').length;
+  const lowCount = pending.filter(t => t.priority === 'low').length;
+
+  let h = '';
+
+  // Stats
+  h += `<div class="stats">
+    <div class="card stat-card"><div class="stat-num" style="color:#4f46e5">${pending.length}</div><div class="stat-label">Pending</div></div>
+    <div class="card stat-card"><div class="stat-num" style="color:#ef4444">${highCount}</div><div class="stat-label">High</div></div>
+    <div class="card stat-card"><div class="stat-num" style="color:#16a34a">${completed.length}</div><div class="stat-label">Done</div></div>
+  </div>`;
+
+  // Filters
+  h += `<div class="filter-bar">
+    ${['all','high','medium','low','done'].map(f => `<button class="filter-btn ${filter===f?'active':''}" onclick="filter='${f}';render()">${f === 'all' ? 'All ('+pending.length+')' : f === 'done' ? 'â Done ('+completed.length+')' : f.charAt(0).toUpperCase()+f.slice(1)+' ('+( f==='high'?highCount:f==='medium'?medCount:lowCount )+')'}</button>`).join('')}
+  </div>`;
+
+  // Add form
+  if (showAdd) {
+    h += `<div class="add-bar"><div class="card add-card">
+      <input id="inp-text" placeholder="What needs to be done?" value="${esc(newText)}" oninput="newText=this.value" onkeydown="if(event.key==='Enter')addTodo()">
+      <div class="add-row" style="margin-bottom:8px">
+        <input placeholder="ð¤ Person (optional)" value="${esc(newPerson)}" oninput="newPerson=this.value">
+        <input placeholder="ð Deadline (optional)" value="${esc(newDeadline)}" oninput="newDeadline=this.value">
+      </div>
+      <div class="add-row" style="margin-bottom:10px">
+        <input placeholder="â¡ Next step (optional)" value="${esc(newNextStep)}" oninput="newNextStep=this.value">
+        <input placeholder="ð·ï¸ Category (optional)" value="${esc(newCategory)}" oninput="newCategory=this.value">
+      </div>
+      <div class="add-row">
+        ${['high','medium','low'].map(p => `<button class="pri-btn" onclick="newPriority='${p}';render()" style="border:${newPriority===p?'2px':'1px'} solid ${priColor(p)};background:${newPriority===p?priBg(p):'transparent'};color:${priColor(p)}">${p}</button>`).join('')}
+        <div style="flex:1"></div>
+        <button class="add-submit" onclick="addTodo()">Add Task</button>
+      </div>
+    </div></div>`;
+  }
+
+  // Filter todos
+  let display = [];
+  if (filter === 'done') display = completed;
+  else if (filter === 'all') display = pending;
+  else display = pending.filter(t => t.priority === filter);
+
+  // Render list
+  h += `<div class="section">`;
+  if (display.length === 0) {
+    h += `<div class="card empty">${filter === 'done' ? 'No completed tasks yet.' : 'No tasks here. Tap + to add one.'}</div>`;
+  } else {
+    h += `<div class="card">`;
+    display.forEach(t => {
+      h += `<div class="todo-item ${t.done ? 'todo-done' : ''}">
+        <div class="pri-dot" style="background:${priColor(t.priority||'medium')}"></div>
+        <div style="flex:1;min-width:0">
+          <div class="todo-text">${esc(t.text)}</div>
+          <div class="todo-meta">
+            ${t.person ? `<span>ð¤ ${esc(t.person)}</span>` : ''}
+            ${t.deadline ? `<span>ð ${esc(t.deadline)}</span>` : ''}
+            ${t.nextStep ? `<span>â¡ ${esc(t.nextStep)}</span>` : ''}
+            ${t.category ? `<span style="text-transform:uppercase;font-size:10px;letter-spacing:.5px;color:#9ca3af">${esc(t.category)}</span>` : ''}
+          </div>
+        </div>
+        <div class="todo-actions">
+          <button onclick="toggleDone(${t.id})" title="${t.done?'Undo':'Done'}">${t.done ? 'â©ï¸' : 'â'}</button>
+          <button onclick="deleteTodo(${t.id})" title="Delete">Ã</button>
+        </div>
+      </div>`;
+    });
+    h += `</div>`;
+  }
+
+  // Show completed toggle (when not filtering by done)
+  if (filter !== 'done' && completed.length > 0) {
+    h += `<div class="card" style="margin-top:8px">
+      <div class="completed-header" onclick="showCompleted=!showCompleted;render()">
+        <span>Completed (${completed.length})</span>
+        <span>${showCompleted ? 'â²' : 'â¼'}</span>
+      </div>`;
+    if (showCompleted) {
+      completed.forEach(t => {
+        h += `<div class="todo-item todo-done" style="padding:10px 16px">
+          <div class="pri-dot" style="background:#d1d5db"></div>
+          <div style="flex:1;min-width:0">
+            <div class="todo-text">${esc(t.text)}</div>
+          </div>
+          <div class="todo-actions">
+            <button onclick="toggleDone(${t.id})" title="Undo">â©ï¸</button>
+            <button onclick="deleteTodo(${t.id})" title="Delete">Ã</button>
+          </div>
+        </div>`;
+      });
+    }
+    h += `</div>`;
+  }
+
+  h += `</div>`;
+
+  // Sync note
+  h += `<div style="text-align:center;padding:20px 16px;font-size:11px;color:#9ca3af">Syncs with EA Dashboard via localStorage (dave_todos_v6)</div>`;
+
+  document.getElementById('app').innerHTML = h;
+}
+
+// Listen for storage changes from other tabs (EA dashboard)
+window.addEventListener('storage', (e) => { if (e.key === STORAGE_KEY) render(); });
+
+render();
+</script>
+</body>
+</html>
