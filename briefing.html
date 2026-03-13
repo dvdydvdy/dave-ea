@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#fafafa">
+<title>Daily Briefing - Dave's EA</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  ::-webkit-scrollbar { display: none; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro", "Segoe UI", Roboto, sans-serif;
+    background: #fafafa; color: #111827;
+    max-width: 480px; margin: 0 auto;
+    min-height: 100vh; padding-bottom: 32px; overflow-x: hidden;
+  }
+  .card { background: #fff; border-radius: 14px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,.04); margin-bottom: 12px; }
+  .header { padding: 20px 20px 0; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .back-btn { background: none; border: none; cursor: pointer; font-size: 14px; color: #4f46e5; font-weight: 600; font-family: inherit; display: flex; align-items: center; gap: 4px; }
+  .section { padding: 0 16px; margin-bottom: 24px; }
+  .section-title { font-size: 16px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+
+  .brief-hero { padding: 24px 16px; margin: 0 16px 20px; background: linear-gradient(135deg, #4f46e5, #7c3aed); color: #fff; border-radius: 16px; }
+  .brief-greeting { font-size: 14px; opacity: .8; }
+  .brief-date { font-size: 24px; font-weight: 800; margin: 4px 0 12px; }
+  .brief-summary { font-size: 13px; line-height: 1.6; opacity: .9; }
+
+  .priority-item { padding: 14px 16px; display: flex; align-items: flex-start; gap: 12px; }
+  .priority-num { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; flex-shrink: 0; }
+  .priority-text { font-size: 14px; font-weight: 600; }
+  .priority-detail { font-size: 12px; color: #6b7280; margin-top: 2px; }
+
+  .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .metric-card { padding: 14px; }
+  .metric-label { font-size: 11px; color: #6b7280; font-weight: 500; }
+  .metric-value { font-size: 20px; font-weight: 800; margin-top: 4px; }
+  .metric-change { font-size: 11px; margin-top: 2px; font-weight: 600; }
+
+  .news-item { padding: 12px 16px; border-bottom: 1px solid #f3f4f6; }
+  .news-item:last-child { border-bottom: none; }
+  .news-source { font-size: 10px; color: #4f46e5; font-weight: 600; text-transform: uppercase; }
+  .news-title { font-size: 13px; font-weight: 600; margin-top: 2px; }
+  .news-snippet { font-size: 12px; color: #6b7280; margin-top: 4px; line-height: 1.4; }
+
+  .weather-card { padding: 16px; display: flex; align-items: center; gap: 16px; }
+  .weather-icon { font-size: 36px; }
+  .weather-temp { font-size: 28px; font-weight: 800; }
+  .weather-desc { font-size: 12px; color: #6b7280; }
+  .weather-detail { font-size: 11px; color: #9ca3af; margin-top: 2px; }
+
+  .schedule-item { padding: 10px 16px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #f9fafb; }
+  .schedule-item:last-child { border-bottom: none; }
+  .sched-time { font-size: 12px; font-weight: 600; color: #4f46e5; width: 60px; flex-shrink: 0; }
+  .sched-title { font-size: 13px; font-weight: 500; }
+  .sched-now { background: #faf5ff; border-left: 3px solid #4f46e5; }
+
+  .tip-card { padding: 12px 16px; margin: 0 16px 16px; background: #eef2ff; border-color: #c7d2fe; }
+  .tip-card p { font-size: 12px; color: #4f46e5; font-weight: 500; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <button class="back-btn" onclick="window.location.href='index.html'">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    EA Home
+  </button>
+  <span style="font-size:12px;color:#6b7280" id="genTime"></span>
+</div>
+
+<div class="brief-hero">
+  <div class="brief-greeting" id="greeting"></div>
+  <div class="brief-date" id="dateStr"></div>
+  <div class="brief-summary">You have <strong>13 events</strong> today including key meetings with Dennis, DBS, and portfolio reviews. <strong>3 follow-ups</strong> are due today and <strong>2 are overdue</strong>. SF trip is in 5 days.</div>
+</div>
+
+<!-- Today's Priorities -->
+<div class="section">
+  <div class="section-title">\ud83c\udfaf Top Priorities Today</div>
+  <div class="card">
+    <div class="priority-item">
+      <div class="priority-num" style="background:#fef2f2;color:#ef4444">1</div>
+      <div>
+        <div class="priority-text">Review NexaFlow Q1 metrics</div>
+        <div class="priority-detail">Due Mar 15 \u00b7 Alex Rivera waiting on feedback</div>
+      </div>
+    </div>
+    <div class="priority-item">
+      <div class="priority-num" style="background:#fffbeb;color:#d97706">2</div>
+      <div>
+        <div class="priority-text">Send Fund I deck to Sarah Chen</div>
+        <div class="priority-detail">Sequoia LP prospect \u00b7 Before SF trip</div>
+      </div>
+    </div>
+    <div class="priority-item">
+      <div class="priority-num" style="background:#eef2ff;color:#4f46e5">3</div>
+      <div>
+        <div class="priority-text">Intro Marcus to VP Eng candidates</div>
+        <div class="priority-detail">DataMesh AI \u00b7 3 profiles ready to send</div>
+      </div>
+    </div>
+    <div class="priority-item">
+      <div class="priority-num" style="background:#f0fdf4;color:#16a34a">4</div>
+      <div>
+        <div class="priority-text">Prep for DBS Corporate Banking meeting</div>
+        <div class="priority-detail">10:30 AM \u00b7 Fund account setup & banking facilities</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Schedule overview -->
+<div class="section">
+  <div class="section-title">\ud83d\udcc5 Today's Schedule</div>
+  <div class="card" id="schedule"></div>
+</div>
+
+<!-- Weather -->
+<div class="section">
+  <div class="section-title">\u2600\ufe0f Weather</div>
+  <div class="card weather-card">
+    <div class="weather-icon">\u26c5</div>
+    <div>
+      <div class="weather-temp">31\u00b0C</div>
+      <div class="weather-desc">Partly Cloudy \u00b7 Singapore</div>
+      <div class="weather-detail">H: 33\u00b0 L: 26\u00b0 \u00b7 Humidity 78% \u00b7 UV High</div>
+    </div>
+  </div>
+</div>
+
+<!-- Portfolio pulse -->
+<div class="section">
+  <div class="section-title">\ud83d\udcca Portfolio Pulse</div>
+  <div class="metric-grid">
+    <div class="card metric-card">
+      <div class="metric-label">Active Deals</div>
+      <div class="metric-value" style="color:#4f46e5">8</div>
+      <div class="metric-change" style="color:#16a34a">\u2191 2 new this week</div>
+    </div>
+    <div class="card metric-card">
+      <div class="metric-label">Pipeline Value</div>
+      <div class="metric-value" style="color:#059669">$12.5M</div>
+      <div class="metric-change" style="color:#16a34a">\u2191 $2M vs last week</div>
+    </div>
+    <div class="card metric-card">
+      <div class="metric-label">Follow-ups Due</div>
+      <div class="metric-value" style="color:#d97706">5</div>
+      <div class="metric-change" style="color:#ef4444">2 overdue</div>
+    </div>
+    <div class="card metric-card">
+      <div class="metric-label">Meetings This Week</div>
+      <div class="metric-value" style="color:#7c3aed">18</div>
+      <div class="metric-change" style="color:#6b7280">3 remaining today</div>
+    </div>
+  </div>
+</div>
+
+<!-- Market news -->
+<div class="section">
+  <div class="section-title">\ud83d\udcf0 Market Intel</div>
+  <div class="card">
+    <div class="news-item">
+      <div class="news-source">TechCrunch</div>
+      <div class="news-title">YC Demo Day W26 Highlights: AI-First Startups Dominate</div>
+      <div class="news-snippet">73% of W26 batch are AI-native companies. Notable cos in fintech & healthtech verticals.</div>
+    </div>
+    <div class="news-item">
+      <div class="news-source">Bloomberg</div>
+      <div class="news-title">Southeast Asia VC Funding Rebounds in Q1 2026</div>
+      <div class="news-snippet">$4.2B deployed across 380 deals, up 35% YoY. Singapore remains top hub.</div>
+    </div>
+    <div class="news-item">
+      <div class="news-source">The Information</div>
+      <div class="news-title">Emerging Manager Allocations Hit Record as LPs Diversify</div>
+      <div class="news-snippet">Institutional LPs now allocating 15-20% to emerging managers, up from 8% in 2023.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Upcoming travel -->
+<div class="section">
+  <div class="section-title">\u2708\ufe0f Upcoming Travel</div>
+  <div class="card" style="padding:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-size:15px;font-weight:700">San Francisco</div>
+        <div style="font-size:12px;color:#6b7280">Mar 18\u201321 \u00b7 LP Meeting & YC Demo Day</div>
+      </div>
+      <div style="font-size:12px;font-weight:700;color:#4f46e5;background:#eef2ff;padding:4px 10px;border-radius:8px">In 5 days</div>
+    </div>
+    <div style="margin-top:8px;font-size:12px;color:#6b7280">SQ 32 \u00b7 Seat 11A \u00b7 The LINE SF</div>
+  </div>
+  <div class="card" style="padding:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-size:15px;font-weight:700">Tokyo</div>
+        <div style="font-size:12px;color:#6b7280">Apr 7\u201311 \u00b7 Asia Crypto Week</div>
+      </div>
+      <div style="font-size:12px;font-weight:600;color:#6b7280;background:#f3f4f6;padding:4px 10px;border-radius:8px">In 25 days</div>
+    </div>
+  </div>
+</div>
+
+<div class="card tip-card">
+  <p>This briefing updates daily. Ask your EA in Cowork for a live version with real-time data.</p>
+</div>
+
+<script>
+const SCHEDULE = [
+  { time: '7:40 AM', title: 'Sync with Dennis', icon: '\ud83d\udcf1' },
+  { time: '8:30 AM', title: 'Review deal memos', icon: '\ud83d\udcdd' },
+  { time: '9:00 AM', title: 'IV Team Standup', icon: '\ud83d\udc65' },
+  { time: '9:30 AM', title: 'Portfolio office hours', icon: '\ud83d\udcbc' },
+  { time: '10:30 AM', title: 'DBS Corporate Banking', icon: '\ud83c\udfe6' },
+  { time: '11:30 AM', title: 'CodeWeave deep dive', icon: '\ud83d\udd0d' },
+  { time: '12:00 PM', title: 'Lunch: Networking', icon: '\ud83c\udf7d\ufe0f' },
+  { time: '1:30 PM', title: 'LP update call', icon: '\ud83d\udcde' },
+  { time: '2:30 PM', title: 'NexaFlow metrics review', icon: '\ud83d\udcca' },
+  { time: '3:30 PM', title: 'Legal: Fund II docs', icon: '\u2696\ufe0f' },
+  { time: '4:30 PM', title: 'Founder coffee chat', icon: '\u2615' },
+  { time: '5:30 PM', title: 'Email & follow-up block', icon: '\ud83d\udce7' },
+  { time: '7:00 PM', title: 'VC dinner @ Burnt Ends', icon: '\ud83c\udf7d\ufe0f' }
+];
+
+function getGreeting() {
+  const h = new Date().getHours();
+  if (h < 12) return 'Good morning, Dave';
+  if (h < 17) return 'Good afternoon, Dave';
+  return 'Good evening, Dave';
+}
+
+function isNow(timeStr) {
+  const now = new Date();
+  const [hm, ampm] = timeStr.split(' ');
+  let [h, m] = hm.split(':').map(Number);
+  if (ampm === 'PM' && h !== 12) h += 12;
+  if (ampm === 'AM' && h === 12) h = 0;
+  const eventTime = h * 60 + m;
+  const currentTime = now.getHours() * 60 + now.getMinutes();
+  return currentTime >= eventTime && currentTime < eventTime + 60;
+}
+
+document.getElementById('greeting').textContent = getGreeting();
+document.getElementById('dateStr').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+document.getElementById('genTime').textContent = 'Updated ' + new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+document.getElementById('schedule').innerHTML = SCHEDULE.map(s =>
+  `<div class="schedule-item ${isNow(s.time) ? 'sched-now' : ''}">
+    <span class="sched-time">${s.time}</span>
+    <span style="font-size:16px">${s.icon}</span>
+    <span class="sched-title">${s.title}</span>
+  </div>`
+).join('');
+</script>
+</body>
+</html>
