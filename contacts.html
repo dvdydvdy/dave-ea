@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#fafafa">
+<title>Contacts CRM - Dave's EA</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  ::-webkit-scrollbar { display: none; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro", "Segoe UI", Roboto, sans-serif;
+    background: #fafafa; color: #111827;
+    max-width: 480px; margin: 0 auto;
+    min-height: 100vh; padding-bottom: 32px; overflow-x: hidden;
+  }
+  .card { background: #fff; border-radius: 14px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,.04); margin-bottom: 10px; }
+  .header { padding: 20px 20px 0; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .back-btn { background: none; border: none; cursor: pointer; font-size: 14px; color: #4f46e5; font-weight: 600; font-family: inherit; display: flex; align-items: center; gap: 4px; }
+  .section { padding: 0 16px; margin-bottom: 24px; }
+
+  /* Search */
+  .search-bar { margin: 0 16px 16px; position: relative; }
+  .search-bar input { width: 100%; padding: 12px 16px 12px 40px; border: 1px solid #e5e7eb; border-radius: 12px; font-size: 14px; font-family: inherit; background: #fff; outline: none; }
+  .search-bar input:focus { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,.1); }
+  .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #9ca3af; }
+
+  /* Filter tabs */
+  .filter-bar { display: flex; gap: 8px; padding: 0 16px; margin-bottom: 16px; overflow-x: auto; }
+  .filter-btn { padding: 6px 14px; border-radius: 20px; border: 1px solid #e5e7eb; background: #fff; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; font-family: inherit; transition: all .15s; }
+  .filter-btn.active { background: #4f46e5; color: #fff; border-color: #4f46e5; }
+
+  /* Contact card */
+  .contact-card { padding: 14px 16px; cursor: pointer; transition: background .15s; }
+  .contact-card:hover { background: #f9fafb; }
+  .contact-row { display: flex; align-items: center; gap: 12px; }
+  .avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; color: #fff; flex-shrink: 0; }
+  .contact-name { font-size: 14px; font-weight: 600; }
+  .contact-role { font-size: 12px; color: #6b7280; margin-top: 1px; }
+  .contact-meta { display: flex; gap: 12px; margin-top: 8px; flex-wrap: wrap; }
+  .meta-tag { font-size: 11px; color: #6b7280; display: flex; align-items: center; gap: 4px; }
+  .strength-bar { width: 48px; height: 4px; background: #f3f4f6; border-radius: 2px; overflow: hidden; }
+  .strength-fill { height: 100%; border-radius: 2px; }
+
+  /* Detail modal */
+  .detail-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 80; display: flex; align-items: flex-end; justify-content: center; }
+  .detail-modal { background: #fff; border-radius: 20px 20px 0 0; width: 100%; max-width: 480px; max-height: 85vh; overflow-y: auto; padding: 24px 20px 40px; box-shadow: 0 -8px 32px rgba(0,0,0,.15); animation: slideUp .3s ease; }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .detail-header { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+  .detail-avatar { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; color: #fff; }
+  .detail-name { font-size: 20px; font-weight: 700; }
+  .detail-role { font-size: 13px; color: #6b7280; }
+  .detail-section { margin-bottom: 16px; }
+  .detail-section h3 { font-size: 13px; font-weight: 600; color: #4f46e5; margin-bottom: 8px; }
+  .detail-section p { font-size: 13px; color: #374151; line-height: 1.5; }
+  .note-item { padding: 8px 0; border-bottom: 1px solid #f3f4f6; font-size: 13px; }
+  .note-date { font-size: 11px; color: #9ca3af; }
+
+  .tip-card { padding: 12px 16px; margin: 0 16px 16px; background: #eef2ff; border-color: #c7d2fe; }
+  .tip-card p { font-size: 12px; color: #4f46e5; font-weight: 500; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <button class="back-btn" onclick="window.location.href='index.html'">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    EA Home
+  </button>
+  <span style="font-size:13px;font-weight:600;color:#4f46e5" id="contactCount"></span>
+</div>
+
+<div style="padding:0 16px;margin-bottom:16px">
+  <h1 style="font-size:24px;font-weight:800">Contacts</h1>
+  <p style="font-size:13px;color:#6b7280;margin-top:4px">Your network & relationship tracker</p>
+</div>
+
+<div class="search-bar">
+  <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+  <input type="text" placeholder="Search contacts..." id="searchInput" oninput="render()">
+</div>
+
+<div class="filter-bar" id="filters"></div>
+<div class="section" id="contactList"></div>
+<div id="modal"></div>
+
+<div class="card tip-card">
+  <p>Ask your EA in Cowork to add contacts, log interactions, or prep relationship briefs before meetings.</p>
+</div>
+
+<script>
+const COLORS = ['#4f46e5','#0891b2','#7c3aed','#059669','#d97706','#dc2626','#2563eb','#9333ea'];
+function colorFor(name) { let h = 0; for (let i = 0; i < name.length; i++) h = name.charCodeAt(i) + ((h << 5) - h); return COLORS[Math.abs(h) % COLORS.length]; }
+function initials(name) { return name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase(); }
+
+const CONTACTS = [
+  { name: 'Dennis Phelps', role: 'GP, Informed Ventures', company: 'Informed Ventures', category: 'partner', strength: 95, lastContact: '2026-03-13', tags: ['co-founder','fund'], notes: ['Weekly sync every Friday 7:40 AM','Discussing Fund II strategy','LP intro pipeline review'] },
+  { name: 'Sarah Chen', role: 'Partner, Sequoia Capital', company: 'Sequoia Capital', category: 'investor', strength: 72, lastContact: '2026-03-10', tags: ['LP prospect','co-invest'], notes: ['Met at SaaStr 2025','Interested in our B2B SaaS thesis','Follow up after SF trip'] },
+  { name: 'Marcus Thompson', role: 'CEO, DataMesh AI', company: 'DataMesh AI', category: 'portfolio', strength: 88, lastContact: '2026-03-12', tags: ['series-a','ai/ml'], notes: ['Series A closed $12M','Monthly board call 2nd Tuesday','Hiring VP Eng - need intros'] },
+  { name: 'Yuki Tanaka', role: 'MD, SoftBank Ventures', company: 'SoftBank Ventures', category: 'investor', strength: 60, lastContact: '2026-02-28', tags: ['LP prospect','asia'], notes: ['Tokyo meeting scheduled Apr 8','$50M allocation to emerging managers','Warm intro via Masa\'s office'] },
+  { name: 'Alex Rivera', role: 'Founder, NexaFlow', company: 'NexaFlow', category: 'portfolio', strength: 82, lastContact: '2026-03-11', tags: ['seed','fintech'], notes: ['Seed round $3.5M','Revenue growing 15% MoM','Need to review Q1 metrics'] },
+  { name: 'James Liu', role: 'Partner, a16z Crypto', company: 'a16z', category: 'investor', strength: 55, lastContact: '2026-02-15', tags: ['co-invest','crypto'], notes: ['Met at ETH Denver','Open to co-investments in DeFi','Reconnect at Token2049'] },
+  { name: 'Priya Sharma', role: 'COO, CloudKitchen Asia', company: 'CloudKitchen Asia', category: 'portfolio', strength: 78, lastContact: '2026-03-08', tags: ['series-b','southeast-asia'], notes: ['Series B prep underway','Need to connect with Goldman team','Expansion to Vietnam Q2'] },
+  { name: 'Tom Walsh', role: 'Managing Partner, Bridgepoint', company: 'Bridgepoint Capital', category: 'lp', strength: 85, lastContact: '2026-03-05', tags: ['LP','fund-of-funds'], notes: ['Committed $5M to Fund I','Annual review meeting Q2','Interested in Fund II'] },
+  { name: 'Rachel Kim', role: 'Founder, HealthBridge', company: 'HealthBridge', category: 'pipeline', strength: 40, lastContact: '2026-03-01', tags: ['pre-seed','healthtech'], notes: ['Warm intro from YC batch','Interesting AI diagnostics play','Schedule deep dive call'] },
+  { name: 'Wei Zhang', role: 'CTO, TechFlow', company: 'TechFlow', category: 'portfolio', strength: 70, lastContact: '2026-03-09', tags: ['seed','developer-tools'], notes: ['Technical advisor relationship','Monthly product review','Need to discuss pivot strategy'] }
+];
+
+const CATEGORIES = ['all','partner','portfolio','investor','lp','pipeline'];
+let activeFilter = 'all';
+let openContact = null;
+
+function strengthColor(s) { return s >= 80 ? '#16a34a' : s >= 50 ? '#d97706' : '#ef4444'; }
+function daysSince(d) { return Math.floor((Date.now() - new Date(d)) / 86400000); }
+
+function render() {
+  const q = (document.getElementById('searchInput').value || '').toLowerCase();
+  let filtered = CONTACTS;
+  if (activeFilter !== 'all') filtered = filtered.filter(c => c.category === activeFilter);
+  if (q) filtered = filtered.filter(c => c.name.toLowerCase().includes(q) || c.company.toLowerCase().includes(q) || c.tags.some(t => t.includes(q)));
+
+  document.getElementById('contactCount').textContent = `${filtered.length} contacts`;
+
+  // Filters
+  document.getElementById('filters').innerHTML = CATEGORIES.map(cat =>
+    `<button class="filter-btn ${activeFilter === cat ? 'active' : ''}" onclick="activeFilter='${cat}';render()">${cat === 'all' ? 'All' : cat === 'lp' ? 'LPs' : cat.charAt(0).toUpperCase() + cat.slice(1)}</button>`
+  ).join('');
+
+  // List
+  let h = '';
+  filtered.sort((a,b) => new Date(b.lastContact) - new Date(a.lastContact)).forEach((c, i) => {
+    const days = daysSince(c.lastContact);
+    const daysLabel = days === 0 ? 'Today' : days === 1 ? 'Yesterday' : `${days}d ago`;
+    h += `<div class="card contact-card" onclick="openDetail(${CONTACTS.indexOf(c)})">
+      <div class="contact-row">
+        <div class="avatar" style="background:${colorFor(c.name)}">${initials(c.name)}</div>
+        <div style="flex:1;min-width:0">
+          <div class="contact-name">${c.name}</div>
+          <div class="contact-role">${c.role}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:11px;color:${days > 14 ? '#ef4444' : '#6b7280'}">${daysLabel}</div>
+          <div class="strength-bar" style="margin-top:4px">
+            <div class="strength-fill" style="width:${c.strength}%;background:${strengthColor(c.strength)}"></div>
+          </div>
+        </div>
+      </div>
+      <div class="contact-meta">
+        ${c.tags.slice(0,3).map(t => `<span class="meta-tag">${t}</span>`).join('')}
+      </div>
+    </div>`;
+  });
+  document.getElementById('contactList').innerHTML = h || '<div style="text-align:center;padding:24px;color:#6b7280;font-size:13px">No contacts match your search.</div>';
+}
+
+function openDetail(idx) {
+  const c = CONTACTS[idx];
+  const days = daysSince(c.lastContact);
+  const daysLabel = days === 0 ? 'Today' : days === 1 ? 'Yesterday' : `${days} days ago`;
+  document.getElementById('modal').innerHTML = `<div class="detail-overlay" onclick="if(event.target===this)closeDetail()">
+    <div class="detail-modal">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+        <button onclick="closeDetail()" style="background:none;border:none;cursor:pointer;font-size:20px;color:#6b7280">\u2715</button>
+      </div>
+      <div class="detail-header">
+        <div class="detail-avatar" style="background:${colorFor(c.name)}">${initials(c.name)}</div>
+        <div>
+          <div class="detail-name">${c.name}</div>
+          <div class="detail-role">${c.role}</div>
+        </div>
+      </div>
+      <div class="detail-section">
+        <h3>Relationship</h3>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="flex:1;height:8px;background:#f3f4f6;border-radius:4px;overflow:hidden">
+            <div style="width:${c.strength}%;height:100%;background:${strengthColor(c.strength)};border-radius:4px"></div>
+          </div>
+          <span style="font-size:13px;font-weight:700;color:${strengthColor(c.strength)}">${c.strength}%</span>
+        </div>
+        <p style="margin-top:6px;font-size:12px;color:#6b7280">Last contact: ${daysLabel} (${c.lastContact})</p>
+      </div>
+      <div class="detail-section">
+        <h3>Tags</h3>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          ${c.tags.map(t => `<span style="font-size:11px;padding:4px 10px;background:#eef2ff;color:#4f46e5;border-radius:8px;font-weight:500">${t}</span>`).join('')}
+        </div>
+      </div>
+      <div class="detail-section">
+        <h3>Notes & Context</h3>
+        ${c.notes.map(n => `<div class="note-item">${n}</div>`).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+function closeDetail() { document.getElementById('modal').innerHTML = ''; }
+
+render();
+</script>
+</body>
+</html>
