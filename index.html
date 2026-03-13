@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#fafafa">
+<title>Dave's EA</title>
+<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiRGF2ZSdzIEVBIiwic2hvcnRfbmFtZSI6IkVBIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiI2ZhZmFmYSIsInRoZW1lX2NvbG9yIjoiIzRmNDZlNSJ9">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  ::-webkit-scrollbar { display: none; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro", "Segoe UI", Roboto, sans-serif;
+    background: #fafafa; color: #111827;
+    max-width: 480px; margin: 0 auto;
+    min-height: 100vh; min-height: 100dvh;
+    padding-bottom: 72px;
+    overflow-x: hidden;
+  }
+  .card { background: #fff; border-radius: 14px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+  .text-sec { color: #6b7280; }
+  .accent { color: #4f46e5; }
+  .btn { background: none; border: none; cursor: pointer; font-family: inherit; }
+
+  /* Toast */
+  .toast { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); background: #111827; color: #fff; padding: 10px 20px; border-radius: 12px; font-size: 14px; z-index: 100; max-width: 90vw; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,.2); animation: slideDown .3s ease; }
+  @keyframes slideDown { from { opacity:0; transform: translate(-50%,-20px); } to { opacity:1; transform: translate(-50%,0); } }
+
+  /* Voice modal */
+  .voice-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 99; display: flex; align-items: center; justify-content: center; }
+  .voice-modal { background: #fff; border-radius: 24px; padding: 40px; text-align: center; width: 300px; box-shadow: 0 24px 48px rgba(0,0,0,.15); }
+  .mic-circle { width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+  .mic-circle.listening { background: #ef4444; animation: pulse 1.5s infinite; }
+  .mic-circle.idle { background: #4f46e5; }
+  @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+
+  /* Header */
+  .header { padding: 20px 20px 0; display: flex; justify-content: space-between; align-items: center; }
+  .mic-btn { width: 44px; height: 44px; border-radius: 50%; border: none; background: #4f46e5; color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(79,70,229,.3); }
+
+  /* Summary grid */
+  .summary-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+  .summary-card { padding: 14px 12px; text-align: center; }
+  .summary-card .num { font-size: 22px; font-weight: 700; }
+  .summary-card .lbl { font-size: 11px; color: #6b7280; }
+
+  /* Quick actions */
+  .quick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .quick-btn { display: flex; align-items: center; gap: 10px; padding: 14px 12px; text-align: left; font-size: 13px; font-weight: 500; }
+  .quick-icon { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+
+  /* Event card */
+  .evt-card { padding: 12px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
+  .evt-card .icon { font-size: 18px; flex-shrink: 0; }
+  .evt-card .title { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .evt-card .meta { font-size: 11px; color: #6b7280; margin-top: 2px; }
+
+  /* Schedule full */
+  .evt-full { padding: 14px 16px; margin-bottom: 10px; }
+  .evt-full .icon { font-size: 20px; margin-top: 2px; flex-shrink: 0; }
+  .evt-full .title { font-size: 14px; font-weight: 600; }
+  .evt-full .detail { display: flex; align-items: center; gap: 6px; margin-top: 4px; font-size: 12px; color: #6b7280; }
+
+  /* Todo */
+  .todo-item { padding: 12px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
+  .todo-item.high { border-left: 3px solid #ef4444; }
+  .todo-item.medium { border-left: 3px solid #f59e0b; }
+  .todo-item.low { border-left: 3px solid #6b7280; }
+  .todo-text { font-size: 13px; flex: 1; }
+  .todo-done { opacity: 0.5; }
+  .todo-done .todo-text { text-decoration: line-through; }
+
+  /* Add todo */
+  .add-form { padding: 16px; margin-bottom: 16px; border-color: #4f46e5 !important; box-shadow: 0 4px 16px rgba(79,70,229,.1); }
+  .add-form input { width: 100%; border: none; outline: none; font-size: 14px; background: transparent; margin-bottom: 12px; font-family: inherit; }
+  .priority-btns { display: flex; gap: 8px; align-items: center; }
+  .pri-btn { padding: 4px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; text-transform: capitalize; }
+  .add-btn { padding: 6px 16px; border-radius: 8px; border: none; background: #4f46e5; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; margin-left: auto; }
+
+  /* Email */
+  .email-card { padding: 14px 16px; margin-bottom: 10px; }
+  .email-card.important { border-left: 3px solid #6366f1; }
+
+  /* Bottom nav */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 480px; background: #fff;
+    border-top: 1px solid #e5e7eb; display: flex; justify-content: space-around;
+    padding: 8px 0; padding-bottom: max(8px, env(safe-area-inset-bottom));
+    z-index: 50;
+  }
+  .nav-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 10px; padding: 4px 12px; color: #6b7280; font-weight: 400; }
+  .nav-btn.active { color: #4f46e5; font-weight: 600; }
+
+  /* Section */
+  .section { padding: 12px 20px; }
+  .section-title { font-size: 14px; font-weight: 600; margin-bottom: 10px; }
+  .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+
+  /* SVG icons inline */
+  .icon-sm { width: 12px; height: 12px; }
+  .icon-md { width: 16px; height: 16px; }
+  .icon-lg { width: 20px; height: 20px; }
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<script>
+// âââ Data ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+const TODAY_EVENTS = [
+  { time: "12:00 AM â 3:50 AM", title: "Claude", icon: "ð»" },
+  { time: "2:00 AM â 2:25 AM", title: "Call: Valerie Osband Mahoney (NFX)", icon: "ð", location: "Zoom" },
+  { time: "3:00 AM â 3:45 AM", title: "Coffee with Cami @ Blue Bottle", icon: "â", location: "Blue Bottle, 2 S Park St" },
+  { time: "4:00 AM â 5:00 AM", title: "David / Cathryn", icon: "ð¤", location: "South Beach Cafe" },
+  { time: "5:00 AM â 5:40 AM", title: "Claude", icon: "ð»" },
+  { time: "8:00 AM â 8:30 AM", title: "Chuk <> Informed Ventures", icon: "ð", location: "Zoom" },
+  { time: "8:45 AM â 9:15 AM", title: "Elephants <> Informed Ventures", icon: "ð", location: "Zoom" },
+  { time: "9:00 AM â 10:00 AM", title: "IV Fintech Sync / Presentations", icon: "ð", location: "Zoom" },
+  { time: "9:15 AM â 9:45 AM", title: "Rhythmic <> Informed Ventures", icon: "ð", location: "Zoom" },
+  { time: "9:30 AM â 11:30 AM", title: "Private Party with Didi's CFO", icon: "ð", location: "1235D Howard St, SF" },
+  { time: "12:00 PM â 12:40 PM", title: "Mandy event", icon: "ð" },
+  { time: "11:30 PM â 12:00 AM", title: "Informed x Anna (Perena)", icon: "ð", location: "Google Meet" },
+];
+
+const TOMORROW_EVENTS = [
+  { time: "12:30 AM", title: "Informed Ventures & Gus Ba", icon: "ð" },
+  { time: "1:00 AM", title: "David Yin & Variant", icon: "ð" },
+  { time: "1:30 AM", title: "Dennis Cong's Zoom", icon: "ð" },
+  { time: "2:00 AM", title: "Informed & Sahil Hasan", icon: "ð" },
+  { time: "3:00 AM", title: "David Yin & Will Robinson", icon: "ð" },
+  { time: "5:00 AM", title: "Prep for Zoom call", icon: "ð»" },
+  { time: "6:00 AM", title: "Dennis a16z speedrun call", icon: "ð" },
+  { time: "7:00 AM", title: "Linda Sheng @ BB Visa", icon: "ð¤" },
+  { time: "8:00 AM", title: "Trovy <> Informed Ventures", icon: "ð", location: "Zoom" },
+  { time: "5:00 PM", title: "Sutton Capital PE & VC Summit", icon: "ð", location: "1 Embarcadero Ctr" },
+  { time: "6:30 PM", title: "Chinese Founders Dinner (Altos)", icon: "ð½ï¸", location: "250 California Dr, Burlingame" },
+];
+
+const EMAILS = [
+  { from: "Self", subject: "3/11/26 Elephants", snippet: "AI native, stablecoin as banking 2.0, custody...", time: "11:22 PM", important: true },
+  { from: "Self (IV)", subject: "Meeting recap - Chuk <> IV", snippet: "Fireflies meeting summary forwarded", time: "4:43 PM", important: true },
+  { from: "Self (IV)", subject: "Meeting Summary - Informed <> CMT", snippet: "Zoom AI companion summary", time: "6:34 AM", important: false },
+  { from: "Self (IV)", subject: "Meeting Summary - Miranda/Tony", snippet: "Zoom AI companion summary", time: "6:33 AM", important: false },
+];
+
+// âââ State âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+let state = {
+  tab: "home",
+  todos: [
+    { id: 1, text: "Schedule Elephants call follow-up", priority: "high", done: false },
+    { id: 2, text: "Plan next week at Stanford", priority: "high", done: false },
+    { id: 3, text: "Check Sutton Capital speaker list", priority: "medium", done: false },
+    { id: 4, text: "Review Bento / Trovy", priority: "medium", done: false },
+    { id: 5, text: "Reach out to Qi Wang / Mia", priority: "low", done: false },
+    { id: 6, text: "Connect with Yu Hang", priority: "low", done: false },
+    { id: 7, text: "Tiantong Zhou LinkedIn review", priority: "low", done: false },
+    { id: 8, text: "Yu Wang LinkedIn review", priority: "low", done: false },
+  ],
+  showAdd: false,
+  newTodo: "",
+  newPriority: "medium",
+  toast: "",
+  listening: false,
+  voiceModal: false,
+  voiceText: "",
+};
+
+function now() {
+  return new Date(new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" }));
+}
+
+function greeting() {
+  const h = now().getHours();
+  return h < 12 ? "morning" : h < 18 ? "afternoon" : "evening";
+}
+
+function dateStr() {
+  return now().toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" });
+}
+
+function shortDate() {
+  return now().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+}
+
+const priColor = p => p === "high" ? "#ef4444" : p === "medium" ? "#f59e0b" : "#6b7280";
+const priBg = p => p === "high" ? "#fef2f2" : p === "medium" ? "#fffbeb" : "#f9fafb";
+const pending = () => state.todos.filter(t => !t.done).sort((a,b) => {const o={high:0,medium:1,low:2}; return o[a.priority]-o[b.priority];});
+const done = () => state.todos.filter(t => t.done);
+
+// âââ SVG Icons âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+const icons = {
+  mic: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>',
+  home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+  cal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>',
+  list: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="6" height="6" rx="1"/><path d="m3 17 2 2 4-4"/><line x1="13" x2="21" y1="6" y2="6"/><line x1="13" x2="21" y1="12" y2="12"/><line x1="13" x2="21" y1="18" y2="18"/></svg>',
+  inbox: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>',
+  clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+  pin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>',
+  circle: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+  plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>',
+  trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
+  mail: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>',
+  checksq: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
+};
+
+function icon(name, size=20, color="currentColor") {
+  return `<span style="display:inline-flex;width:${size}px;height:${size}px;color:${color}">${icons[name]||""}</span>`;
+}
+
+// âââ Voice âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+let recognition = null;
+
+function startVoice() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { showToast("Voice not supported. Try Chrome."); return; }
+  recognition = new SR();
+  recognition.continuous = false;
+  recognition.interimResults = true;
+  recognition.lang = "en-US";
+  recognition.onstart = () => { state.listening = true; state.voiceModal = true; state.voiceText = ""; render(); };
+  recognition.onresult = (e) => {
+    state.voiceText = Array.from(e.results).map(r => r[0].transcript).join("");
+    render();
+    if (e.results[0].isFinal) processVoice(state.voiceText);
+  };
+  recognition.onerror = () => { state.listening = false; state.voiceModal = false; render(); };
+  recognition.onend = () => { state.listening = false; render(); };
+  recognition.start();
+}
+
+function stopVoice() {
+  if (recognition) recognition.stop();
+  state.listening = false; state.voiceModal = false; render();
+}
+
+function processVoice(text) {
+  const l = text.toLowerCase();
+  setTimeout(() => {
+    if (l.includes("add todo") || l.includes("add task") || l.includes("remind me")) {
+      const task = text.replace(/add (todo|task)|remind me (to)?/gi, "").trim();
+      if (task) { state.todos.push({ id: Date.now(), text: task, priority: "medium", done: false }); showToast(`Added: "${task}"`); }
+    } else if (l.includes("what's next") || l.includes("next meeting")) {
+      showToast("Check your schedule tab for upcoming events.");
+    } else if (l.includes("inbox") || l.includes("email")) {
+      state.tab = "inbox"; showToast("Here's your inbox.");
+    } else if (l.includes("briefing") || l.includes("my day") || l.includes("what's today")) {
+      state.tab = "home"; showToast(`${TODAY_EVENTS.length} events today. ${pending().length} open tasks.`);
+    } else if (l.includes("show task") || l.includes("show todo")) {
+      state.tab = "todos"; showToast("Here are your tasks.");
+    } else {
+      showToast(`Heard: "${text}". Try "add task...", "what's next", or "briefing".`);
+    }
+    state.voiceModal = false; render();
+  }, 400);
+}
+
+function showToast(msg) {
+  state.toast = msg; render();
+  setTimeout(() => { state.toast = ""; render(); }, 3500);
+}
+
+// âââ Actions âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+function toggleTodo(id) { const t = state.todos.find(x => x.id === id); if (t) t.done = !t.done; render(); }
+function deleteTodo(id) { state.todos = state.todos.filter(x => x.id !== id); render(); }
+function addTodo() {
+  const inp = document.getElementById("new-todo-input");
+  if (!inp || !inp.value.trim()) return;
+  state.todos.push({ id: Date.now(), text: inp.value.trim(), priority: state.newPriority, done: false });
+  state.newTodo = ""; state.showAdd = false; render();
+}
+function setTab(t) { state.tab = t; render(); }
+
+// âââ Render ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+function render() {
+  const app = document.getElementById("app");
+  let html = "";
+
+  // Toast
+  if (state.toast) html += `<div class="toast">${esc(state.toast)}</div>`;
+
+  // Voice modal
+  if (state.voiceModal) {
+    html += `<div class="voice-overlay" onclick="stopVoice()">
+      <div class="voice-modal" onclick="event.stopPropagation()">
+        <div class="mic-circle ${state.listening?'listening':'idle'}">${icon('mic',32,'#fff')}</div>
+        <p style="font-size:16px;font-weight:600;margin-bottom:8px">${state.listening?'Listening...':'Processing...'}</p>
+        <p style="font-size:14px;color:#6b7280;min-height:40px">${esc(state.voiceText) || 'Try: "Add task review deck" or "What\'s next?"'}</p>
+        <button class="btn" onclick="stopVoice()" style="margin-top:16px;padding:8px 24px;border-radius:8px;border:1px solid #e5e7eb;font-size:14px">Cancel</button>
+      </div>
+    </div>`;
+  }
+
+  // Header
+  html += `<div class="header">
+    <div>
+      <p style="font-size:13px;color:#6b7280">${dateStr()}</p>
+      <h1 style="font-size:26px;font-weight:700;margin:2px 0 0">Good ${greeting()}, Dave</h1>
+    </div>
+    <button class="mic-btn" onclick="startVoice()">${icon('mic',20,'#fff')}</button>
+  </div>`;
+
+  // Tabs
+  if (state.tab === "home") html += renderHome();
+  else if (state.tab === "schedule") html += renderSchedule();
+  else if (state.tab === "todos") html += renderTodos();
+  else if (state.tab === "inbox") html += renderInbox();
+
+  // Bottom nav
+  html += `<div class="bottom-nav">
+    ${navBtn("home","Home","home")}
+    ${navBtn("schedule","Schedule","cal")}
+    ${navBtn("todos","Tasks","list")}
+    ${navBtn("inbox","Inbox","inbox")}
+  </div>`;
+
+  app.innerHTML = html;
+}
+
+function navBtn(id, label, ic) {
+  return `<button class="btn nav-btn ${state.tab===id?'active':''}" onclick="setTab('${id}')">
+    ${icon(ic,20)} ${label}
+  </button>`;
+}
+
+function renderHome() {
+  const p = pending();
+  let h = `<div class="section">`;
+
+  // Summary
+  h += `<div class="summary-grid">
+    <div class="card summary-card"><div style="display:flex;justify-content:center;margin-bottom:6px;color:#6366f1">${icon('cal',16)}</div><div class="num">${TODAY_EVENTS.length}</div><div class="lbl">Events</div></div>
+    <div class="card summary-card"><div style="display:flex;justify-content:center;margin-bottom:6px;color:#f59e0b">${icon('checksq',16)}</div><div class="num">${p.length}</div><div class="lbl">Tasks</div></div>
+    <div class="card summary-card"><div style="display:flex;justify-content:center;margin-bottom:6px;color:#ef4444">${icon('mail',16)}</div><div class="num">201</div><div class="lbl">Unread</div></div>
+  </div>`;
+
+  // Quick actions
+  h += `<div style="margin-bottom:20px">
+    <h3 class="section-title">Quick Actions</h3>
+    <div class="quick-grid">
+      <button class="btn card quick-btn" onclick="showToast('Use voice or Cowork: schedule meeting')"><div class="quick-icon" style="background:#6366f115;color:#6366f1">${icon('cal',18)}</div>Schedule meeting</button>
+      <button class="btn card quick-btn" onclick="showToast('Use voice or Cowork: block focus time')"><div class="quick-icon" style="background:#8b5cf615;color:#8b5cf6">${icon('clock',18)}</div>Block focus time</button>
+      <button class="btn card quick-btn" onclick="showToast('Use voice or Cowork: draft email')"><div class="quick-icon" style="background:#3b82f615;color:#3b82f6">${icon('mail',18)}</div>Draft email</button>
+      <button class="btn card quick-btn" onclick="state.tab='todos';state.showAdd=true;render()"><div class="quick-icon" style="background:#10b98115;color:#10b981">${icon('plus',18)}</div>Add task</button>
+    </div>
+  </div>`;
+
+  // Today schedule preview
+  h += `<div style="margin-bottom:20px"><div class="section-header"><h3 style="font-size:14px;font-weight:600">Today's Schedule</h3><span class="accent" style="font-size:12px;cursor:pointer" onclick="setTab('schedule')">See all â</span></div>`;
+  TODAY_EVENTS.slice(0,5).forEach(e => {
+    h += `<div class="card evt-card"><span class="icon">${e.icon}</span><div style="flex:1;min-width:0"><p class="title">${esc(e.title)}</p><p class="meta">${esc(e.time)}${e.location?' Â· '+esc(e.location):''}</p></div></div>`;
+  });
+  h += `</div>`;
+
+  // Top tasks
+  h += `<div><div class="section-header"><h3 style="font-size:14px;font-weight:600">Top Tasks</h3><span class="accent" style="font-size:12px;cursor:pointer" onclick="setTab('todos')">See all â</span></div>`;
+  p.filter(t=>t.priority==="high").slice(0,3).forEach(t => {
+    h += `<div class="card evt-card" style="cursor:pointer" onclick="toggleTodo(${t.id})">
+      <span style="color:${priColor(t.priority)}">${icon('circle',20)}</span>
+      <span style="font-size:13px;flex:1">${esc(t.text)}</span>
+      <div style="width:8px;height:8px;border-radius:50%;background:${priColor(t.priority)}"></div>
+    </div>`;
+  });
+  h += `</div></div>`;
+  return h;
+}
+
+function renderSchedule() {
+  let h = `<div class="section">
+    <h3 style="font-size:16px;font-weight:600;margin-bottom:4px">Today, ${shortDate()}</h3>
+    <p style="font-size:12px;color:#6b7280;margin-bottom:16px">${TODAY_EVENTS.length} events Â· PDT</p>`;
+  TODAY_EVENTS.forEach(e => {
+    h += `<div class="card evt-full"><div style="display:flex;align-items:flex-start;gap:12px">
+      <span class="icon">${e.icon}</span><div style="flex:1">
+        <p class="title">${esc(e.title)}</p>
+        <div class="detail">${icon('clock',12,'#6b7280')} ${esc(e.time)}</div>
+        ${e.location?`<div class="detail">${icon('pin',12,'#6b7280')} ${esc(e.location)}</div>`:''}
+      </div></div></div>`;
+  });
+  h += `<h3 style="font-size:16px;font-weight:600;margin:24px 0 4px">Tomorrow, Fri Mar 13</h3>
+    <p style="font-size:12px;color:#6b7280;margin-bottom:16px">${TOMORROW_EVENTS.length} events</p>`;
+  TOMORROW_EVENTS.forEach(e => {
+    h += `<div class="card evt-full"><div style="display:flex;align-items:flex-start;gap:12px">
+      <span class="icon">${e.icon}</span><div style="flex:1">
+        <p class="title">${esc(e.title)}</p>
+        <div class="detail">${icon('clock',12,'#6b7280')} ${esc(e.time)}</div>
+        ${e.location?`<div class="detail">${icon('pin',12,'#6b7280')} ${esc(e.location)}</div>`:''}
+      </div></div></div>`;
+  });
+  h += `</div>`;
+  return h;
+}
+
+function renderTodos() {
+  const p = pending(), d = done();
+  let h = `<div class="section">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <h3 style="font-size:16px;font-weight:600">Tasks (${p.length})</h3>
+      <button class="btn" onclick="state.showAdd=!state.showAdd;render()" style="width:36px;height:36px;border-radius:50%;background:#4f46e5;color:#fff;display:flex;align-items:center;justify-content:center">${icon('plus',18,'#fff')}</button>
+    </div>`;
+
+  if (state.showAdd) {
+    h += `<div class="card add-form">
+      <input id="new-todo-input" placeholder="What needs to be done?" value="${esc(state.newTodo)}" onkeydown="if(event.key==='Enter')addTodo()" oninput="state.newTodo=this.value" autofocus>
+      <div class="priority-btns">
+        ${['high','medium','low'].map(p => `<button class="btn pri-btn" onclick="state.newPriority='${p}';render()" style="border:${state.newPriority===p?'2px':'1px'} solid ${priColor(p)};background:${state.newPriority===p?priBg(p):'transparent'};color:${priColor(p)}">${p}</button>`).join('')}
+        <button class="add-btn" onclick="addTodo()">Add</button>
+      </div>
+    </div>`;
+  }
+
+  p.forEach(t => {
+    h += `<div class="card todo-item ${t.priority}">
+      <button class="btn" onclick="toggleTodo(${t.id})" style="color:#6b7280;padding:0">${icon('circle',20)}</button>
+      <span class="todo-text">${esc(t.text)}</span>
+      <button class="btn" onclick="deleteTodo(${t.id})" style="color:#6b7280;opacity:.4;padding:0">${icon('trash',16)}</button>
+    </div>`;
+  });
+
+  if (d.length) {
+    h += `<p style="font-size:12px;color:#6b7280;margin:20px 0 8px">Completed (${d.length})</p>`;
+    d.forEach(t => {
+      h += `<div class="card todo-item todo-done" style="border-left:3px solid #10b981">
+        <button class="btn" onclick="toggleTodo(${t.id})" style="color:#10b981;padding:0">${icon('check',20)}</button>
+        <span class="todo-text">${esc(t.text)}</span>
+      </div>`;
+    });
+  }
+  h += `</div>`;
+  return h;
+}
+
+function renderInbox() {
+  let h = `<div class="section">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <h3 style="font-size:16px;font-weight:600">Inbox</h3>
+      <span style="font-size:12px;color:#ef4444;font-weight:600;background:#fef2f2;padding:4px 10px;border-radius:8px">~201 unread</span>
+    </div>
+    <div class="card" style="padding:12px 16px;margin-bottom:16px;background:#eef2ff;border-color:#c7d2fe">
+      <p style="font-size:13px;font-weight:600;color:#4f46e5">Most unread are Zoom meeting recaps</p>
+      <p style="font-size:12px;color:#6b7280;margin-top:4px">~8 forwarded Zoom summaries from your IV account. 2 items look actionable.</p>
+    </div>`;
+
+  EMAILS.forEach(e => {
+    h += `<div class="card email-card${e.important?' important':''}">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <p style="font-size:13px;font-weight:600;flex:1">${esc(e.subject)}</p>
+        <span style="font-size:11px;color:#6b7280;white-space:nowrap;margin-left:8px">${e.time}</span>
+      </div>
+      <p style="font-size:12px;color:#6b7280">${esc(e.from)}</p>
+      <p style="font-size:12px;color:#6b7280;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(e.snippet)}</p>
+    </div>`;
+  });
+
+  h += `<div class="card" style="padding:16px;margin-top:16px;text-align:center">
+    <p style="font-size:13px;color:#6b7280">For full inbox triage, ask in Cowork:</p>
+    <p style="font-size:13px;font-weight:600;color:#4f46e5;margin-top:4px">"Triage my emails"</p>
+  </div></div>`;
+  return h;
+}
+
+function esc(s) { const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+// Initial render
+render();
+</script>
+</body>
+</html>
