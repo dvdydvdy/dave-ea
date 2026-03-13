@@ -129,10 +129,6 @@
   .time-dot.upcoming { background: #f59e0b; }
   @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
 
-  /* Birthdays */
-  .bday-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 20px; }
-  .bday-chip { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 8px 12px; font-size: 12px; white-space: nowrap; flex-shrink: 0; }
-
   .icon-sm { width: 12px; height: 12px; }
   .icon-md { width: 16px; height: 16px; }
   .icon-lg { width: 20px; height: 20px; }
@@ -167,8 +163,6 @@ const TOMORROW_EVENTS = [
   { time: "7:00 PM", end: "9:00 PM", title: "SG Networking Dinner", icon: "\ud83c\udf7d\ufe0f", location: "Tamarine, Palo Alto", id: "sg-dinner", type: "networking" },
   { time: "8:45 PM", end: "9:30 PM", title: "Caltrain return", icon: "\ud83d\ude86", id: "caltrain", type: "travel" },
 ];
-
-const BIRTHDAYS = ["Perrine Legoullon", "Jessica Drun", "Dave Girouard", "Zach Newburgh", "Matteo Godi"];
 
 const REMINDERS = ["true north alex chat?", "zhang qiao", "Hako btc"];
 
@@ -269,12 +263,66 @@ let state = {
 // âââ To-do list integration (loads from same localStorage as todo.html) ââââââ
 const TODO_STORAGE_KEY = "dave_todos_v6";
 
+const SEED_TODOS = [
+  {id:1,text:"Schedule Elephants call follow-up",category:"deals",priority:"high",done:false,parentId:null,person:"",deadline:"",nextStep:"",nextStepNote:""},
+  {id:2,text:"Plan next week at Stanford",category:"networking",priority:"high",done:false,parentId:null,person:"",deadline:"",nextStep:"",nextStepNote:""},
+  {id:3,text:"Jefferson \u2192 Holograph project",category:"deals",priority:"medium",done:false,parentId:null,person:"Jefferson",deadline:"",nextStep:"",nextStepNote:""},
+  {id:4,text:"Jefferson \u2192 Kun update (Irene)",category:"deals",priority:"medium",done:false,parentId:null,person:"Jefferson",deadline:"",nextStep:"",nextStepNote:""},
+  {id:5,text:"Asksia update (Michelle)",category:"deals",priority:"medium",done:false,parentId:null,person:"Michelle",deadline:"",nextStep:"",nextStepNote:""},
+  {id:6,text:"Check Sutton Capital speaker list",category:"networking",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"",nextStepNote:""},
+  {id:7,text:"Review Bento / Trovy",category:"deals",priority:"medium",done:false,parentId:null,person:"Dennis",deadline:"",nextStep:"",nextStepNote:""},
+  {id:8,text:"Expensify / expense reports",category:"admin",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"",nextStepNote:""},
+  {id:20,text:"Intern GSB \u2192 JC",category:"iv",priority:"medium",done:false,parentId:null,person:"JC",deadline:"",nextStep:"email",nextStepNote:""},
+  {id:21,text:"Connect to Alex",category:"iv",priority:"medium",done:false,parentId:20,person:"Alex",deadline:"",nextStep:"intro",nextStepNote:""},
+  {id:22,text:"GIC - notes JC",category:"iv",priority:"medium",done:false,parentId:null,person:"JC",deadline:"",nextStep:"draft",nextStepNote:""},
+  {id:23,text:"Intern / full time candidates",category:"iv",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"review",nextStepNote:""},
+  {id:24,text:"Circle intro",category:"iv",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"intro",nextStepNote:""},
+  {id:30,text:"Circle Asia",category:"deals",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"research",nextStepNote:""},
+  {id:31,text:"Jefferson - Kyle",category:"deals",priority:"medium",done:false,parentId:null,person:"Kyle",deadline:"",nextStep:"email",nextStepNote:""},
+  {id:32,text:"Agentic payments",category:"deals",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"research",nextStepNote:""},
+  {id:33,text:"Research Aven",category:"deals",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"research",nextStepNote:""},
+  {id:34,text:"Kairos \u2192 Thu?",category:"deals",priority:"medium",done:false,parentId:null,person:"Thu",deadline:"",nextStep:"intro",nextStepNote:""},
+  {id:35,text:"Noise",category:"deals",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"research",nextStepNote:""},
+  {id:36,text:"Myriad",category:"deals",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"research",nextStepNote:""},
+  {id:37,text:"42",category:"deals",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"research",nextStepNote:""},
+  {id:38,text:"1 Money - intro (London guy?)",category:"deals",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"intro",nextStepNote:""},
+  {id:39,text:"Lex",category:"deals",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"research",nextStepNote:""},
+  {id:40,text:"Harper \u2192 Tyler",category:"deals",priority:"medium",done:false,parentId:null,person:"Tyler",deadline:"",nextStep:"intro",nextStepNote:""},
+  {id:41,text:"Amenify",category:"deals",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"research",nextStepNote:""},
+  {id:42,text:"Klavi - fundraising",category:"deals",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"review",nextStepNote:""},
+  {id:43,text:"Expertise AI",category:"deals",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"research",nextStepNote:""},
+  {id:44,text:"Fusenpack",category:"deals",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"research",nextStepNote:""},
+  {id:45,text:"Cool Mate",category:"deals",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"research",nextStepNote:""},
+  {id:46,text:"Henry Weng \u2192 research",category:"deals",priority:"medium",done:false,parentId:null,person:"Henry Weng",deadline:"",nextStep:"research",nextStepNote:""},
+  {id:47,text:"Efex",category:"deals",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"research",nextStepNote:""},
+  {id:48,text:"Share Klavi",category:"deals",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"email",nextStepNote:""},
+  {id:49,text:"Distilla",category:"deals",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"research",nextStepNote:""},
+  {id:50,text:"Freeport - social marketing",category:"deals",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"",nextStepNote:""},
+  {id:51,text:"Actual paid marketing",category:"deals",priority:"medium",done:false,parentId:50,person:"",deadline:"",nextStep:"research",nextStepNote:""},
+  {id:52,text:"Outsource UGC",category:"deals",priority:"medium",done:false,parentId:50,person:"",deadline:"",nextStep:"research",nextStepNote:""},
+  {id:60,text:"Joyce Zhang - fintech meetup dinner?",category:"networking",priority:"medium",done:false,parentId:null,person:"Joyce Zhang",deadline:"",nextStep:"email",nextStepNote:""},
+  {id:61,text:"Ellen",category:"networking",priority:"medium",done:false,parentId:null,person:"Ellen",deadline:"",nextStep:"email",nextStepNote:""},
+  {id:65,text:"BeFreed cofounder msg",category:"networking",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"linkedin",nextStepNote:""},
+  {id:70,text:"Reschedule Skywalk",category:"admin",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"schedule",nextStepNote:""},
+  {id:71,text:"Hyperliquid hire",category:"networking",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"linkedin",nextStepNote:""},
+  {id:72,text:"Roy China",category:"iv",priority:"medium",done:false,parentId:null,person:"Roy",deadline:"",nextStep:"email",nextStepNote:""},
+  {id:9,text:"Reach out to Qi Wang / Mia",category:"networking",priority:"low",done:false,parentId:null,person:"",deadline:"",nextStep:"",nextStepNote:""},
+  {id:10,text:"Connect with Yu Hang",category:"networking",priority:"low",done:false,parentId:null,person:"",deadline:"",nextStep:"",nextStepNote:""},
+  {id:11,text:"Tiantong Zhou LinkedIn review",category:"networking",priority:"low",done:false,parentId:null,person:"",deadline:"",nextStep:"",nextStepNote:""},
+  {id:12,text:"Yu Wang LinkedIn review",category:"networking",priority:"low",done:false,parentId:null,person:"",deadline:"",nextStep:"",nextStepNote:""},
+  {id:62,text:"May Allen event",category:"networking",priority:"low",done:false,parentId:null,person:"Allen",deadline:"",nextStep:"schedule",nextStepNote:""},
+  {id:63,text:"May Jefferson / fintech events",category:"networking",priority:"low",done:false,parentId:null,person:"",deadline:"",nextStep:"schedule",nextStepNote:""},
+  {id:64,text:"Ramon GSB MBA3",category:"networking",priority:"low",done:false,parentId:null,person:"Ramon",deadline:"",nextStep:"email",nextStepNote:""},
+];
+
 function loadTodos() {
   try {
     const raw = localStorage.getItem(TODO_STORAGE_KEY);
     if (raw) return JSON.parse(raw);
   } catch(e) {}
-  return null;
+  // Seed defaults on first load
+  localStorage.setItem(TODO_STORAGE_KEY, JSON.stringify(SEED_TODOS));
+  return SEED_TODOS;
 }
 
 function getTodos() {
@@ -401,14 +449,26 @@ function startVoice() {
   recognition.continuous = false;
   recognition.interimResults = true;
   recognition.lang = "en-US";
-  recognition.onstart = () => { state.listening = true; state.voiceModal = true; state.voiceText = ""; render(); };
+  let gotResult = false;
+  let voiceTimeout = null;
+  recognition.onstart = () => { state.listening = true; state.voiceModal = true; state.voiceText = ""; gotResult = false; render();
+    voiceTimeout = setTimeout(() => { if (!gotResult) { recognition.stop(); state.listening = false; state.voiceModal = false; showToast("No speech detected. Tap the mic to try again."); render(); } }, 8000);
+  };
   recognition.onresult = (e) => {
+    gotResult = true;
     state.voiceText = Array.from(e.results).map(r => r[0].transcript).join("");
     render();
-    if (e.results[0].isFinal) processVoice(state.voiceText);
+    if (e.results[0].isFinal) { clearTimeout(voiceTimeout); processVoice(state.voiceText); }
   };
-  recognition.onerror = () => { state.listening = false; state.voiceModal = false; render(); };
-  recognition.onend = () => { state.listening = false; render(); };
+  recognition.onerror = (e) => { clearTimeout(voiceTimeout); state.listening = false; state.voiceModal = false;
+    if (e.error === 'not-allowed') showToast("Microphone access denied. Check browser permissions.");
+    else showToast("Voice error. Try again.");
+    render();
+  };
+  recognition.onend = () => { clearTimeout(voiceTimeout); state.listening = false;
+    if (!gotResult) { state.voiceModal = false; showToast("No speech detected. Tap the mic to try again."); }
+    render();
+  };
   recognition.start();
 }
 
@@ -618,12 +678,6 @@ function renderHome() {
       <p style="font-size:12px;color:#6b7280;margin-top:4px">${esc(nextEvt.time)}${nextEvt.location?' \u00b7 '+esc(nextEvt.location):''}</p>
       ${PREP_DATA[nextEvt.id] ? `<button class="btn" onclick="openPrep('${nextEvt.id}')" style="margin-top:10px;padding:6px 14px;border-radius:8px;border:1.5px solid #4f46e5;color:#4f46e5;font-size:12px;font-weight:600">${icon('brain',14,'#4f46e5')} Meeting Prep</button>` : ''}
     </div>`;
-  }
-
-  // Birthdays
-  if (BIRTHDAYS.length > 0) {
-    h += `<div style="margin-bottom:4px"><p style="font-size:12px;color:#6b7280;margin-bottom:6px">\ud83c\udf82 Birthdays today</p>
-    <div class="bday-row">${BIRTHDAYS.map(b => `<span class="bday-chip">${esc(b)}</span>`).join('')}</div></div>`;
   }
 
   // Quick actions - now functional
