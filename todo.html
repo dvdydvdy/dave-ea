@@ -11,86 +11,224 @@
   ::-webkit-scrollbar { display: none; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro", "Segoe UI", Roboto, sans-serif;
-    background: #fafafa; color: #111827;
-    max-width: 480px; margin: 0 auto;
-    min-height: 100vh; padding-bottom: 80px; overflow-x: hidden;
+    background: #f5f5f7; color: #1d1d1f;
+    max-width: 540px; margin: 0 auto;
+    min-height: 100vh; padding-bottom: 40px; overflow-x: hidden;
   }
-  .header { padding: 20px 20px 0; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-  .back-btn { background: none; border: none; cursor: pointer; font-size: 14px; color: #4f46e5; font-weight: 600; font-family: inherit; display: flex; align-items: center; gap: 4px; }
-  .card { background: #fff; border-radius: 14px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,.04); margin-bottom: 10px; }
-  .section { padding: 0 16px; }
 
-  /* Filters */
-  .filter-bar { display: flex; gap: 8px; overflow-x: auto; padding: 0 16px 16px; }
-  .filter-btn { padding: 6px 14px; border-radius: 20px; border: 1px solid #e5e7eb; background: #fff; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; font-family: inherit; }
-  .filter-btn.active { background: #4f46e5; color: #fff; border-color: #4f46e5; }
+  /* Header */
+  .header {
+    position: sticky; top: 0; z-index: 100; background: #f5f5f7;
+    padding: 16px 16px 0; display: flex; justify-content: space-between; align-items: center;
+  }
+  .back-btn { background: none; border: none; cursor: pointer; font-size: 13px; color: #007aff; font-weight: 600; font-family: inherit; display: flex; align-items: center; gap: 4px; }
+  .header-title { font-size: 15px; font-weight: 700; }
 
-  /* Add form */
-  .add-bar { padding: 0 16px 16px; }
-  .add-card { padding: 14px; }
-  .add-card input { width: 100%; border: 1px solid #e5e7eb; border-radius: 10px; padding: 10px 14px; font-size: 14px; font-family: inherit; outline: none; margin-bottom: 10px; }
-  .add-card input:focus { border-color: #4f46e5; }
-  .add-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-  .add-row input { flex: 1; min-width: 100px; margin-bottom: 0; font-size: 12px; padding: 8px 10px; }
-  .pri-btn { padding: 5px 12px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 11px; font-weight: 700; cursor: pointer; text-transform: uppercase; font-family: inherit; background: transparent; }
-  .add-submit { padding: 8px 20px; border-radius: 10px; background: #4f46e5; color: #fff; border: none; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
+  /* Search + Add bar */
+  .top-bar { position: sticky; top: 44px; z-index: 99; background: #f5f5f7; padding: 12px 16px; }
+  .search-row { display: flex; gap: 8px; }
+  .search-input {
+    flex: 1; padding: 10px 14px 10px 36px; border-radius: 12px; border: 1px solid #e5e7eb;
+    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='7' cy='7' r='4.5'/%3E%3Cpath d='M16 16l-3.5-3.5'/%3E%3C/svg%3E") 12px center no-repeat;
+    font-size: 14px; font-family: inherit; outline: none;
+  }
+  .search-input:focus { border-color: #007aff; }
+  .add-btn {
+    width: 40px; height: 40px; border-radius: 12px; background: #007aff; color: #fff;
+    border: none; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
 
-  /* Todo items */
-  .todo-item { padding: 14px 16px; display: flex; align-items: flex-start; gap: 12px; border-bottom: 1px solid #f3f4f6; }
-  .todo-item:last-child { border-bottom: none; }
-  .todo-check { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #d1d5db; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-top: 1px; }
-  .todo-check.high { border-color: #ef4444; }
-  .todo-check.medium { border-color: #f59e0b; }
-  .todo-check.low { border-color: #6b7280; }
-  .todo-check:hover { background: #f3f4f6; }
-  .todo-text { font-size: 14px; font-weight: 500; }
-  .todo-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
-  .todo-meta span { font-size: 11px; color: #6b7280; }
-  .todo-done .todo-text { text-decoration: line-through; color: #9ca3af; }
-  .todo-actions { display: flex; gap: 4px; flex-shrink: 0; }
-  .todo-actions button { background: none; border: none; cursor: pointer; padding: 4px; border-radius: 6px; color: #9ca3af; font-size: 16px; }
-  .todo-actions button:hover { background: #f3f4f6; color: #6b7280; }
+  /* Quick add */
+  .quick-add {
+    background: #fff; border-radius: 14px; border: 1px solid #e5e7eb; margin: 0 16px 12px; padding: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06); display: none;
+  }
+  .quick-add.open { display: block; }
+  .qa-input { width: 100%; border: 1px solid #e5e7eb; border-radius: 10px; padding: 10px 12px; font-size: 14px; font-family: inherit; outline: none; margin-bottom: 10px; }
+  .qa-input:focus { border-color: #007aff; }
+  .qa-row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .qa-select {
+    padding: 6px 10px; border-radius: 8px; border: 1px solid #e5e7eb; font-size: 12px;
+    font-family: inherit; background: #fff; cursor: pointer; outline: none; color: #374151;
+  }
+  .qa-date { padding: 6px 10px; border-radius: 8px; border: 1px solid #e5e7eb; font-size: 12px; font-family: inherit; outline: none; color: #374151; }
+  .qa-pri {
+    width: 24px; height: 24px; border-radius: 50%; border: 2px solid; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800;
+  }
+  .qa-submit { padding: 6px 16px; border-radius: 8px; background: #007aff; color: #fff; border: none; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; margin-left: auto; }
 
-  .pri-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 7px; }
+  /* Stats row */
+  .stats { display: flex; gap: 8px; padding: 0 16px 12px; }
+  .stat { flex: 1; background: #fff; border-radius: 12px; padding: 10px; text-align: center; border: 1px solid #e5e7eb; }
+  .stat-n { font-size: 20px; font-weight: 800; }
+  .stat-l { font-size: 10px; color: #6b7280; font-weight: 600; margin-top: 2px; text-transform: uppercase; letter-spacing: .5px; }
 
-  .empty { padding: 40px 16px; text-align: center; color: #9ca3af; font-size: 14px; }
-  .count-badge { font-size: 12px; font-weight: 700; padding: 2px 10px; border-radius: 10px; }
+  /* Category section */
+  .cat-section { margin: 0 16px 12px; }
+  .cat-header {
+    display: flex; align-items: center; gap: 8px; padding: 10px 14px; cursor: pointer;
+    background: #fff; border-radius: 12px 12px 0 0; border: 1px solid #e5e7eb; border-bottom: none;
+    user-select: none;
+  }
+  .cat-header.collapsed { border-radius: 12px; border-bottom: 1px solid #e5e7eb; }
+  .cat-icon { font-size: 16px; }
+  .cat-name { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; flex: 1; }
+  .cat-count { font-size: 11px; font-weight: 700; color: #6b7280; background: #f3f4f6; padding: 2px 8px; border-radius: 10px; }
+  .cat-chevron { font-size: 12px; color: #9ca3af; transition: transform .2s; }
+  .cat-header.collapsed .cat-chevron { transform: rotate(-90deg); }
+  .cat-body {
+    background: #fff; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;
+    overflow: hidden;
+  }
 
-  /* Stats */
-  .stats { display: flex; gap: 10px; padding: 0 16px 16px; }
-  .stat-card { flex: 1; padding: 14px; text-align: center; }
-  .stat-num { font-size: 22px; font-weight: 800; }
-  .stat-label { font-size: 11px; color: #6b7280; font-weight: 500; margin-top: 2px; }
+  /* Todo item */
+  .todo {
+    display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px;
+    border-bottom: 1px solid #f3f4f6; cursor: grab; position: relative;
+    transition: background .15s;
+  }
+  .todo:last-child { border-bottom: none; }
+  .todo.dragging { opacity: 0.4; }
+  .todo.drag-over-top { box-shadow: inset 0 3px 0 #007aff; }
+  .todo.drag-over-bottom { box-shadow: inset 0 -3px 0 #007aff; }
+  .todo.drag-over-nest { background: #eff6ff; box-shadow: inset 3px 0 0 #007aff; }
+  .todo.nested { padding-left: 34px; }
+  .todo.done-item { opacity: 0.5; }
+
+  /* Priority dot - clickable */
+  .pri-dot {
+    width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; margin-top: 3px;
+    cursor: pointer; transition: transform .15s; border: 2px solid;
+  }
+  .pri-dot:hover { transform: scale(1.3); }
+  .pri-dot.high { background: #ef4444; border-color: #ef4444; }
+  .pri-dot.medium { background: #f59e0b; border-color: #f59e0b; }
+  .pri-dot.low { background: #d1d5db; border-color: #9ca3af; }
+
+  /* Checkbox */
+  .todo-check {
+    width: 20px; height: 20px; border-radius: 6px; border: 2px solid #d1d5db;
+    cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    margin-top: 1px; transition: all .15s;
+  }
+  .todo-check:hover { border-color: #007aff; background: #eff6ff; }
+  .todo-check.checked { background: #16a34a; border-color: #16a34a; }
+  .todo-check.checked::after { content: '✓'; color: #fff; font-size: 12px; font-weight: 700; }
+
+  .todo-content { flex: 1; min-width: 0; }
+  .todo-text { font-size: 14px; font-weight: 500; line-height: 1.3; }
+  .todo-text.struck { text-decoration: line-through; color: #9ca3af; }
+  .todo-meta { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 3px; align-items: center; }
+  .meta-tag { font-size: 11px; color: #6b7280; display: flex; align-items: center; gap: 2px; }
+  .meta-deadline { color: #ef4444; font-weight: 600; }
+  .meta-deadline.far { color: #6b7280; font-weight: 500; }
+
+  /* Category dropdown on item */
+  .cat-dropdown {
+    font-size: 10px; padding: 1px 6px; border-radius: 4px; border: 1px solid #e5e7eb;
+    background: #f9fafb; cursor: pointer; font-family: inherit; color: #6b7280; outline: none;
+    text-transform: uppercase; letter-spacing: .3px; font-weight: 600;
+  }
+
+  /* Delete button */
+  .del-btn {
+    background: none; border: none; cursor: pointer; color: #d1d5db; font-size: 18px;
+    padding: 2px 4px; border-radius: 6px; flex-shrink: 0; line-height: 1;
+  }
+  .del-btn:hover { color: #ef4444; background: #fef2f2; }
 
   /* Completed section */
-  .completed-header { padding: 16px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 13px; font-weight: 600; color: #6b7280; }
+  .done-section { margin: 0 16px 12px; }
+  .done-header {
+    display: flex; align-items: center; gap: 8px; padding: 10px 14px; cursor: pointer;
+    background: #fff; border-radius: 12px; border: 1px solid #e5e7eb; user-select: none;
+  }
+  .done-header.expanded { border-radius: 12px 12px 0 0; border-bottom: none; }
+  .done-body { background: #fff; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px; }
 
-  /* FAB */
-  .fab { position: fixed; bottom: 24px; right: 24px; width: 56px; height: 56px; border-radius: 50%; background: #4f46e5; color: #fff; border: none; font-size: 28px; cursor: pointer; box-shadow: 0 4px 12px rgba(79,70,229,.4); display: flex; align-items: center; justify-content: center; z-index: 10; }
-  .fab:active { transform: scale(0.95); }
+  /* Deadline editor */
+  .deadline-edit {
+    position: absolute; top: 100%; left: 0; right: 0; background: #fff;
+    border: 1px solid #e5e7eb; border-radius: 0 0 12px 12px; padding: 10px 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,.1); z-index: 50; display: flex; gap: 8px; align-items: center;
+  }
 
-  @media (min-width: 481px) { .fab { right: calc(50% - 240px + 24px); } }
+  /* Priority matrix view */
+  .matrix-toggle {
+    padding: 6px 12px; border-radius: 8px; border: 1px solid #e5e7eb; background: #fff;
+    font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; color: #374151;
+  }
+  .matrix-toggle.active { background: #007aff; color: #fff; border-color: #007aff; }
+
+  .footer-note { text-align: center; padding: 16px; font-size: 11px; color: #9ca3af; }
+
+  @media (max-width: 400px) {
+    .stats { gap: 6px; }
+    .stat { padding: 8px 4px; }
+    .stat-n { font-size: 17px; }
+  }
 </style>
 </head>
 <body>
 
 <div class="header">
   <button class="back-btn" onclick="window.location.href='index.html'">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
     EA Home
   </button>
-  <span style="font-size:14px;font-weight:700">📋 To-Do List</span>
+  <span class="header-title">To-Do List</span>
+</div>
+
+<div class="top-bar">
+  <div class="search-row">
+    <input class="search-input" id="searchInput" type="text" placeholder="Search tasks..." oninput="onSearch(this.value)">
+    <button class="add-btn" onclick="toggleQuickAdd()" id="addToggle">+</button>
+  </div>
+</div>
+
+<div class="quick-add" id="quickAdd">
+  <input class="qa-input" id="qaText" placeholder="What needs to be done?" onkeydown="if(event.key==='Enter')submitQuickAdd()">
+  <div class="qa-row">
+    <select class="qa-select" id="qaCat">
+      <option value="deals">Deals</option>
+      <option value="iv">IV</option>
+      <option value="networking">Networking</option>
+      <option value="finance">Finance</option>
+      <option value="personal">Personal</option>
+      <option value="admin">Admin</option>
+    </select>
+    <div class="qa-pri high" id="qaPri" onclick="cycleNewPri()" title="Click to change priority" style="border-color:#f59e0b;background:#f59e0b;">M</div>
+    <input class="qa-date" id="qaDeadline" type="date">
+    <input class="qa-input" id="qaPerson" placeholder="Person" style="flex:1;min-width:60px;margin:0;padding:6px 10px;font-size:12px;">
+    <button class="qa-submit" onclick="submitQuickAdd()">Add</button>
+  </div>
 </div>
 
 <div id="app"></div>
-<button class="fab" onclick="toggleAdd()">+</button>
 
 <script>
 const STORAGE_KEY = "dave_todos_v6";
-let filter = "all"; // all, high, medium, low, done
-let showAdd = false;
+const CATEGORIES = [
+  { key: "deals", name: "Deals", icon: "💼", color: "#6366f1" },
+  { key: "iv", name: "IV", icon: "🏢", color: "#0891b2" },
+  { key: "networking", name: "Networking", icon: "🤝", color: "#059669" },
+  { key: "finance", name: "Finance", icon: "💰", color: "#d97706" },
+  { key: "personal", name: "Personal", icon: "👤", color: "#8b5cf6" },
+  { key: "admin", name: "Admin", icon: "⚙️", color: "#64748b" }
+];
+const CAT_MAP = {};
+CATEGORIES.forEach(c => CAT_MAP[c.key] = c);
+
+const PRI_ORDER = { high: 0, medium: 1, low: 2 };
+const PRI_CYCLE = ['high', 'medium', 'low'];
+
+let searchQuery = '';
+let collapsedCats = {};
 let showCompleted = false;
-let newText = "", newPerson = "", newDeadline = "", newNextStep = "", newCategory = "", newPriority = "medium";
+let showQuickAdd = false;
+let newPri = 'medium';
+let dragId = null;
 
 const SEED_TODOS = [
   {id:1,text:"Schedule Elephants call follow-up",category:"deals",priority:"high",done:false,parentId:null,person:"",deadline:"",nextStep:"",nextStepNote:""},
@@ -144,179 +282,329 @@ const SEED_TODOS = [
   {id:64,text:"Ramon GSB MBA3",category:"networking",priority:"low",done:false,parentId:null,person:"Ramon",deadline:"",nextStep:"email",nextStepNote:""},
 ];
 
+/* ── Data ── */
 function load() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
-  } catch(e) {}
-  // Seed defaults on first load
+  try { const r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch(e) {}
   localStorage.setItem(STORAGE_KEY, JSON.stringify(SEED_TODOS));
-  return SEED_TODOS;
+  return JSON.parse(JSON.stringify(SEED_TODOS));
 }
 function save(todos) { localStorage.setItem(STORAGE_KEY, JSON.stringify(todos)); }
+function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 
-function toggleAdd() { showAdd = !showAdd; render(); if (showAdd) setTimeout(() => { const i = document.getElementById('inp-text'); if(i) i.focus(); }, 50); }
-
-function addTodo() {
-  if (!newText.trim()) return;
+/* ── Priority helpers ── */
+function priClass(p) { return p || 'medium'; }
+function cyclePri(id) {
   const todos = load();
-  const maxId = todos.reduce((m, t) => Math.max(m, t.id || 0), 200);
-  todos.push({
-    id: maxId + 1,
-    text: newText.trim(),
-    priority: newPriority,
-    done: false,
-    person: newPerson.trim() || undefined,
-    deadline: newDeadline.trim() || undefined,
-    nextStep: newNextStep.trim() || undefined,
-    category: newCategory.trim() || undefined,
-    created: new Date().toISOString()
-  });
+  const t = todos.find(x => x.id === id);
+  if (!t) return;
+  const i = PRI_CYCLE.indexOf(t.priority || 'medium');
+  t.priority = PRI_CYCLE[(i + 1) % 3];
   save(todos);
-  newText = ""; newPerson = ""; newDeadline = ""; newNextStep = ""; newCategory = ""; newPriority = "medium";
-  showAdd = false;
   render();
 }
+function cycleNewPri() {
+  const i = PRI_CYCLE.indexOf(newPri);
+  newPri = PRI_CYCLE[(i + 1) % 3];
+  updateNewPriBtn();
+}
+function updateNewPriBtn() {
+  const el = document.getElementById('qaPri');
+  if (!el) return;
+  const colors = { high: '#ef4444', medium: '#f59e0b', low: '#9ca3af' };
+  const labels = { high: 'H', medium: 'M', low: 'L' };
+  el.style.borderColor = colors[newPri];
+  el.style.background = colors[newPri];
+  el.textContent = labels[newPri];
+  el.className = 'qa-pri ' + newPri;
+}
 
+/* ── Actions ── */
 function toggleDone(id) {
   const todos = load();
   const t = todos.find(x => x.id === id);
   if (t) { t.done = !t.done; t.completedAt = t.done ? new Date().toISOString() : undefined; }
-  save(todos);
-  render();
+  save(todos); render();
 }
-
 function deleteTodo(id) {
+  if (!confirm('Delete this task?')) return;
   let todos = load();
+  // Also un-nest children
+  todos.filter(t => t.parentId === id).forEach(t => t.parentId = null);
   todos = todos.filter(x => x.id !== id);
+  save(todos); render();
+}
+function changeCat(id, newCat) {
+  const todos = load();
+  const t = todos.find(x => x.id === id);
+  if (t) t.category = newCat;
+  save(todos); render();
+}
+function setDeadline(id, val) {
+  const todos = load();
+  const t = todos.find(x => x.id === id);
+  if (t) t.deadline = val;
+  save(todos); render();
+}
+
+/* ── Quick Add ── */
+function toggleQuickAdd() {
+  showQuickAdd = !showQuickAdd;
+  const el = document.getElementById('quickAdd');
+  const btn = document.getElementById('addToggle');
+  el.classList.toggle('open', showQuickAdd);
+  btn.textContent = showQuickAdd ? '×' : '+';
+  if (showQuickAdd) setTimeout(() => document.getElementById('qaText').focus(), 50);
+}
+function submitQuickAdd() {
+  const text = document.getElementById('qaText').value.trim();
+  if (!text) return;
+  const cat = document.getElementById('qaCat').value;
+  const deadline = document.getElementById('qaDeadline').value;
+  const person = document.getElementById('qaPerson').value.trim();
+  const todos = load();
+  const maxId = todos.reduce((m, t) => Math.max(m, t.id || 0), 200);
+  todos.push({
+    id: maxId + 1, text, category: cat, priority: newPri, done: false,
+    parentId: null, person: person || '', deadline: deadline || '',
+    nextStep: '', nextStepNote: '', created: new Date().toISOString()
+  });
   save(todos);
+  document.getElementById('qaText').value = '';
+  document.getElementById('qaPerson').value = '';
+  document.getElementById('qaDeadline').value = '';
+  newPri = 'medium'; updateNewPriBtn();
   render();
 }
 
-function priColor(p) {
-  if (p === 'high') return '#ef4444';
-  if (p === 'medium') return '#f59e0b';
-  return '#6b7280';
+/* ── Search ── */
+function onSearch(q) { searchQuery = q.toLowerCase().trim(); render(); }
+
+/* ── Drag & Drop ── */
+function onDragStart(e, id) {
+  dragId = id;
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', id);
+  e.currentTarget.classList.add('dragging');
 }
-function priBg(p) {
-  if (p === 'high') return '#fef2f2';
-  if (p === 'medium') return '#fffbeb';
-  return '#f9fafb';
+function onDragEnd(e) {
+  dragId = null;
+  e.currentTarget.classList.remove('dragging');
+  document.querySelectorAll('.drag-over-top,.drag-over-bottom,.drag-over-nest').forEach(el => {
+    el.classList.remove('drag-over-top','drag-over-bottom','drag-over-nest');
+  });
+}
+function onDragOver(e, id) {
+  e.preventDefault();
+  if (dragId === id) return;
+  const rect = e.currentTarget.getBoundingClientRect();
+  const y = e.clientY - rect.top;
+  const h = rect.height;
+  const el = e.currentTarget;
+  el.classList.remove('drag-over-top','drag-over-bottom','drag-over-nest');
+  if (y < h * 0.25) el.classList.add('drag-over-top');
+  else if (y > h * 0.75) el.classList.add('drag-over-bottom');
+  else el.classList.add('drag-over-nest');
+}
+function onDragLeave(e) {
+  e.currentTarget.classList.remove('drag-over-top','drag-over-bottom','drag-over-nest');
+}
+function onDrop(e, targetId, catKey) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over-top','drag-over-bottom','drag-over-nest');
+  if (!dragId || dragId === targetId) return;
+  const todos = load();
+  const dragItem = todos.find(t => t.id === dragId);
+  const targetItem = todos.find(t => t.id === targetId);
+  if (!dragItem || !targetItem) return;
+
+  const rect = e.currentTarget.getBoundingClientRect();
+  const y = e.clientY - rect.top;
+  const h = rect.height;
+
+  if (y >= h * 0.25 && y <= h * 0.75) {
+    // Nest: make dragItem a child of targetItem
+    dragItem.parentId = targetId;
+    dragItem.category = targetItem.category;
+  } else {
+    // Reorder: move above or below target
+    dragItem.parentId = targetItem.parentId;
+    dragItem.category = targetItem.category || catKey;
+    // Reposition in array
+    const dragIdx = todos.indexOf(dragItem);
+    todos.splice(dragIdx, 1);
+    let targetIdx = todos.indexOf(targetItem);
+    if (y >= h * 0.75) targetIdx++;
+    todos.splice(targetIdx, 0, dragItem);
+  }
+  save(todos);
+  dragId = null;
+  render();
 }
 
-function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+/* ── Deadline formatting ── */
+function fmtDeadline(d) {
+  if (!d) return null;
+  const date = new Date(d + 'T00:00:00');
+  const now = new Date();
+  now.setHours(0,0,0,0);
+  const diff = Math.ceil((date - now) / 86400000);
+  const label = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  if (diff < 0) return { text: label + ' (overdue)', cls: 'meta-deadline' };
+  if (diff === 0) return { text: 'Today', cls: 'meta-deadline' };
+  if (diff === 1) return { text: 'Tomorrow', cls: 'meta-deadline' };
+  if (diff <= 7) return { text: label + ' (' + diff + 'd)', cls: 'meta-deadline' };
+  return { text: label, cls: 'meta-deadline far' };
+}
 
+/* ── Render ── */
 function render() {
   const todos = load();
   const pending = todos.filter(t => !t.done);
   const completed = todos.filter(t => t.done);
-  const highCount = pending.filter(t => t.priority === 'high').length;
-  const medCount = pending.filter(t => t.priority === 'medium').length;
-  const lowCount = pending.filter(t => t.priority === 'low').length;
 
+  // Apply search filter
+  let filtered = pending;
+  if (searchQuery) {
+    filtered = pending.filter(t =>
+      t.text.toLowerCase().includes(searchQuery) ||
+      (t.person || '').toLowerCase().includes(searchQuery) ||
+      (t.category || '').toLowerCase().includes(searchQuery) ||
+      (t.nextStep || '').toLowerCase().includes(searchQuery)
+    );
+  }
+
+  // Group by category
+  const groups = {};
+  CATEGORIES.forEach(c => groups[c.key] = []);
+  filtered.forEach(t => {
+    const cat = t.category || 'admin';
+    if (!groups[cat]) groups[cat] = [];
+    groups[cat].push(t);
+  });
+
+  // Sort within categories: parents first by priority, children after their parent
+  CATEGORIES.forEach(c => {
+    const items = groups[c.key];
+    const parents = items.filter(t => !t.parentId).sort((a, b) => (PRI_ORDER[a.priority||'medium']) - (PRI_ORDER[b.priority||'medium']));
+    const sorted = [];
+    parents.forEach(p => {
+      sorted.push(p);
+      const kids = items.filter(t => t.parentId === p.id).sort((a, b) => (PRI_ORDER[a.priority||'medium']) - (PRI_ORDER[b.priority||'medium']));
+      sorted.push(...kids);
+    });
+    // Orphaned children (parent in different category or missing)
+    const inSorted = new Set(sorted.map(t => t.id));
+    items.filter(t => !inSorted.has(t.id)).forEach(t => sorted.push(t));
+    groups[c.key] = sorted;
+  });
+
+  const highCount = pending.filter(t => t.priority === 'high').length;
   let h = '';
 
   // Stats
   h += `<div class="stats">
-    <div class="card stat-card"><div class="stat-num" style="color:#4f46e5">${pending.length}</div><div class="stat-label">Pending</div></div>
-    <div class="card stat-card"><div class="stat-num" style="color:#ef4444">${highCount}</div><div class="stat-label">High</div></div>
-    <div class="card stat-card"><div class="stat-num" style="color:#16a34a">${completed.length}</div><div class="stat-label">Done</div></div>
+    <div class="stat"><div class="stat-n" style="color:#1d1d1f">${pending.length}</div><div class="stat-l">Total</div></div>
+    <div class="stat"><div class="stat-n" style="color:#ef4444">${highCount}</div><div class="stat-l">High</div></div>
+    <div class="stat"><div class="stat-n" style="color:#f59e0b">${pending.filter(t=>t.priority==='medium').length}</div><div class="stat-l">Med</div></div>
+    <div class="stat"><div class="stat-n" style="color:#16a34a">${completed.length}</div><div class="stat-l">Done</div></div>
   </div>`;
 
-  // Filters
-  h += `<div class="filter-bar">
-    ${['all','high','medium','low','done'].map(f => `<button class="filter-btn ${filter===f?'active':''}" onclick="filter='${f}';render()">${f === 'all' ? 'All ('+pending.length+')' : f === 'done' ? '✓ Done ('+completed.length+')' : f.charAt(0).toUpperCase()+f.slice(1)+' ('+( f==='high'?highCount:f==='medium'?medCount:lowCount )+')'}</button>`).join('')}
-  </div>`;
+  // Category sections
+  CATEGORIES.forEach(cat => {
+    const items = groups[cat.key];
+    if (items.length === 0 && searchQuery) return; // hide empty when searching
+    const collapsed = collapsedCats[cat.key];
 
-  // Add form
-  if (showAdd) {
-    h += `<div class="add-bar"><div class="card add-card">
-      <input id="inp-text" placeholder="What needs to be done?" value="${esc(newText)}" oninput="newText=this.value" onkeydown="if(event.key==='Enter')addTodo()">
-      <div class="add-row" style="margin-bottom:8px">
-        <input placeholder="👤 Person (optional)" value="${esc(newPerson)}" oninput="newPerson=this.value">
-        <input placeholder="📅 Deadline (optional)" value="${esc(newDeadline)}" oninput="newDeadline=this.value">
-      </div>
-      <div class="add-row" style="margin-bottom:10px">
-        <input placeholder="⚡ Next step (optional)" value="${esc(newNextStep)}" oninput="newNextStep=this.value">
-        <input placeholder="🏷️ Category (optional)" value="${esc(newCategory)}" oninput="newCategory=this.value">
-      </div>
-      <div class="add-row">
-        ${['high','medium','low'].map(p => `<button class="pri-btn" onclick="newPriority='${p}';render()" style="border:${newPriority===p?'2px':'1px'} solid ${priColor(p)};background:${newPriority===p?priBg(p):'transparent'};color:${priColor(p)}">${p}</button>`).join('')}
-        <div style="flex:1"></div>
-        <button class="add-submit" onclick="addTodo()">Add Task</button>
-      </div>
-    </div></div>`;
-  }
+    h += `<div class="cat-section">`;
+    h += `<div class="cat-header ${collapsed ? 'collapsed' : ''}" onclick="collapsedCats['${cat.key}']=!collapsedCats['${cat.key}'];render()">
+      <span class="cat-icon">${cat.icon}</span>
+      <span class="cat-name" style="color:${cat.color}">${cat.name}</span>
+      <span class="cat-count">${items.length}</span>
+      <span class="cat-chevron">▼</span>
+    </div>`;
 
-  // Filter todos
-  let display = [];
-  if (filter === 'done') display = completed;
-  else if (filter === 'all') display = pending;
-  else display = pending.filter(t => t.priority === filter);
+    if (!collapsed) {
+      h += `<div class="cat-body">`;
+      if (items.length === 0) {
+        h += `<div style="padding:20px;text-align:center;color:#9ca3af;font-size:13px">No tasks</div>`;
+      } else {
+        items.forEach(t => {
+          const isNested = !!t.parentId;
+          const dl = fmtDeadline(t.deadline);
+          const priC = priClass(t.priority);
 
-  // Render list
-  h += `<div class="section">`;
-  if (display.length === 0) {
-    h += `<div class="card empty">${filter === 'done' ? 'No completed tasks yet.' : 'No tasks here. Tap + to add one.'}</div>`;
-  } else {
-    h += `<div class="card">`;
-    display.forEach(t => {
-      h += `<div class="todo-item ${t.done ? 'todo-done' : ''}">
-        <div class="pri-dot" style="background:${priColor(t.priority||'medium')}"></div>
-        <div style="flex:1;min-width:0">
-          <div class="todo-text">${esc(t.text)}</div>
-          <div class="todo-meta">
-            ${t.person ? `<span>👤 ${esc(t.person)}</span>` : ''}
-            ${t.deadline ? `<span>📅 ${esc(t.deadline)}</span>` : ''}
-            ${t.nextStep ? `<span>⚡ ${esc(t.nextStep)}</span>` : ''}
-            ${t.category ? `<span style="text-transform:uppercase;font-size:10px;letter-spacing:.5px;color:#9ca3af">${esc(t.category)}</span>` : ''}
-          </div>
-        </div>
-        <div class="todo-actions">
-          <button onclick="toggleDone(${t.id})" title="${t.done?'Undo':'Done'}">${t.done ? '↩️' : '✓'}</button>
-          <button onclick="deleteTodo(${t.id})" title="Delete">×</button>
-        </div>
-      </div>`;
-    });
+          h += `<div class="todo ${isNested ? 'nested' : ''}"
+            draggable="true"
+            ondragstart="onDragStart(event,${t.id})"
+            ondragend="onDragEnd(event)"
+            ondragover="onDragOver(event,${t.id})"
+            ondragleave="onDragLeave(event)"
+            ondrop="onDrop(event,${t.id},'${cat.key}')">
+            <div class="pri-dot ${priC}" onclick="cyclePri(${t.id})" title="Click to change priority"></div>
+            <div class="todo-check" onclick="toggleDone(${t.id})" title="Mark complete"></div>
+            <div class="todo-content">
+              <div class="todo-text">${esc(t.text)}</div>
+              <div class="todo-meta">
+                ${t.person ? `<span class="meta-tag">👤 ${esc(t.person)}</span>` : ''}
+                ${dl ? `<span class="${dl.cls}">${dl.text}</span>` : `<span class="meta-tag" style="cursor:pointer;color:#d1d5db" onclick="promptDeadline(${t.id})">+ deadline</span>`}
+                ${t.nextStep ? `<span class="meta-tag" style="background:#f3f4f6;padding:1px 6px;border-radius:4px">⚡${esc(t.nextStep)}</span>` : ''}
+                <select class="cat-dropdown" onchange="changeCat(${t.id},this.value)" title="Change category">
+                  ${CATEGORIES.map(c => `<option value="${c.key}" ${c.key === (t.category||'admin') ? 'selected' : ''}>${c.name}</option>`).join('')}
+                </select>
+              </div>
+            </div>
+            <button class="del-btn" onclick="deleteTodo(${t.id})" title="Delete">×</button>
+          </div>`;
+        });
+      }
+      h += `</div>`;
+    }
     h += `</div>`;
-  }
+  });
 
-  // Show completed toggle (when not filtering by done)
-  if (filter !== 'done' && completed.length > 0) {
-    h += `<div class="card" style="margin-top:8px">
-      <div class="completed-header" onclick="showCompleted=!showCompleted;render()">
-        <span>Completed (${completed.length})</span>
-        <span>${showCompleted ? '▲' : '▼'}</span>
+  // Completed section
+  if (completed.length > 0) {
+    h += `<div class="done-section">
+      <div class="done-header ${showCompleted ? 'expanded' : ''}" onclick="showCompleted=!showCompleted;render()">
+        <span style="font-size:13px;font-weight:600;color:#6b7280">Completed (${completed.length})</span>
+        <span style="font-size:12px;color:#9ca3af">${showCompleted ? '▲' : '▼'}</span>
       </div>`;
     if (showCompleted) {
-      completed.forEach(t => {
-        h += `<div class="todo-item todo-done" style="padding:10px 16px">
-          <div class="pri-dot" style="background:#d1d5db"></div>
-          <div style="flex:1;min-width:0">
-            <div class="todo-text">${esc(t.text)}</div>
+      h += `<div class="done-body">`;
+      completed.slice().reverse().forEach(t => {
+        h += `<div class="todo done-item">
+          <div class="todo-check checked" onclick="toggleDone(${t.id})" title="Undo"></div>
+          <div class="todo-content">
+            <div class="todo-text struck">${esc(t.text)}</div>
+            <div class="todo-meta">
+              <span class="meta-tag" style="color:#9ca3af">${esc(t.category || 'admin')}</span>
+              ${t.completedAt ? `<span class="meta-tag" style="color:#9ca3af">${new Date(t.completedAt).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>` : ''}
+            </div>
           </div>
-          <div class="todo-actions">
-            <button onclick="toggleDone(${t.id})" title="Undo">↩️</button>
-            <button onclick="deleteTodo(${t.id})" title="Delete">×</button>
-          </div>
+          <button class="del-btn" onclick="deleteTodo(${t.id})" title="Delete">×</button>
         </div>`;
       });
+      h += `</div>`;
     }
     h += `</div>`;
   }
 
-  h += `</div>`;
-
-  // Sync note
-  h += `<div style="text-align:center;padding:20px 16px;font-size:11px;color:#9ca3af">Syncs with EA Dashboard via localStorage (dave_todos_v6)</div>`;
+  h += `<div class="footer-note">Syncs with EA Dashboard via localStorage (dave_todos_v6)</div>`;
 
   document.getElementById('app').innerHTML = h;
 }
 
-// Listen for storage changes from other tabs (EA dashboard)
+function promptDeadline(id) {
+  const val = prompt('Enter deadline (YYYY-MM-DD):');
+  if (val) setDeadline(id, val);
+}
+
+// Storage sync across tabs
 window.addEventListener('storage', (e) => { if (e.key === STORAGE_KEY) render(); });
 
+// Init
 render();
+updateNewPriBtn();
 </script>
 </body>
 </html>
