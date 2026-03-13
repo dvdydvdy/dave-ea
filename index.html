@@ -43,9 +43,11 @@
 
   /* Summary grid */
   .summary-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-  .summary-card { padding: 14px 12px; text-align: center; }
+  .summary-card { padding: 14px 12px; text-align: center; cursor: pointer; transition: transform .1s; }
+  .summary-card:active { transform: scale(.97); }
   .summary-card .num { font-size: 22px; font-weight: 700; }
   .summary-card .lbl { font-size: 11px; color: #6b7280; }
+  .summary-card .sub { font-size: 10px; color: #9ca3af; margin-top: 2px; }
 
   /* Quick actions */
   .quick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -53,16 +55,36 @@
   .quick-icon { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
 
   /* Event card */
-  .evt-card { padding: 12px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
+  .evt-card { padding: 12px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background .15s; }
+  .evt-card:hover { background: #f9fafb; }
   .evt-card .icon { font-size: 18px; flex-shrink: 0; }
   .evt-card .title { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .evt-card .meta { font-size: 11px; color: #6b7280; margin-top: 2px; }
+  .evt-now { border-left: 3px solid #4f46e5; background: #faf5ff; }
+  .evt-past { opacity: 0.55; }
 
   /* Schedule full */
-  .evt-full { padding: 14px 16px; margin-bottom: 10px; }
+  .evt-full { padding: 14px 16px; margin-bottom: 10px; cursor: pointer; transition: background .15s; }
+  .evt-full:hover { background: #f9fafb; }
   .evt-full .icon { font-size: 20px; margin-top: 2px; flex-shrink: 0; }
   .evt-full .title { font-size: 14px; font-weight: 600; }
   .evt-full .detail { display: flex; align-items: center; gap: 6px; margin-top: 4px; font-size: 12px; color: #6b7280; }
+
+  /* Meeting prep modal */
+  .prep-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 80; display: flex; align-items: flex-end; justify-content: center; }
+  .prep-modal { background: #fff; border-radius: 20px 20px 0 0; width: 100%; max-width: 480px; max-height: 80vh; overflow-y: auto; padding: 24px 20px 40px; box-shadow: 0 -8px 32px rgba(0,0,0,.15); animation: slideUp .3s ease; }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .prep-modal h2 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .prep-modal .sub { font-size: 13px; color: #6b7280; margin-bottom: 16px; }
+  .prep-section { margin-bottom: 16px; }
+  .prep-section h3 { font-size: 13px; font-weight: 600; color: #4f46e5; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .prep-section p { font-size: 13px; color: #374151; line-height: 1.5; }
+  .prep-section ul { font-size: 13px; color: #374151; padding-left: 18px; line-height: 1.7; }
+  .prep-action { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+  .prep-action button { padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1.5px solid #e5e7eb; background: #fff; transition: all .15s; }
+  .prep-action button:hover { background: #f3f4f6; }
+  .prep-action .primary { background: #4f46e5; color: #fff; border-color: #4f46e5; }
+  .prep-action .primary:hover { background: #4338ca; }
 
   /* Todo */
   .todo-item { padding: 12px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
@@ -70,6 +92,7 @@
   .todo-item.medium { border-left: 3px solid #f59e0b; }
   .todo-item.low { border-left: 3px solid #6b7280; }
   .todo-text { font-size: 13px; flex: 1; }
+  .todo-meta { font-size: 11px; color: #6b7280; display: flex; gap: 8px; margin-top: 2px; }
   .todo-done { opacity: 0.5; }
   .todo-done .todo-text { text-decoration: line-through; }
 
@@ -100,7 +123,16 @@
   .section-title { font-size: 14px; font-weight: 600; margin-bottom: 10px; }
   .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 
-  /* SVG icons inline */
+  /* Time indicator */
+  .time-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 4px; }
+  .time-dot.live { background: #22c55e; animation: blink 2s infinite; }
+  .time-dot.upcoming { background: #f59e0b; }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+
+  /* Birthdays */
+  .bday-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 20px; }
+  .bday-chip { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 8px 12px; font-size: 12px; white-space: nowrap; flex-shrink: 0; }
+
   .icon-sm { width: 12px; height: 12px; }
   .icon-md { width: 16px; height: 16px; }
   .icon-lg { width: 20px; height: 20px; }
@@ -111,65 +143,167 @@
 <div id="app"></div>
 
 <script>
-// ─── Data ────────────────────────────────────────────────────────────────────
+// âââ Live Data (updated 2026-03-13) âââââââââââââââââââââââââââââââââââââââââ
 const TODAY_EVENTS = [
-  { time: "12:00 AM \u2013 3:50 AM", title: "Claude", icon: "\ud83d\udcbb" },
-  { time: "2:00 AM \u2013 2:25 AM", title: "Call: Valerie Osband Mahoney (NFX)", icon: "\ud83d\udcde", location: "Zoom" },
-  { time: "3:00 AM \u2013 3:45 AM", title: "Coffee with Cami @ Blue Bottle", icon: "\u2615", location: "Blue Bottle, 2 S Park St" },
-  { time: "4:00 AM \u2013 5:00 AM", title: "David / Cathryn", icon: "\ud83e\udd1d", location: "South Beach Cafe" },
-  { time: "5:00 AM \u2013 5:40 AM", title: "Claude", icon: "\ud83d\udcbb" },
-  { time: "8:00 AM \u2013 8:30 AM", title: "Chuk <> Informed Ventures", icon: "\ud83d\udcde", location: "Zoom" },
-  { time: "8:45 AM \u2013 9:15 AM", title: "Elephants <> Informed Ventures", icon: "\ud83d\udcde", location: "Zoom" },
-  { time: "9:00 AM \u2013 10:00 AM", title: "IV Fintech Sync / Presentations", icon: "\ud83d\udcca", location: "Zoom" },
-  { time: "9:15 AM \u2013 9:45 AM", title: "Rhythmic <> Informed Ventures", icon: "\ud83d\udcde", location: "Zoom" },
-  { time: "9:30 AM \u2013 11:30 AM", title: "Private Party with Didi's CFO", icon: "\ud83c\udf89", location: "1235D Howard St, SF" },
-  { time: "12:00 PM \u2013 12:40 PM", title: "Mandy event", icon: "\ud83c\udf89" },
-  { time: "11:30 PM \u2013 12:00 AM", title: "Informed x Anna (Perena)", icon: "\ud83d\udcde", location: "Google Meet" },
+  { time: "7:40 AM", end: "8:00 AM", title: "David / Dennis - Trovy sync", icon: "\ud83d\udcde", location: "Zoom", id: "trovy-dennis", person: "Dennis Cong", company: "Trovy", type: "deal" },
+  { time: "8:00 AM", end: "8:45 AM", title: "Trovy <> Informed Ventures", icon: "\ud83d\udcde", location: "Zoom", id: "trovy-iv", person: "Trovy team", company: "Trovy", type: "deal" },
+  { time: "9:00 AM", end: "9:30 AM", title: "US Investment Check-in", icon: "\ud83d\udcca", location: "Zoom", id: "us-invest", person: "IV Team", company: "Informed Ventures", type: "internal" },
+  { time: "11:00 AM", end: "12:30 PM", title: "Travel", icon: "\ud83d\ude97", id: "travel-1", type: "travel" },
+  { time: "12:30 PM", end: "1:00 PM", title: "EWB lunch with CEO Dominic Ng", icon: "\ud83c\udf7d\ufe0f", id: "ewb-lunch", person: "Dominic Ng", company: "East West Bank", type: "networking" },
+  { time: "1:00 PM", end: "2:00 PM", title: "David <> Ryan (Fusion Fund)", icon: "\ud83d\udcde", location: "Zoom", id: "ryan-fusion", person: "Ryan", company: "Fusion Fund", type: "deal" },
+  { time: "2:00 PM", end: "4:00 PM", title: "Travel", icon: "\ud83d\ude97", id: "travel-2", type: "travel" },
+  { time: "4:00 PM", end: "5:00 PM", title: "Yu Kuai / David @ near Salesforce", icon: "\ud83e\udd1d", location: "Near Salesforce Tower", id: "yu-kuai", person: "Yu Kuai", type: "networking" },
+  { time: "5:00 PM", end: "5:30 PM", title: "David <> Linda", icon: "\ud83e\udd1d", location: "FiDi", id: "linda", person: "Linda", type: "networking" },
+  { time: "5:30 PM", end: "6:00 PM", title: "Under Pressure: Mandy Wen", icon: "\ud83c\udf89", location: "AngelList", id: "mandy-wen", person: "Mandy Wen", company: "AngelList", type: "event" },
+  { time: "6:00 PM", end: "6:30 PM", title: "Mithra Office Warming", icon: "\ud83c\udf89", location: "410 Townsend St", id: "mithra", company: "Mithra", type: "event" },
+  { time: "6:30 PM", end: "7:00 PM", title: "David / Olga weekly dinner", icon: "\ud83c\udf7d\ufe0f", id: "olga-dinner", person: "Olga", type: "personal" },
+  { time: "7:00 PM", end: "9:00 PM", title: "Private Dinner: amber.ac & Pantera", icon: "\ud83c\udf7e", location: "PABU Izakaya", id: "pantera-dinner", person: "amber.ac & Pantera", type: "networking" },
 ];
 
 const TOMORROW_EVENTS = [
-  { time: "12:30 AM", title: "Informed Ventures & Gus Ba", icon: "\ud83d\udcde" },
-  { time: "1:00 AM", title: "David Yin & Variant", icon: "\ud83d\udcde" },
-  { time: "1:30 AM", title: "Dennis Cong's Zoom", icon: "\ud83d\udcde" },
-  { time: "2:00 AM", title: "Informed & Sahil Hasan", icon: "\ud83d\udcde" },
-  { time: "3:00 AM", title: "David Yin & Will Robinson", icon: "\ud83d\udcde" },
-  { time: "5:00 AM", title: "Prep for Zoom call", icon: "\ud83d\udcbb" },
-  { time: "6:00 AM", title: "Dennis a16z speedrun call", icon: "\ud83d\udcde" },
-  { time: "7:00 AM", title: "Linda Sheng @ BB Visa", icon: "\ud83e\udd1d" },
-  { time: "8:00 AM", title: "Trovy <> Informed Ventures", icon: "\ud83d\udcde", location: "Zoom" },
-  { time: "5:00 PM", title: "Sutton Capital PE & VC Summit", icon: "\ud83c\udf89", location: "1 Embarcadero Ctr" },
-  { time: "6:30 PM", title: "Chinese Founders Dinner (Altos)", icon: "\ud83c\udf7d", location: "250 California Dr, Burlingame" },
+  { time: "10:30 AM", end: "11:00 AM", title: "Dennis Cong & Wasi/Brandon (Maven)", icon: "\ud83d\udcde", location: "Zoom", id: "maven-call", person: "Dennis, Wasi, Brandon", company: "Maven", type: "deal" },
+  { time: "1:30 PM", end: "3:00 PM", title: "Builders & Backers Mixer", icon: "\ud83c\udf89", location: "Los Altos", id: "builders-mixer", type: "event" },
+  { time: "3:00 PM", end: "4:00 PM", title: "Dentist - xray and cleaning", icon: "\ud83e\udeb7", id: "dentist", type: "personal" },
+  { time: "7:00 PM", end: "9:00 PM", title: "SG Networking Dinner", icon: "\ud83c\udf7d\ufe0f", location: "Tamarine, Palo Alto", id: "sg-dinner", type: "networking" },
+  { time: "8:45 PM", end: "9:30 PM", title: "Caltrain return", icon: "\ud83d\ude86", id: "caltrain", type: "travel" },
 ];
 
-const EMAILS = [
-  { from: "Self", subject: "3/11/26 Elephants", snippet: "AI native, stablecoin as banking 2.0, custody...", time: "11:22 PM", important: true },
-  { from: "Self (IV)", subject: "Meeting recap - Chuk <> IV", snippet: "Fireflies meeting summary forwarded", time: "4:43 PM", important: true },
-  { from: "Self (IV)", subject: "Meeting Summary - Informed <> CMT", snippet: "Zoom AI companion summary", time: "6:34 AM", important: false },
-  { from: "Self (IV)", subject: "Meeting Summary - Miranda/Tony", snippet: "Zoom AI companion summary", time: "6:33 AM", important: false },
-];
+const BIRTHDAYS = ["Perrine Legoullon", "Jessica Drun", "Dave Girouard", "Zach Newburgh", "Matteo Godi"];
 
-// ─── State ───────────────────────────────────────────────────────────────────
+const REMINDERS = ["true north alex chat?", "zhang qiao", "Hako btc"];
+
+// âââ Meeting prep data âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+const PREP_DATA = {
+  "trovy-dennis": {
+    headline: "Trovy Sync with Dennis Cong",
+    context: "Pre-meeting sync with Dennis before the full Trovy <> IV call. Dennis is your co-investor/collaborator on this deal.",
+    talkingPoints: ["Align on key questions for the Trovy team call right after", "Discuss any updates from Trovy since last check-in", "Review Bento / Trovy thesis (on your to-do list)"],
+    research: "Trovy is in your active deal pipeline. You have a to-do to 'Review Bento / Trovy' flagged for today.",
+    action: "Use this sync to get on the same page before the 8 AM team call."
+  },
+  "trovy-iv": {
+    headline: "Trovy <> Informed Ventures - Deal Review",
+    context: "Full team call with Trovy. Follow-up from ongoing due diligence.",
+    talkingPoints: ["Product roadmap and recent traction updates", "Key metrics and unit economics", "Competitive landscape questions", "Next steps for the deal process"],
+    research: "Active deal in your pipeline. Dennis Cong is the point person.",
+    action: "Take notes for deal memo. Clarify timeline and next steps."
+  },
+  "us-invest": {
+    headline: "US Investment Check-in",
+    context: "Regular internal IV team sync on US investment portfolio and pipeline.",
+    talkingPoints: ["Pipeline updates across active deals", "Portfolio company check-ins", "New deal flow and inbound", "Resource allocation and priorities"],
+    research: "Internal meeting. Review your deal pipeline list before this call.",
+    action: "Come prepared with updates on your active deals."
+  },
+  "ewb-lunch": {
+    headline: "Lunch with Dominic Ng, CEO of East West Bank",
+    context: "High-profile networking lunch. Dominic Ng has been CEO of East West Bank since 1991. EWB is the largest independent bank focused on the US-China financial corridor.",
+    talkingPoints: ["Cross-border fintech trends and opportunities", "EWB's innovation strategy and partnerships", "IV's fintech investment thesis in APAC corridors", "Potential deal flow or co-investment opportunities"],
+    research: "East West Bank (EWBC) is publicly traded, ~$12B market cap. Dominic Ng is a prominent figure in US-Asia business. EWB has been expanding its digital banking and fintech partnerships.",
+    action: "This is a relationship-building lunch. Focus on finding mutual interests and potential collaboration."
+  },
+  "ryan-fusion": {
+    headline: "David <> Ryan - Fusion Fund",
+    context: "Call with Ryan from Fusion Fund. Fusion Fund is an early-stage VC focused on deep tech and AI.",
+    talkingPoints: ["Co-investment opportunities in AI/fintech", "Portfolio overlap and deal flow sharing", "Market views on current AI investment landscape", "Specific deals to discuss or share"],
+    research: "Fusion Fund is a Palo Alto-based VC. They invest in seed to Series A in AI, robotics, and enterprise tech.",
+    action: "Explore partnership angles. Share relevant deal flow."
+  },
+  "yu-kuai": {
+    headline: "Coffee with Yu Kuai",
+    context: "In-person meeting near Salesforce Tower.",
+    talkingPoints: ["Background and current focus", "Mutual connections and interests", "Potential collaboration areas"],
+    research: "Check LinkedIn for Yu Kuai's background before this meeting.",
+    action: "Networking meeting. Exchange context and find mutual interests."
+  },
+  "linda": {
+    headline: "Catch-up with Linda",
+    context: "Meeting in FiDi (Financial District).",
+    talkingPoints: ["Recent updates", "Industry insights", "Potential introductions or collaborations"],
+    research: "Review previous conversations with Linda if any.",
+    action: "Casual networking. Look for ways to help each other."
+  },
+  "mandy-wen": {
+    headline: "Under Pressure: Mandy Wen (AngelList)",
+    context: "Event or talk featuring Mandy Wen at AngelList. AngelList is a major platform for startup fundraising and venture fund management.",
+    talkingPoints: ["AngelList platform updates and trends", "Rolling funds and venture fund management", "Deal flow insights from AngelList data", "Potential IV presence on AngelList"],
+    research: "Mandy Wen is at AngelList. Check her role and recent work.",
+    action: "Attend event, network with Mandy and other attendees."
+  },
+  "pantera-dinner": {
+    headline: "Private Dinner: amber.ac & Pantera Capital",
+    context: "High-value networking dinner at PABU Izakaya. amber.ac is a crypto-native finance firm based in Hong Kong. Pantera Capital is one of the oldest and largest crypto/blockchain investment firms.",
+    talkingPoints: ["Crypto market outlook and thesis areas", "DeFi and institutional crypto trends", "Cross-border crypto opportunities (Asia <> US)", "Potential co-investment in crypto/web3 deals"],
+    research: "Pantera Capital manages ~$5B+ in AUM, focuses on blockchain/crypto. amber.ac provides crypto trading and DeFi services. Both are key players in institutional crypto.",
+    action: "High-priority networking. Discuss crypto investment themes and potential deal collaboration."
+  },
+  "maven-call": {
+    headline: "Dennis Cong & Wasi/Brandon - Maven",
+    context: "Call about Maven with Dennis and team.",
+    talkingPoints: ["Maven product and traction update", "Deal terms and timeline", "Due diligence questions"],
+    research: "Check your notes on Maven from previous discussions.",
+    action: "Evaluate deal and determine next steps."
+  },
+  "sg-dinner": {
+    headline: "Bay Area Overseas Singaporean Networking Dinner",
+    context: "Networking dinner for Singaporean professionals in the Bay Area. Held at Tamarine restaurant in Palo Alto.",
+    talkingPoints: ["SG tech ecosystem updates", "Cross-border investment opportunities", "Community building and introductions"],
+    research: "Check attendee list if available. Good opportunity for SG-based deal flow.",
+    action: "Network broadly. Exchange contacts with interesting people."
+  }
+};
+
+// âââ State âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 let state = {
   tab: "home",
-  todos: [
-    { id: 1, text: "Schedule Elephants call follow-up", priority: "high", done: false },
-    { id: 2, text: "Plan next week at Stanford", priority: "high", done: false },
-    { id: 3, text: "Check Sutton Capital speaker list", priority: "medium", done: false },
-    { id: 4, text: "Review Bento / Trovy", priority: "medium", done: false },
-    { id: 5, text: "Reach out to Qi Wang / Mia", priority: "low", done: false },
-    { id: 6, text: "Connect with Yu Hang", priority: "low", done: false },
-    { id: 7, text: "Tiantong Zhou LinkedIn review", priority: "low", done: false },
-    { id: 8, text: "Yu Wang LinkedIn review", priority: "low", done: false },
-  ],
-  showAdd: false,
-  newTodo: "",
-  newPriority: "medium",
   toast: "",
   listening: false,
   voiceModal: false,
   voiceText: "",
+  prepModal: null, // event id for meeting prep
+  showAdd: false,
+  newTodo: "",
+  newPriority: "medium",
 };
 
+// âââ To-do list integration (loads from same localStorage as todo.html) ââââââ
+const TODO_STORAGE_KEY = "dave_todos_v6";
+
+function loadTodos() {
+  try {
+    const raw = localStorage.getItem(TODO_STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return null;
+}
+
+function getTodos() {
+  const data = loadTodos();
+  if (!data) return [];
+  return data.filter(t => !t.done && !t.parentId).sort((a,b) => {
+    const o = { high: 0, medium: 1, low: 2 };
+    return (o[a.priority]||2) - (o[b.priority]||2);
+  });
+}
+
+function getHighPriorityTodos() {
+  return getTodos().filter(t => t.priority === "high").slice(0, 5);
+}
+
+function getAllPendingCount() {
+  const data = loadTodos();
+  if (!data) return 0;
+  return data.filter(t => !t.done).length;
+}
+
+function getOverdueCount() {
+  const data = loadTodos();
+  if (!data) return 0;
+  const today = new Date().toISOString().slice(0, 10);
+  return data.filter(t => !t.done && t.deadline && t.deadline < today).length;
+}
+
+// âââ Time helpers ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function now() {
   return new Date(new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" }));
 }
@@ -187,12 +321,52 @@ function shortDate() {
   return now().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
 }
 
+function parseTime(timeStr) {
+  const m = timeStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
+  if (!m) return 0;
+  let h = parseInt(m[1]); const min = parseInt(m[2]); const ap = m[3].toUpperCase();
+  if (ap === "PM" && h !== 12) h += 12;
+  if (ap === "AM" && h === 12) h = 0;
+  return h * 60 + min;
+}
+
+function getEventStatus(evt) {
+  const n = now();
+  const nowMin = n.getHours() * 60 + n.getMinutes();
+  const start = parseTime(evt.time);
+  const end = evt.end ? parseTime(evt.end) : start + 60;
+  if (nowMin >= start && nowMin < end) return "now";
+  if (nowMin < start) return "upcoming";
+  return "past";
+}
+
+function getNextEvent() {
+  const n = now();
+  const nowMin = n.getHours() * 60 + n.getMinutes();
+  for (const evt of TODAY_EVENTS) {
+    const start = parseTime(evt.time);
+    if (start > nowMin) return evt;
+    const end = evt.end ? parseTime(evt.end) : start + 60;
+    if (nowMin >= start && nowMin < end) return evt;
+  }
+  return null;
+}
+
+function timeUntil(evt) {
+  const n = now();
+  const nowMin = n.getHours() * 60 + n.getMinutes();
+  const start = parseTime(evt.time);
+  const diff = start - nowMin;
+  if (diff <= 0) return "Now";
+  if (diff < 60) return `in ${diff}m`;
+  return `in ${Math.floor(diff/60)}h ${diff%60}m`;
+}
+
 const priColor = p => p === "high" ? "#ef4444" : p === "medium" ? "#f59e0b" : "#6b7280";
 const priBg = p => p === "high" ? "#fef2f2" : p === "medium" ? "#fffbeb" : "#f9fafb";
-const pending = () => state.todos.filter(t => !t.done).sort((a,b) => {const o={high:0,medium:1,low:2}; return o[a.priority]-o[b.priority];});
-const done = () => state.todos.filter(t => t.done);
+const typeIcon = t => ({ deal: "\ud83d\udcbc", networking: "\ud83e\udd1d", internal: "\ud83d\udcca", event: "\ud83c\udf89", travel: "\ud83d\ude97", personal: "\ud83d\udc9c" }[t] || "\ud83d\udcc5");
 
-// ─── SVG Icons ───────────────────────────────────────────────────────────────
+// âââ SVG Icons âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 const icons = {
   mic: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>',
   home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
@@ -207,13 +381,17 @@ const icons = {
   trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
   mail: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>',
   checksq: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
+  search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>',
+  zap: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+  brain: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg>',
+  ext: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>',
 };
 
 function icon(name, size=20, color="currentColor") {
   return `<span style="display:inline-flex;width:${size}px;height:${size}px;color:${color}">${icons[name]||""}</span>`;
 }
 
-// ─── Voice ───────────────────────────────────────────────────────────────────
+// âââ Voice âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 let recognition = null;
 
 function startVoice() {
@@ -244,17 +422,26 @@ function processVoice(text) {
   setTimeout(() => {
     if (l.includes("add todo") || l.includes("add task") || l.includes("remind me")) {
       const task = text.replace(/add (todo|task)|remind me (to)?/gi, "").trim();
-      if (task) { state.todos.push({ id: Date.now(), text: task, priority: "medium", done: false }); showToast(`Added: "${task}"`); }
+      if (task) {
+        addTodoToStorage(task, "medium");
+        showToast(`Added: "${task}"`);
+      }
     } else if (l.includes("what's next") || l.includes("next meeting")) {
-      showToast("Check your schedule tab for upcoming events.");
+      const next = getNextEvent();
+      if (next) showToast(`Next: ${next.title} at ${next.time}`);
+      else showToast("No more meetings today!");
     } else if (l.includes("inbox") || l.includes("email")) {
       state.tab = "inbox"; showToast("Here's your inbox.");
     } else if (l.includes("briefing") || l.includes("my day") || l.includes("what's today")) {
-      state.tab = "home"; showToast(`${TODAY_EVENTS.length} events today. ${pending().length} open tasks.`);
+      state.tab = "home"; showToast(`${TODAY_EVENTS.length} events today. ${getAllPendingCount()} open tasks.`);
     } else if (l.includes("show task") || l.includes("show todo")) {
       state.tab = "todos"; showToast("Here are your tasks.");
+    } else if (l.includes("prep")) {
+      const next = getNextEvent();
+      if (next && PREP_DATA[next.id]) { state.prepModal = next.id; showToast("Meeting prep loaded."); }
+      else showToast("No prep available for the next meeting.");
     } else {
-      showToast(`Heard: "${text}". Try "add task...", "what's next", or "briefing".`);
+      showToast(`Heard: "${text}". Try "add task...", "what's next", "prep", or "briefing".`);
     }
     state.voiceModal = false; render();
   }, 400);
@@ -265,18 +452,36 @@ function showToast(msg) {
   setTimeout(() => { state.toast = ""; render(); }, 3500);
 }
 
-// ─── Actions ─────────────────────────────────────────────────────────────────
-function toggleTodo(id) { const t = state.todos.find(x => x.id === id); if (t) t.done = !t.done; render(); }
-function deleteTodo(id) { state.todos = state.todos.filter(x => x.id !== id); render(); }
-function addTodo() {
-  const inp = document.getElementById("new-todo-input");
-  if (!inp || !inp.value.trim()) return;
-  state.todos.push({ id: Date.now(), text: inp.value.trim(), priority: state.newPriority, done: false });
-  state.newTodo = ""; state.showAdd = false; render();
+// âââ Todo Storage Integration ââââââââââââââââââââââââââââââââââââââââââââââââ
+function addTodoToStorage(text, priority) {
+  let todos = loadTodos() || [];
+  const maxId = todos.reduce((m, t) => Math.max(m, t.id || 0), 200);
+  todos.push({
+    id: maxId + 1,
+    text: text,
+    category: "deals",
+    priority: priority,
+    done: false,
+    parentId: null,
+    person: "",
+    deadline: "",
+    nextStep: "",
+    nextStepNote: ""
+  });
+  localStorage.setItem(TODO_STORAGE_KEY, JSON.stringify(todos));
 }
-function setTab(t) { state.tab = t; render(); }
 
-// ─── Render ──────────────────────────────────────────────────────────────────
+// âââ Actions âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+function setTab(t) { state.tab = t; render(); }
+function openPrep(evtId) { state.prepModal = evtId; render(); }
+function closePrep() { state.prepModal = null; render(); }
+
+function openTodoApp() {
+  // Open the standalone todo app in a new tab
+  window.open('https://dvdydvdy.github.io/dave-ea/todo.html', '_blank');
+}
+
+// âââ Render ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function render() {
   const app = document.getElementById("app");
   let html = "";
@@ -290,8 +495,49 @@ function render() {
       <div class="voice-modal" onclick="event.stopPropagation()">
         <div class="mic-circle ${state.listening?'listening':'idle'}">${icon('mic',32,'#fff')}</div>
         <p style="font-size:16px;font-weight:600;margin-bottom:8px">${state.listening?'Listening...':'Processing...'}</p>
-        <p style="font-size:14px;color:#6b7280;min-height:40px">${esc(state.voiceText) || 'Try: "Add task review deck" or "What\'s next?"'}</p>
+        <p style="font-size:14px;color:#6b7280;min-height:40px">${esc(state.voiceText) || 'Try: "Add task review deck", "What\'s next?", or "Prep"'}</p>
         <button class="btn" onclick="stopVoice()" style="margin-top:16px;padding:8px 24px;border-radius:8px;border:1px solid #e5e7eb;font-size:14px">Cancel</button>
+      </div>
+    </div>`;
+  }
+
+  // Meeting prep modal
+  if (state.prepModal && PREP_DATA[state.prepModal]) {
+    const prep = PREP_DATA[state.prepModal];
+    const evt = TODAY_EVENTS.concat(TOMORROW_EVENTS).find(e => e.id === state.prepModal);
+    html += `<div class="prep-overlay" onclick="closePrep()">
+      <div class="prep-modal" onclick="event.stopPropagation()">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
+          <h2>${esc(prep.headline)}</h2>
+          <button class="btn" onclick="closePrep()" style="font-size:20px;padding:0 4px;color:#6b7280">&times;</button>
+        </div>
+        ${evt ? `<p class="sub">${esc(evt.time)}${evt.location ? ' \u00b7 ' + esc(evt.location) : ''}</p>` : ''}
+
+        <div class="prep-section">
+          <h3>${icon('brain',14,'#4f46e5')} Context</h3>
+          <p>${esc(prep.context)}</p>
+        </div>
+
+        <div class="prep-section">
+          <h3>${icon('zap',14,'#4f46e5')} Talking Points</h3>
+          <ul>${prep.talkingPoints.map(p => `<li>${esc(p)}</li>`).join('')}</ul>
+        </div>
+
+        <div class="prep-section">
+          <h3>${icon('search',14,'#4f46e5')} Research Notes</h3>
+          <p>${esc(prep.research)}</p>
+        </div>
+
+        <div class="prep-section">
+          <h3>${icon('checksq',14,'#4f46e5')} Recommended Action</h3>
+          <p>${esc(prep.action)}</p>
+        </div>
+
+        <div class="prep-action">
+          <button class="primary" onclick="showToast('Ask in Cowork: research ${evt?esc(evt.person||evt.title):'this person'}');closePrep()">Deep Research</button>
+          <button onclick="showToast('Ask in Cowork: pull previous context');closePrep()">Past Context</button>
+          <button onclick="closePrep()">Done</button>
+        </div>
       </div>
     </div>`;
   }
@@ -315,7 +561,7 @@ function render() {
   html += `<div class="bottom-nav">
     ${navBtn("home","Home","home")}
     ${navBtn("schedule","Schedule","cal")}
-    ${navBtn("todos","Tasks","list")}
+    ${navBtn("todos","To-Do","list")}
     ${navBtn("inbox","Inbox","inbox")}
   </div>`;
 
@@ -328,143 +574,250 @@ function navBtn(id, label, ic) {
   </button>`;
 }
 
+// âââ Home Tab ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function renderHome() {
-  const p = pending();
+  const todoCount = getAllPendingCount();
+  const overdueCount = getOverdueCount();
+  const nextEvt = getNextEvent();
   let h = `<div class="section">`;
 
-  // Summary
+  // Summary cards - Now with useful info
   h += `<div class="summary-grid">
-    <div class="card summary-card"><div style="display:flex;justify-content:center;margin-bottom:6px;color:#6366f1">${icon('cal',16)}</div><div class="num">${TODAY_EVENTS.length}</div><div class="lbl">Events</div></div>
-    <div class="card summary-card"><div style="display:flex;justify-content:center;margin-bottom:6px;color:#f59e0b">${icon('checksq',16)}</div><div class="num">${p.length}</div><div class="lbl">Tasks</div></div>
-    <div class="card summary-card"><div style="display:flex;justify-content:center;margin-bottom:6px;color:#ef4444">${icon('mail',16)}</div><div class="num">201</div><div class="lbl">Unread</div></div>
+    <div class="card summary-card" onclick="setTab('schedule')">
+      <div style="display:flex;justify-content:center;margin-bottom:6px;color:#6366f1">${icon('cal',16)}</div>
+      <div class="num">${TODAY_EVENTS.length}</div>
+      <div class="lbl">Meetings</div>
+      <div class="sub">${nextEvt ? timeUntil(nextEvt) : 'Done!'}</div>
+    </div>
+    <div class="card summary-card" onclick="setTab('todos')">
+      <div style="display:flex;justify-content:center;margin-bottom:6px;color:#f59e0b">${icon('checksq',16)}</div>
+      <div class="num">${todoCount}</div>
+      <div class="lbl">Open Tasks</div>
+      <div class="sub">${overdueCount > 0 ? overdueCount + ' overdue' : 'on track'}</div>
+    </div>
+    <div class="card summary-card" onclick="setTab('inbox')">
+      <div style="display:flex;justify-content:center;margin-bottom:6px;color:#ef4444">${icon('mail',16)}</div>
+      <div class="num">201</div>
+      <div class="lbl">Unread</div>
+      <div class="sub">triage in Cowork</div>
+    </div>
   </div>`;
 
-  // Quick actions
+  // Next up - contextual card
+  if (nextEvt) {
+    const status = getEventStatus(nextEvt);
+    const statusLabel = status === "now" ? "Happening now" : "Up next";
+    const dotClass = status === "now" ? "live" : "upcoming";
+    h += `<div class="card" style="padding:16px;margin-bottom:20px;${status==='now'?'border-left:3px solid #4f46e5;background:#faf5ff;':'border-left:3px solid #f59e0b;background:#fffbeb;'}">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+        <span class="time-dot ${dotClass}"></span>
+        <span style="font-size:11px;font-weight:600;color:${status==='now'?'#4f46e5':'#d97706'};text-transform:uppercase;letter-spacing:.5px">${statusLabel}</span>
+        <span style="font-size:11px;color:#6b7280;margin-left:auto">${timeUntil(nextEvt)}</span>
+      </div>
+      <p style="font-size:15px;font-weight:700">${nextEvt.icon} ${esc(nextEvt.title)}</p>
+      <p style="font-size:12px;color:#6b7280;margin-top:4px">${esc(nextEvt.time)}${nextEvt.location?' \u00b7 '+esc(nextEvt.location):''}</p>
+      ${PREP_DATA[nextEvt.id] ? `<button class="btn" onclick="openPrep('${nextEvt.id}')" style="margin-top:10px;padding:6px 14px;border-radius:8px;border:1.5px solid #4f46e5;color:#4f46e5;font-size:12px;font-weight:600">${icon('brain',14,'#4f46e5')} Meeting Prep</button>` : ''}
+    </div>`;
+  }
+
+  // Birthdays
+  if (BIRTHDAYS.length > 0) {
+    h += `<div style="margin-bottom:4px"><p style="font-size:12px;color:#6b7280;margin-bottom:6px">\ud83c\udf82 Birthdays today</p>
+    <div class="bday-row">${BIRTHDAYS.map(b => `<span class="bday-chip">${esc(b)}</span>`).join('')}</div></div>`;
+  }
+
+  // Quick actions - now functional
   h += `<div style="margin-bottom:20px">
     <h3 class="section-title">Quick Actions</h3>
     <div class="quick-grid">
-      <button class="btn card quick-btn" onclick="showToast('Use voice or Cowork: schedule meeting')"><div class="quick-icon" style="background:#6366f115;color:#6366f1">${icon('cal',18)}</div>Schedule meeting</button>
-      <button class="btn card quick-btn" onclick="showToast('Use voice or Cowork: block focus time')"><div class="quick-icon" style="background:#8b5cf615;color:#8b5cf6">${icon('clock',18)}</div>Block focus time</button>
-      <button class="btn card quick-btn" onclick="showToast('Use voice or Cowork: draft email')"><div class="quick-icon" style="background:#3b82f615;color:#3b82f6">${icon('mail',18)}</div>Draft email</button>
-      <button class="btn card quick-btn" onclick="state.tab='todos';state.showAdd=true;render()"><div class="quick-icon" style="background:#10b98115;color:#10b981">${icon('plus',18)}</div>Add task</button>
+      <button class="btn card quick-btn" onclick="startVoice()"><div class="quick-icon" style="background:#6366f115;color:#6366f1">${icon('mic',18)}</div>Voice Command</button>
+      <button class="btn card quick-btn" onclick="state.tab='todos';state.showAdd=true;render()"><div class="quick-icon" style="background:#10b98115;color:#10b981">${icon('plus',18)}</div>Add Task</button>
+      <button class="btn card quick-btn" onclick="setTab('schedule')"><div class="quick-icon" style="background:#8b5cf615;color:#8b5cf6">${icon('cal',18)}</div>Full Schedule</button>
+      <button class="btn card quick-btn" onclick="setTab('inbox')"><div class="quick-icon" style="background:#3b82f615;color:#3b82f6">${icon('mail',18)}</div>Check Inbox</button>
     </div>
   </div>`;
 
   // Today schedule preview
   h += `<div style="margin-bottom:20px"><div class="section-header"><h3 style="font-size:14px;font-weight:600">Today's Schedule</h3><span class="accent" style="font-size:12px;cursor:pointer" onclick="setTab('schedule')">See all \u2192</span></div>`;
-  TODAY_EVENTS.slice(0,5).forEach(e => {
-    h += `<div class="card evt-card"><span class="icon">${e.icon}</span><div style="flex:1;min-width:0"><p class="title">${esc(e.title)}</p><p class="meta">${esc(e.time)}${e.location?' \u00b7 '+esc(e.location):''}</p></div></div>`;
-  });
-  h += `</div>`;
-
-  // Top tasks
-  h += `<div><div class="section-header"><h3 style="font-size:14px;font-weight:600">Top Tasks</h3><span class="accent" style="font-size:12px;cursor:pointer" onclick="setTab('todos')">See all \u2192</span></div>`;
-  p.filter(t=>t.priority==="high").slice(0,3).forEach(t => {
-    h += `<div class="card evt-card" style="cursor:pointer" onclick="toggleTodo(${t.id})">
-      <span style="color:${priColor(t.priority)}">${icon('circle',20)}</span>
-      <span style="font-size:13px;flex:1">${esc(t.text)}</span>
-      <div style="width:8px;height:8px;border-radius:50%;background:${priColor(t.priority)}"></div>
-    </div>`;
-  });
-  h += `</div></div>`;
-  return h;
-}
-
-function renderSchedule() {
-  let h = `<div class="section">
-    <h3 style="font-size:16px;font-weight:600;margin-bottom:4px">Today, ${shortDate()}</h3>
-    <p style="font-size:12px;color:#6b7280;margin-bottom:16px">${TODAY_EVENTS.length} events \u00b7 PDT</p>`;
-  TODAY_EVENTS.forEach(e => {
-    h += `<div class="card evt-full"><div style="display:flex;align-items:flex-start;gap:12px">
-      <span class="icon">${e.icon}</span><div style="flex:1">
+  TODAY_EVENTS.slice(0,6).forEach(e => {
+    const status = getEventStatus(e);
+    const cls = status === "now" ? "evt-now" : status === "past" ? "evt-past" : "";
+    h += `<div class="card evt-card ${cls}" onclick="${PREP_DATA[e.id]?`openPrep('${e.id}')`:''}">
+      <span class="icon">${e.icon}</span>
+      <div style="flex:1;min-width:0">
         <p class="title">${esc(e.title)}</p>
-        <div class="detail">${icon('clock',12,'#6b7280')} ${esc(e.time)}</div>
-        ${e.location?`<div class="detail">${icon('pin',12,'#6b7280')} ${esc(e.location)}</div>`:''}
-      </div></div></div>`;
-  });
-  h += `<h3 style="font-size:16px;font-weight:600;margin:24px 0 4px">Tomorrow, Fri Mar 13</h3>
-    <p style="font-size:12px;color:#6b7280;margin-bottom:16px">${TOMORROW_EVENTS.length} events</p>`;
-  TOMORROW_EVENTS.forEach(e => {
-    h += `<div class="card evt-full"><div style="display:flex;align-items:flex-start;gap:12px">
-      <span class="icon">${e.icon}</span><div style="flex:1">
-        <p class="title">${esc(e.title)}</p>
-        <div class="detail">${icon('clock',12,'#6b7280')} ${esc(e.time)}</div>
-        ${e.location?`<div class="detail">${icon('pin',12,'#6b7280')} ${esc(e.location)}</div>`:''}
-      </div></div></div>`;
-  });
-  h += `</div>`;
-  return h;
-}
-
-function renderTodos() {
-  const p = pending(), d = done();
-  let h = `<div class="section">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <h3 style="font-size:16px;font-weight:600">Tasks (${p.length})</h3>
-      <button class="btn" onclick="state.showAdd=!state.showAdd;render()" style="width:36px;height:36px;border-radius:50%;background:#4f46e5;color:#fff;display:flex;align-items:center;justify-content:center">${icon('plus',18,'#fff')}</button>
-    </div>`;
-
-  if (state.showAdd) {
-    h += `<div class="card add-form">
-      <input id="new-todo-input" placeholder="What needs to be done?" value="${esc(state.newTodo)}" onkeydown="if(event.key==='Enter')addTodo()" oninput="state.newTodo=this.value" autofocus>
-      <div class="priority-btns">
-        ${['high','medium','low'].map(p => `<button class="btn pri-btn" onclick="state.newPriority='${p}';render()" style="border:${state.newPriority===p?'2px':'1px'} solid ${priColor(p)};background:${state.newPriority===p?priBg(p):'transparent'};color:${priColor(p)}">${p}</button>`).join('')}
-        <button class="add-btn" onclick="addTodo()">Add</button>
+        <p class="meta">${esc(e.time)}${e.location?' \u00b7 '+esc(e.location):''}</p>
       </div>
-    </div>`;
-  }
-
-  p.forEach(t => {
-    h += `<div class="card todo-item ${t.priority}">
-      <button class="btn" onclick="toggleTodo(${t.id})" style="color:#6b7280;padding:0">${icon('circle',20)}</button>
-      <span class="todo-text">${esc(t.text)}</span>
-      <button class="btn" onclick="deleteTodo(${t.id})" style="color:#6b7280;opacity:.4;padding:0">${icon('trash',16)}</button>
+      ${PREP_DATA[e.id] ? `<span style="color:#4f46e5;opacity:.6">${icon('brain',16)}</span>` : ''}
     </div>`;
   });
+  h += `</div>`;
 
-  if (d.length) {
-    h += `<p style="font-size:12px;color:#6b7280;margin:20px 0 8px">Completed (${d.length})</p>`;
-    d.forEach(t => {
-      h += `<div class="card todo-item todo-done" style="border-left:3px solid #10b981">
-        <button class="btn" onclick="toggleTodo(${t.id})" style="color:#10b981;padding:0">${icon('check',20)}</button>
-        <span class="todo-text">${esc(t.text)}</span>
+  // To-do list preview (high priority)
+  const highTodos = getHighPriorityTodos();
+  h += `<div><div class="section-header"><h3 style="font-size:14px;font-weight:600">To-Do List</h3><span class="accent" style="font-size:12px;cursor:pointer" onclick="setTab('todos')">See all \u2192</span></div>`;
+  if (highTodos.length === 0) {
+    h += `<div class="card" style="padding:16px;text-align:center;color:#6b7280;font-size:13px">No high-priority tasks. Open the full to-do list to see all items.</div>`;
+  } else {
+    highTodos.forEach(t => {
+      h += `<div class="card evt-card" style="border-left:3px solid ${priColor(t.priority)}">
+        <span style="color:${priColor(t.priority)}">${icon('circle',18)}</span>
+        <div style="flex:1;min-width:0">
+          <span style="font-size:13px">${esc(t.text)}</span>
+          ${t.person || t.nextStep ? `<div class="todo-meta">${t.person ? '<span>'+esc(t.person)+'</span>' : ''}${t.nextStep ? '<span>'+esc(t.nextStep)+'</span>' : ''}</div>` : ''}
+        </div>
       </div>`;
     });
   }
   h += `</div>`;
+
+  // Reminders
+  if (REMINDERS.length > 0) {
+    h += `<div style="margin-top:20px"><p style="font-size:12px;color:#6b7280;margin-bottom:6px">\ud83d\udccc All-day reminders</p>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">${REMINDERS.map(r => `<span style="background:#fef3c7;color:#92400e;padding:4px 10px;border-radius:8px;font-size:12px">${esc(r)}</span>`).join('')}</div></div>`;
+  }
+
+  h += `</div>`;
   return h;
 }
 
+// âââ Schedule Tab ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+function renderSchedule() {
+  let h = `<div class="section">
+    <h3 style="font-size:16px;font-weight:600;margin-bottom:4px">Today, ${shortDate()}</h3>
+    <p style="font-size:12px;color:#6b7280;margin-bottom:16px">${TODAY_EVENTS.length} events \u00b7 PDT</p>`;
+
+  TODAY_EVENTS.forEach(e => {
+    const status = getEventStatus(e);
+    const cls = status === "now" ? "evt-now" : status === "past" ? "evt-past" : "";
+    h += `<div class="card evt-full ${cls}" onclick="${PREP_DATA[e.id]?`openPrep('${e.id}')`:''}">
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <span class="icon">${e.icon}</span>
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:6px">
+            <p class="title" style="flex:1">${esc(e.title)}</p>
+            ${status === "now" ? '<span class="time-dot live"></span>' : ''}
+            ${PREP_DATA[e.id] ? `<span style="color:#4f46e5;opacity:.6">${icon('brain',16)}</span>` : ''}
+          </div>
+          <div class="detail">${icon('clock',12,'#6b7280')} ${esc(e.time)} \u2013 ${esc(e.end || '')}</div>
+          ${e.location?`<div class="detail">${icon('pin',12,'#6b7280')} ${esc(e.location)}</div>`:''}
+          ${e.person?`<div class="detail" style="color:#4f46e5">\ud83d\udc64 ${esc(e.person)}</div>`:''}
+        </div>
+      </div>
+    </div>`;
+  });
+
+  h += `<h3 style="font-size:16px;font-weight:600;margin:24px 0 4px">Tomorrow, Sat Mar 14</h3>
+    <p style="font-size:12px;color:#6b7280;margin-bottom:16px">${TOMORROW_EVENTS.length} events</p>`;
+  TOMORROW_EVENTS.forEach(e => {
+    h += `<div class="card evt-full" onclick="${PREP_DATA[e.id]?`openPrep('${e.id}')`:''}">
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <span class="icon">${e.icon}</span>
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:6px">
+            <p class="title" style="flex:1">${esc(e.title)}</p>
+            ${PREP_DATA[e.id] ? `<span style="color:#4f46e5;opacity:.6">${icon('brain',16)}</span>` : ''}
+          </div>
+          <div class="detail">${icon('clock',12,'#6b7280')} ${esc(e.time)}</div>
+          ${e.location?`<div class="detail">${icon('pin',12,'#6b7280')} ${esc(e.location)}</div>`:''}
+        </div>
+      </div>
+    </div>`;
+  });
+  h += `</div>`;
+  return h;
+}
+
+// âââ Todos Tab âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+function renderTodos() {
+  const todos = getTodos();
+  const pendingCount = getAllPendingCount();
+  let h = `<div class="section">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <h3 style="font-size:16px;font-weight:600">To-Do List (${pendingCount})</h3>
+      <div style="display:flex;gap:8px">
+        <button class="btn" onclick="state.showAdd=!state.showAdd;render()" style="width:36px;height:36px;border-radius:50%;background:#4f46e5;color:#fff;display:flex;align-items:center;justify-content:center">${icon('plus',18,'#fff')}</button>
+      </div>
+    </div>`;
+
+  if (state.showAdd) {
+    h += `<div class="card add-form">
+      <input id="new-todo-input" placeholder="What needs to be done?" value="${esc(state.newTodo)}" onkeydown="if(event.key==='Enter')addNewTodo()" oninput="state.newTodo=this.value" autofocus>
+      <div class="priority-btns">
+        ${['high','medium','low'].map(p => `<button class="btn pri-btn" onclick="state.newPriority='${p}';render()" style="border:${state.newPriority===p?'2px':'1px'} solid ${priColor(p)};background:${state.newPriority===p?priBg(p):'transparent'};color:${priColor(p)}">${p}</button>`).join('')}
+        <button class="add-btn" onclick="addNewTodo()">Add</button>
+      </div>
+    </div>`;
+  }
+
+  // Show tip about full todo app
+  h += `<div class="card" style="padding:12px 16px;margin-bottom:16px;background:#eef2ff;border-color:#c7d2fe">
+    <p style="font-size:12px;color:#4f46e5;font-weight:500">This syncs with your full To-Do app. For advanced features (person, deadline, next steps, focus mode), open the full app.</p>
+  </div>`;
+
+  if (todos.length === 0) {
+    h += `<div class="card" style="padding:24px;text-align:center;color:#6b7280;font-size:13px">No pending tasks found. Add one above or use the full to-do app.</div>`;
+  } else {
+    todos.slice(0, 20).forEach(t => {
+      h += `<div class="card todo-item ${t.priority || 'medium'}">
+        <span style="color:${priColor(t.priority||'medium')}">${icon('circle',18)}</span>
+        <div style="flex:1;min-width:0">
+          <span class="todo-text">${esc(t.text)}</span>
+          <div class="todo-meta">
+            ${t.person ? `<span>\ud83d\udc64 ${esc(t.person)}</span>` : ''}
+            ${t.deadline ? `<span>\ud83d\udcc5 ${esc(t.deadline)}</span>` : ''}
+            ${t.nextStep ? `<span>\u26a1 ${esc(t.nextStep)}</span>` : ''}
+            ${t.category ? `<span style="text-transform:uppercase;font-size:10px;color:#9ca3af">${esc(t.category)}</span>` : ''}
+          </div>
+        </div>
+      </div>`;
+    });
+    if (todos.length > 20) {
+      h += `<p style="text-align:center;font-size:12px;color:#6b7280;margin-top:8px">+ ${todos.length - 20} more tasks. Open full app to see all.</p>`;
+    }
+  }
+
+  h += `</div>`;
+  return h;
+}
+
+function addNewTodo() {
+  const inp = document.getElementById("new-todo-input");
+  if (!inp || !inp.value.trim()) return;
+  addTodoToStorage(inp.value.trim(), state.newPriority);
+  state.newTodo = ""; state.showAdd = false;
+  showToast("Task added to your to-do list!");
+  render();
+}
+
+// âââ Inbox Tab âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function renderInbox() {
   let h = `<div class="section">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
       <h3 style="font-size:16px;font-weight:600">Inbox</h3>
       <span style="font-size:12px;color:#ef4444;font-weight:600;background:#fef2f2;padding:4px 10px;border-radius:8px">~201 unread</span>
     </div>
-    <div class="card" style="padding:12px 16px;margin-bottom:16px;background:#eef2ff;border-color:#c7d2fe">
-      <p style="font-size:13px;font-weight:600;color:#4f46e5">Most unread are Zoom meeting recaps</p>
-      <p style="font-size:12px;color:#6b7280;margin-top:4px">~8 forwarded Zoom summaries from your IV account. 2 items look actionable.</p>
-    </div>`;
-
-  EMAILS.forEach(e => {
-    h += `<div class="card email-card${e.important?' important':''}">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <p style="font-size:13px;font-weight:600;flex:1">${esc(e.subject)}</p>
-        <span style="font-size:11px;color:#6b7280;white-space:nowrap;margin-left:8px">${e.time}</span>
+    <div class="card" style="padding:16px;margin-bottom:16px;background:#eef2ff;border-color:#c7d2fe">
+      <p style="font-size:13px;font-weight:600;color:#4f46e5">Inbox triage works best in Cowork</p>
+      <p style="font-size:12px;color:#6b7280;margin-top:4px">Ask your EA in Cowork to triage emails, draft replies, or summarize threads.</p>
+    </div>
+    <div class="card" style="padding:16px;margin-bottom:12px">
+      <p style="font-size:13px;font-weight:600;margin-bottom:8px">Quick actions you can ask:</p>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:13px;color:#4f46e5;cursor:pointer">\u2022 "Triage my emails"</div>
+        <div style="font-size:13px;color:#4f46e5;cursor:pointer">\u2022 "Summarize unread from today"</div>
+        <div style="font-size:13px;color:#4f46e5;cursor:pointer">\u2022 "Draft a reply to [person]"</div>
+        <div style="font-size:13px;color:#4f46e5;cursor:pointer">\u2022 "Find emails about [deal name]"</div>
       </div>
-      <p style="font-size:12px;color:#6b7280">${esc(e.from)}</p>
-      <p style="font-size:12px;color:#6b7280;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(e.snippet)}</p>
-    </div>`;
-  });
-
-  h += `<div class="card" style="padding:16px;margin-top:16px;text-align:center">
-    <p style="font-size:13px;color:#6b7280">For full inbox triage, ask in Cowork:</p>
-    <p style="font-size:13px;font-weight:600;color:#4f46e5;margin-top:4px">"Triage my emails"</p>
-  </div></div>`;
+    </div>
+    <div class="card" style="padding:12px 16px;text-align:center;color:#6b7280;font-size:12px;margin-top:12px">
+      Email accounts: davidyin.sg@gmail.com \u00b7 davidyin@informedventures.com
+    </div>
+  </div>`;
   return h;
 }
 
-function esc(s) { const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+function esc(s) { if (!s) return ''; const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
 
 // Initial render
 render();
