@@ -111,34 +111,34 @@
 <div id="app"></div>
 
 <script>
-// âââ Data ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ─── Data ────────────────────────────────────────────────────────────────────
 const TODAY_EVENTS = [
-  { time: "12:00 AM â 3:50 AM", title: "Claude", icon: "ð»" },
-  { time: "2:00 AM â 2:25 AM", title: "Call: Valerie Osband Mahoney (NFX)", icon: "ð", location: "Zoom" },
-  { time: "3:00 AM â 3:45 AM", title: "Coffee with Cami @ Blue Bottle", icon: "â", location: "Blue Bottle, 2 S Park St" },
-  { time: "4:00 AM â 5:00 AM", title: "David / Cathryn", icon: "ð¤", location: "South Beach Cafe" },
-  { time: "5:00 AM â 5:40 AM", title: "Claude", icon: "ð»" },
-  { time: "8:00 AM â 8:30 AM", title: "Chuk <> Informed Ventures", icon: "ð", location: "Zoom" },
-  { time: "8:45 AM â 9:15 AM", title: "Elephants <> Informed Ventures", icon: "ð", location: "Zoom" },
-  { time: "9:00 AM â 10:00 AM", title: "IV Fintech Sync / Presentations", icon: "ð", location: "Zoom" },
-  { time: "9:15 AM â 9:45 AM", title: "Rhythmic <> Informed Ventures", icon: "ð", location: "Zoom" },
-  { time: "9:30 AM â 11:30 AM", title: "Private Party with Didi's CFO", icon: "ð", location: "1235D Howard St, SF" },
-  { time: "12:00 PM â 12:40 PM", title: "Mandy event", icon: "ð" },
-  { time: "11:30 PM â 12:00 AM", title: "Informed x Anna (Perena)", icon: "ð", location: "Google Meet" },
+  { time: "12:00 AM \u2013 3:50 AM", title: "Claude", icon: "\ud83d\udcbb" },
+  { time: "2:00 AM \u2013 2:25 AM", title: "Call: Valerie Osband Mahoney (NFX)", icon: "\ud83d\udcde", location: "Zoom" },
+  { time: "3:00 AM \u2013 3:45 AM", title: "Coffee with Cami @ Blue Bottle", icon: "\u2615", location: "Blue Bottle, 2 S Park St" },
+  { time: "4:00 AM \u2013 5:00 AM", title: "David / Cathryn", icon: "\ud83e\udd1d", location: "South Beach Cafe" },
+  { time: "5:00 AM \u2013 5:40 AM", title: "Claude", icon: "\ud83d\udcbb" },
+  { time: "8:00 AM \u2013 8:30 AM", title: "Chuk <> Informed Ventures", icon: "\ud83d\udcde", location: "Zoom" },
+  { time: "8:45 AM \u2013 9:15 AM", title: "Elephants <> Informed Ventures", icon: "\ud83d\udcde", location: "Zoom" },
+  { time: "9:00 AM \u2013 10:00 AM", title: "IV Fintech Sync / Presentations", icon: "\ud83d\udcca", location: "Zoom" },
+  { time: "9:15 AM \u2013 9:45 AM", title: "Rhythmic <> Informed Ventures", icon: "\ud83d\udcde", location: "Zoom" },
+  { time: "9:30 AM \u2013 11:30 AM", title: "Private Party with Didi's CFO", icon: "\ud83c\udf89", location: "1235D Howard St, SF" },
+  { time: "12:00 PM \u2013 12:40 PM", title: "Mandy event", icon: "\ud83c\udf89" },
+  { time: "11:30 PM \u2013 12:00 AM", title: "Informed x Anna (Perena)", icon: "\ud83d\udcde", location: "Google Meet" },
 ];
 
 const TOMORROW_EVENTS = [
-  { time: "12:30 AM", title: "Informed Ventures & Gus Ba", icon: "ð" },
-  { time: "1:00 AM", title: "David Yin & Variant", icon: "ð" },
-  { time: "1:30 AM", title: "Dennis Cong's Zoom", icon: "ð" },
-  { time: "2:00 AM", title: "Informed & Sahil Hasan", icon: "ð" },
-  { time: "3:00 AM", title: "David Yin & Will Robinson", icon: "ð" },
-  { time: "5:00 AM", title: "Prep for Zoom call", icon: "ð»" },
-  { time: "6:00 AM", title: "Dennis a16z speedrun call", icon: "ð" },
-  { time: "7:00 AM", title: "Linda Sheng @ BB Visa", icon: "ð¤" },
-  { time: "8:00 AM", title: "Trovy <> Informed Ventures", icon: "ð", location: "Zoom" },
-  { time: "5:00 PM", title: "Sutton Capital PE & VC Summit", icon: "ð", location: "1 Embarcadero Ctr" },
-  { time: "6:30 PM", title: "Chinese Founders Dinner (Altos)", icon: "ð½ï¸", location: "250 California Dr, Burlingame" },
+  { time: "12:30 AM", title: "Informed Ventures & Gus Ba", icon: "\ud83d\udcde" },
+  { time: "1:00 AM", title: "David Yin & Variant", icon: "\ud83d\udcde" },
+  { time: "1:30 AM", title: "Dennis Cong's Zoom", icon: "\ud83d\udcde" },
+  { time: "2:00 AM", title: "Informed & Sahil Hasan", icon: "\ud83d\udcde" },
+  { time: "3:00 AM", title: "David Yin & Will Robinson", icon: "\ud83d\udcde" },
+  { time: "5:00 AM", title: "Prep for Zoom call", icon: "\ud83d\udcbb" },
+  { time: "6:00 AM", title: "Dennis a16z speedrun call", icon: "\ud83d\udcde" },
+  { time: "7:00 AM", title: "Linda Sheng @ BB Visa", icon: "\ud83e\udd1d" },
+  { time: "8:00 AM", title: "Trovy <> Informed Ventures", icon: "\ud83d\udcde", location: "Zoom" },
+  { time: "5:00 PM", title: "Sutton Capital PE & VC Summit", icon: "\ud83c\udf89", location: "1 Embarcadero Ctr" },
+  { time: "6:30 PM", title: "Chinese Founders Dinner (Altos)", icon: "\ud83c\udf7d", location: "250 California Dr, Burlingame" },
 ];
 
 const EMAILS = [
@@ -148,7 +148,7 @@ const EMAILS = [
   { from: "Self (IV)", subject: "Meeting Summary - Miranda/Tony", snippet: "Zoom AI companion summary", time: "6:33 AM", important: false },
 ];
 
-// âââ State âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ─── State ───────────────────────────────────────────────────────────────────
 let state = {
   tab: "home",
   todos: [
@@ -192,7 +192,7 @@ const priBg = p => p === "high" ? "#fef2f2" : p === "medium" ? "#fffbeb" : "#f9f
 const pending = () => state.todos.filter(t => !t.done).sort((a,b) => {const o={high:0,medium:1,low:2}; return o[a.priority]-o[b.priority];});
 const done = () => state.todos.filter(t => t.done);
 
-// âââ SVG Icons âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ─── SVG Icons ───────────────────────────────────────────────────────────────
 const icons = {
   mic: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>',
   home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
@@ -213,7 +213,7 @@ function icon(name, size=20, color="currentColor") {
   return `<span style="display:inline-flex;width:${size}px;height:${size}px;color:${color}">${icons[name]||""}</span>`;
 }
 
-// âââ Voice âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ─── Voice ───────────────────────────────────────────────────────────────────
 let recognition = null;
 
 function startVoice() {
@@ -265,7 +265,7 @@ function showToast(msg) {
   setTimeout(() => { state.toast = ""; render(); }, 3500);
 }
 
-// âââ Actions âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ─── Actions ─────────────────────────────────────────────────────────────────
 function toggleTodo(id) { const t = state.todos.find(x => x.id === id); if (t) t.done = !t.done; render(); }
 function deleteTodo(id) { state.todos = state.todos.filter(x => x.id !== id); render(); }
 function addTodo() {
@@ -276,7 +276,7 @@ function addTodo() {
 }
 function setTab(t) { state.tab = t; render(); }
 
-// âââ Render ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ─── Render ──────────────────────────────────────────────────────────────────
 function render() {
   const app = document.getElementById("app");
   let html = "";
@@ -351,14 +351,14 @@ function renderHome() {
   </div>`;
 
   // Today schedule preview
-  h += `<div style="margin-bottom:20px"><div class="section-header"><h3 style="font-size:14px;font-weight:600">Today's Schedule</h3><span class="accent" style="font-size:12px;cursor:pointer" onclick="setTab('schedule')">See all â</span></div>`;
+  h += `<div style="margin-bottom:20px"><div class="section-header"><h3 style="font-size:14px;font-weight:600">Today's Schedule</h3><span class="accent" style="font-size:12px;cursor:pointer" onclick="setTab('schedule')">See all \u2192</span></div>`;
   TODAY_EVENTS.slice(0,5).forEach(e => {
-    h += `<div class="card evt-card"><span class="icon">${e.icon}</span><div style="flex:1;min-width:0"><p class="title">${esc(e.title)}</p><p class="meta">${esc(e.time)}${e.location?' Â· '+esc(e.location):''}</p></div></div>`;
+    h += `<div class="card evt-card"><span class="icon">${e.icon}</span><div style="flex:1;min-width:0"><p class="title">${esc(e.title)}</p><p class="meta">${esc(e.time)}${e.location?' \u00b7 '+esc(e.location):''}</p></div></div>`;
   });
   h += `</div>`;
 
   // Top tasks
-  h += `<div><div class="section-header"><h3 style="font-size:14px;font-weight:600">Top Tasks</h3><span class="accent" style="font-size:12px;cursor:pointer" onclick="setTab('todos')">See all â</span></div>`;
+  h += `<div><div class="section-header"><h3 style="font-size:14px;font-weight:600">Top Tasks</h3><span class="accent" style="font-size:12px;cursor:pointer" onclick="setTab('todos')">See all \u2192</span></div>`;
   p.filter(t=>t.priority==="high").slice(0,3).forEach(t => {
     h += `<div class="card evt-card" style="cursor:pointer" onclick="toggleTodo(${t.id})">
       <span style="color:${priColor(t.priority)}">${icon('circle',20)}</span>
@@ -373,7 +373,7 @@ function renderHome() {
 function renderSchedule() {
   let h = `<div class="section">
     <h3 style="font-size:16px;font-weight:600;margin-bottom:4px">Today, ${shortDate()}</h3>
-    <p style="font-size:12px;color:#6b7280;margin-bottom:16px">${TODAY_EVENTS.length} events Â· PDT</p>`;
+    <p style="font-size:12px;color:#6b7280;margin-bottom:16px">${TODAY_EVENTS.length} events \u00b7 PDT</p>`;
   TODAY_EVENTS.forEach(e => {
     h += `<div class="card evt-full"><div style="display:flex;align-items:flex-start;gap:12px">
       <span class="icon">${e.icon}</span><div style="flex:1">
