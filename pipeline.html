@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#fafafa">
+<title>Deal Pipeline - Dave's EA</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  ::-webkit-scrollbar { display: none; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro", "Segoe UI", Roboto, sans-serif;
+    background: #fafafa; color: #111827;
+    max-width: 480px; margin: 0 auto;
+    min-height: 100vh; padding-bottom: 32px; overflow-x: hidden;
+  }
+  .card { background: #fff; border-radius: 14px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,.04); margin-bottom: 10px; }
+  .header { padding: 20px 20px 0; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .back-btn { background: none; border: none; cursor: pointer; font-size: 14px; color: #4f46e5; font-weight: 600; font-family: inherit; display: flex; align-items: center; gap: 4px; }
+  .section { padding: 0 16px; margin-bottom: 24px; }
+
+  /* Stats */
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding: 0 16px; margin-bottom: 20px; }
+  .stat-card { padding: 14px 12px; text-align: center; }
+  .stat-num { font-size: 22px; font-weight: 800; }
+  .stat-label { font-size: 11px; color: #6b7280; margin-top: 2px; }
+
+  /* Stage header */
+  .stage-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .stage-name { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .stage-count { font-size: 12px; color: #6b7280; background: #f3f4f6; padding: 2px 8px; border-radius: 10px; }
+  .stage-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+  /* Deal card */
+  .deal-card { padding: 14px 16px; cursor: pointer; transition: background .15s; }
+  .deal-card:hover { background: #f9fafb; }
+  .deal-name { font-size: 14px; font-weight: 600; }
+  .deal-company { font-size: 12px; color: #6b7280; margin-top: 1px; }
+  .deal-row { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+  .deal-amount { font-size: 13px; font-weight: 700; color: #4f46e5; }
+  .deal-tag { font-size: 10px; padding: 3px 8px; border-radius: 6px; font-weight: 600; }
+  .deal-meta { display: flex; gap: 12px; margin-top: 6px; font-size: 11px; color: #6b7280; }
+  .deal-action { font-size: 12px; color: #4f46e5; font-weight: 500; margin-top: 6px; padding: 6px 0; border-top: 1px solid #f3f4f6; }
+
+  /* Funnel viz */
+  .funnel { padding: 0 16px; margin-bottom: 24px; }
+  .funnel-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .funnel-label { font-size: 11px; width: 80px; text-align: right; color: #6b7280; font-weight: 500; }
+  .funnel-track { flex: 1; height: 20px; background: #f3f4f6; border-radius: 4px; overflow: hidden; }
+  .funnel-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 8px; font-size: 10px; color: #fff; font-weight: 700; transition: width .5s; }
+
+  /* Detail modal */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 80; display: flex; align-items: flex-end; justify-content: center; }
+  .modal-content { background: #fff; border-radius: 20px 20px 0 0; width: 100%; max-width: 480px; max-height: 85vh; overflow-y: auto; padding: 24px 20px 40px; box-shadow: 0 -8px 32px rgba(0,0,0,.15); animation: slideUp .3s ease; }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+  .tip-card { padding: 12px 16px; margin: 0 16px 16px; background: #eef2ff; border-color: #c7d2fe; }
+  .tip-card p { font-size: 12px; color: #4f46e5; font-weight: 500; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <button class="back-btn" onclick="window.location.href='index.html'">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    EA Home
+  </button>
+</div>
+
+<div style="padding:0 16px;margin-bottom:20px">
+  <h1 style="font-size:24px;font-weight:800">Deal Pipeline</h1>
+  <p style="font-size:13px;color:#6b7280;margin-top:4px">Active deals, stages & next actions</p>
+</div>
+
+<div class="stats-grid" id="stats"></div>
+<div class="funnel" id="funnel"></div>
+<div id="stages"></div>
+<div id="modal"></div>
+
+<div class="card tip-card">
+  <p>Ask your EA in Cowork to update deal stages, add new prospects, or generate pipeline reports.</p>
+</div>
+
+<script>
+const STAGES = [
+  { name: 'Sourcing', color: '#6b7280', deals: [
+    { name: 'HealthBridge', founder: 'Rachel Kim', sector: 'HealthTech', amount: '$500K', check: 'Pre-Seed', nextAction: 'Schedule deep dive call', lastUpdate: '2026-03-01', notes: 'AI diagnostics for rural clinics. YC W26 batch.' },
+    { name: 'Quantum Pay', founder: 'Luis Herrera', sector: 'Fintech', amount: '$750K', check: 'Pre-Seed', nextAction: 'Request deck & financials', lastUpdate: '2026-03-08', notes: 'Cross-border payments for LATAM SMBs.' }
+  ]},
+  { name: 'First Meeting', color: '#2563eb', deals: [
+    { name: 'CodeWeave', founder: 'Amir Hassan', sector: 'DevTools', amount: '$1M', check: 'Seed', nextAction: 'Technical DD with Wei Zhang', lastUpdate: '2026-03-10', notes: 'AI code review platform. 3x better than competitors on benchmarks.' },
+    { name: 'GreenRoute', founder: 'Emma Larsson', sector: 'Climate', amount: '$1.5M', check: 'Seed', nextAction: 'Reference calls with 3 customers', lastUpdate: '2026-03-07', notes: 'Supply chain carbon tracking. $200K ARR.' }
+  ]},
+  { name: 'Due Diligence', color: '#7c3aed', deals: [
+    { name: 'NexaFlow', founder: 'Alex Rivera', sector: 'Fintech', amount: '$2M', check: 'Seed', nextAction: 'Review Q1 metrics by Mar 15', lastUpdate: '2026-03-11', notes: 'Payment orchestration. $80K MRR, 15% MoM growth. Strong unit economics.' },
+    { name: 'DataMesh AI', founder: 'Marcus Thompson', sector: 'AI/ML', amount: '$3M', check: 'Series A (follow-on)', nextAction: 'Board call Mar 17', lastUpdate: '2026-03-12', notes: 'Enterprise data platform. Series A $12M closed. Our seed is 4.2x marked up.' }
+  ]},
+  { name: 'Term Sheet', color: '#059669', deals: [
+    { name: 'CloudKitchen Asia', founder: 'Priya Sharma', sector: 'FoodTech', amount: '$2.5M', check: 'Series B (follow-on)', nextAction: 'Finalize terms with Goldman by Mar 20', lastUpdate: '2026-03-08', notes: 'Expanding to Vietnam. Need $25M Series B. We\'re committing $2.5M follow-on.' }
+  ]},
+  { name: 'Closed', color: '#16a34a', deals: [
+    { name: 'TechFlow', founder: 'Wei Zhang', sector: 'DevTools', amount: '$1.2M', check: 'Seed', nextAction: 'Monthly product review', lastUpdate: '2026-03-09', notes: 'Closed Dec 2025. Developer workflow automation.' }
+  ]}
+];
+
+function totalDeals() { return STAGES.reduce((s,st) => s + st.deals.length, 0); }
+function totalCapital() {
+  let t = 0;
+  STAGES.forEach(st => st.deals.forEach(d => { t += parseFloat(d.amount.replace(/[^0-9.]/g,'')); }));
+  return t;
+}
+
+function renderStats() {
+  const active = STAGES.slice(0,4).reduce((s,st) => s + st.deals.length, 0);
+  document.getElementById('stats').innerHTML = `
+    <div class="card stat-card"><div class="stat-num" style="color:#4f46e5">${totalDeals()}</div><div class="stat-label">Total Deals</div></div>
+    <div class="card stat-card"><div class="stat-num" style="color:#059669">$${totalCapital().toFixed(1)}M</div><div class="stat-label">Pipeline Value</div></div>
+    <div class="card stat-card"><div class="stat-num" style="color:#7c3aed">${active}</div><div class="stat-label">Active</div></div>
+  `;
+}
+
+function renderFunnel() {
+  const max = Math.max(...STAGES.map(s => s.deals.length), 1);
+  document.getElementById('funnel').innerHTML = STAGES.map(st => `<div class="funnel-bar">
+    <span class="funnel-label">${st.name}</span>
+    <div class="funnel-track">
+      <div class="funnel-fill" style="width:${(st.deals.length/max)*100}%;background:${st.color}">${st.deals.length}</div>
+    </div>
+  </div>`).join('');
+}
+
+function renderStages() {
+  let h = '';
+  STAGES.forEach((st, si) => {
+    if (st.deals.length === 0) return;
+    h += `<div class="section">
+      <div class="stage-header">
+        <div class="stage-name">
+          <span class="stage-dot" style="background:${st.color}"></span>
+          ${st.name}
+        </div>
+        <span class="stage-count">${st.deals.length}</span>
+      </div>`;
+    st.deals.forEach((d, di) => {
+      h += `<div class="card deal-card" onclick="openDeal(${si},${di})">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <div class="deal-name">${d.name}</div>
+            <div class="deal-company">${d.founder} \u00b7 ${d.sector}</div>
+          </div>
+          <span class="deal-tag" style="background:${st.color}20;color:${st.color}">${d.check}</span>
+        </div>
+        <div class="deal-row">
+          <span class="deal-amount">${d.amount}</span>
+          <span style="font-size:11px;color:#6b7280">${d.lastUpdate}</span>
+        </div>
+        <div class="deal-action">\u26a1 ${d.nextAction}</div>
+      </div>`;
+    });
+    h += '</div>';
+  });
+  document.getElementById('stages').innerHTML = h;
+}
+
+function openDeal(si, di) {
+  const st = STAGES[si];
+  const d = st.deals[di];
+  document.getElementById('modal').innerHTML = `<div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal-content">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+        <button onclick="closeModal()" style="background:none;border:none;cursor:pointer;font-size:20px;color:#6b7280">\u2715</button>
+      </div>
+      <h2 style="font-size:20px;font-weight:800;margin-bottom:4px">${d.name}</h2>
+      <p style="font-size:13px;color:#6b7280;margin-bottom:16px">${d.founder} \u00b7 ${d.sector}</p>
+      <div style="display:flex;gap:8px;margin-bottom:16px">
+        <span class="deal-tag" style="background:${st.color}20;color:${st.color};font-size:12px;padding:4px 12px">${st.name}</span>
+        <span class="deal-tag" style="background:#eef2ff;color:#4f46e5;font-size:12px;padding:4px 12px">${d.check}</span>
+        <span class="deal-tag" style="background:#dcfce7;color:#059669;font-size:12px;padding:4px 12px">${d.amount}</span>
+      </div>
+      <div style="margin-bottom:16px">
+        <h3 style="font-size:13px;font-weight:600;color:#4f46e5;margin-bottom:8px">Next Action</h3>
+        <p style="font-size:14px;font-weight:600">\u26a1 ${d.nextAction}</p>
+      </div>
+      <div style="margin-bottom:16px">
+        <h3 style="font-size:13px;font-weight:600;color:#4f46e5;margin-bottom:8px">Notes</h3>
+        <p style="font-size:13px;line-height:1.6;color:#374151">${d.notes}</p>
+      </div>
+      <div>
+        <h3 style="font-size:13px;font-weight:600;color:#4f46e5;margin-bottom:4px">Last Updated</h3>
+        <p style="font-size:13px;color:#6b7280">${d.lastUpdate}</p>
+      </div>
+    </div>
+  </div>`;
+}
+
+function closeModal() { document.getElementById('modal').innerHTML = ''; }
+
+renderStats();
+renderFunnel();
+renderStages();
+</script>
+</body>
+</html>
