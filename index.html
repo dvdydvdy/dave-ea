@@ -141,27 +141,17 @@
 <script>
 // ─── Live Data (updated 2026-03-13) ─────────────────────────────────────────
 const TODAY_EVENTS = [
-  { time: "7:40 AM", end: "8:00 AM", title: "David / Dennis - Trovy sync", icon: "\ud83d\udcde", location: "Zoom", id: "trovy-dennis", person: "Dennis Cong", company: "Trovy", type: "deal" },
-  { time: "8:00 AM", end: "8:45 AM", title: "Trovy <> Informed Ventures", icon: "\ud83d\udcde", location: "Zoom", id: "trovy-iv", person: "Trovy team", company: "Trovy", type: "deal" },
-  { time: "9:00 AM", end: "9:30 AM", title: "US Investment Check-in", icon: "\ud83d\udcca", location: "Zoom", id: "us-invest", person: "IV Team", company: "Informed Ventures", type: "internal" },
-  { time: "11:00 AM", end: "12:30 PM", title: "Travel", icon: "\ud83d\ude97", id: "travel-1", type: "travel" },
-  { time: "12:30 PM", end: "1:00 PM", title: "EWB lunch with CEO Dominic Ng", icon: "\ud83c\udf7d\ufe0f", id: "ewb-lunch", person: "Dominic Ng", company: "East West Bank", type: "networking" },
-  { time: "1:00 PM", end: "2:00 PM", title: "David <> Ryan (Fusion Fund)", icon: "\ud83d\udcde", location: "Zoom", id: "ryan-fusion", person: "Ryan", company: "Fusion Fund", type: "deal" },
-  { time: "2:00 PM", end: "4:00 PM", title: "Travel", icon: "\ud83d\ude97", id: "travel-2", type: "travel" },
-  { time: "4:00 PM", end: "5:00 PM", title: "Yu Kuai / David @ near Salesforce", icon: "\ud83e\udd1d", location: "Near Salesforce Tower", id: "yu-kuai", person: "Yu Kuai", type: "networking" },
-  { time: "5:00 PM", end: "5:30 PM", title: "David <> Linda", icon: "\ud83e\udd1d", location: "FiDi", id: "linda", person: "Linda", type: "networking" },
-  { time: "5:30 PM", end: "6:00 PM", title: "Under Pressure: Mandy Wen", icon: "\ud83c\udf89", location: "AngelList", id: "mandy-wen", person: "Mandy Wen", company: "AngelList", type: "event" },
-  { time: "6:00 PM", end: "6:30 PM", title: "Mithra Office Warming", icon: "\ud83c\udf89", location: "410 Townsend St", id: "mithra", company: "Mithra", type: "event" },
-  { time: "6:30 PM", end: "7:00 PM", title: "David / Olga weekly dinner", icon: "\ud83c\udf7d\ufe0f", id: "olga-dinner", person: "Olga", type: "personal" },
-  { time: "7:00 PM", end: "9:00 PM", title: "Private Dinner: amber.ac & Pantera", icon: "\ud83c\udf7e", location: "PABU Izakaya", id: "pantera-dinner", person: "amber.ac & Pantera", type: "networking" },
+  { time: "10:30 AM", end: "11:00 AM", title: "Dennis Cong & Wasi/Brandon (Maven)", icon: "\ud83d\udcde", location: "Zoom", id: "maven-call", person: "Dennis Cong, Wasi, Brandon", company: "Maven", type: "deal" },
+  { time: "1:30 PM", end: "4:30 PM", title: "Builders & Backers Mixer", icon: "\ud83c\udf89", location: "1017 Dartmouth Ln, Los Altos", id: "builders-mixer", type: "event" },
+  { time: "3:00 PM", end: "5:00 PM", title: "Dentist - xray and cleaning", icon: "\ud83e\udeb7", id: "dentist", type: "personal" },
+  { time: "7:00 PM", end: "8:30 PM", title: "SG Networking Dinner (IMDA)", icon: "\ud83c\udf7d\ufe0f", location: "Tamarine, Palo Alto", id: "sg-dinner", person: "Kiren (IMDA)", type: "networking" },
 ];
 
 const TOMORROW_EVENTS = [
-  { time: "10:30 AM", end: "11:00 AM", title: "Dennis Cong & Wasi/Brandon (Maven)", icon: "\ud83d\udcde", location: "Zoom", id: "maven-call", person: "Dennis, Wasi, Brandon", company: "Maven", type: "deal" },
-  { time: "1:30 PM", end: "3:00 PM", title: "Builders & Backers Mixer", icon: "\ud83c\udf89", location: "Los Altos", id: "builders-mixer", type: "event" },
-  { time: "3:00 PM", end: "4:00 PM", title: "Dentist - xray and cleaning", icon: "\ud83e\udeb7", id: "dentist", type: "personal" },
-  { time: "7:00 PM", end: "9:00 PM", title: "SG Networking Dinner", icon: "\ud83c\udf7d\ufe0f", location: "Tamarine, Palo Alto", id: "sg-dinner", type: "networking" },
-  { time: "8:45 PM", end: "9:30 PM", title: "Caltrain return", icon: "\ud83d\ude86", id: "caltrain", type: "travel" },
+  { time: "7:00 AM", end: "7:30 AM", title: "Roger/David catchup", icon: "\ud83d\udcde", id: "roger-catchup", person: "Roger", type: "personal" },
+  { time: "12:15 PM", end: "1:15 PM", title: "Caltrain SF \u2192 Redwood City", icon: "\ud83d\ude86", id: "caltrain-rwc", type: "travel" },
+  { time: "1:30 PM", end: "5:30 PM", title: "Holiday Party with Xiaoyin & Adam", icon: "\ud83c\udf89", location: "736 Arlington Rd, Redwood City", id: "xiaoyin-party", person: "Xiaoyin, Adam", type: "event" },
+  { time: "5:30 PM", end: "6:00 PM", title: "David / Kate catchup (WhatsApp)", icon: "\ud83d\udcde", id: "kate-catchup", person: "Kate", type: "personal" },
 ];
 
 const REMINDERS = [];
@@ -815,7 +805,8 @@ function renderTodos() {
   if (todos.length === 0) {
     h += `<div class="card" style="padding:24px;text-align:center;color:#6b7280;font-size:13px">No pending tasks found. Add one above or use the full to-do app.</div>`;
   } else {
-    todos.slice(0, 20).forEach(t => {
+    h += `<div style="max-height:60vh;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-right:2px">`;
+    todos.forEach(t => {
       h += `<div class="card todo-item ${t.priority || 'medium'}">
         <span style="color:${priColor(t.priority||'medium')}">${icon('circle',18)}</span>
         <div style="flex:1;min-width:0">
@@ -829,9 +820,8 @@ function renderTodos() {
         </div>
       </div>`;
     });
-    if (todos.length > 20) {
-      h += `<p style="text-align:center;font-size:12px;color:#6b7280;margin-top:8px">+ ${todos.length - 20} more tasks. Open full app to see all.</p>`;
-    }
+    h += `</div>`;
+    h += `<p style="text-align:center;font-size:12px;color:#6b7280;margin-top:8px">${todos.length} tasks total</p>`;
   }
 
   h += `</div>`;
@@ -852,23 +842,27 @@ function renderInbox() {
   let h = `<div class="section">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
       <h3 style="font-size:16px;font-weight:600">Inbox</h3>
-      <span style="font-size:12px;color:#ef4444;font-weight:600;background:#fef2f2;padding:4px 10px;border-radius:8px">~201 unread</span>
+      <a href="https://mail.google.com" target="_blank" style="font-size:12px;color:#4f46e5;text-decoration:none;font-weight:500">Open Gmail \u2197</a>
     </div>
     <div class="card" style="padding:16px;margin-bottom:16px;background:#eef2ff;border-color:#c7d2fe">
-      <p style="font-size:13px;font-weight:600;color:#4f46e5">Inbox triage works best in Cowork</p>
-      <p style="font-size:12px;color:#6b7280;margin-top:4px">Ask your EA in Cowork to triage emails, draft replies, or summarize threads.</p>
+      <p style="font-size:13px;font-weight:600;color:#4f46e5">Email Agent (powered by Cowork)</p>
+      <p style="font-size:12px;color:#6b7280;margin-top:4px">Your email agent can triage, draft replies, and summarize threads. Open Cowork to use it.</p>
     </div>
     <div class="card" style="padding:16px;margin-bottom:12px">
-      <p style="font-size:13px;font-weight:600;margin-bottom:8px">Quick actions you can ask:</p>
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <div style="font-size:13px;color:#4f46e5;cursor:pointer">\u2022 "Triage my emails"</div>
-        <div style="font-size:13px;color:#4f46e5;cursor:pointer">\u2022 "Summarize unread from today"</div>
-        <div style="font-size:13px;color:#4f46e5;cursor:pointer">\u2022 "Draft a reply to [person]"</div>
-        <div style="font-size:13px;color:#4f46e5;cursor:pointer">\u2022 "Find emails about [deal name]"</div>
+      <p style="font-size:13px;font-weight:600;margin-bottom:10px">Quick links:</p>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <a href="https://mail.google.com/mail/u/0/#inbox" target="_blank" style="display:flex;align-items:center;gap:8px;font-size:13px;color:#4f46e5;text-decoration:none;cursor:pointer">${icon('mail',16)} Personal inbox (davidyin.sg)</a>
+        <a href="https://mail.google.com/mail/u/1/#inbox" target="_blank" style="display:flex;align-items:center;gap:8px;font-size:13px;color:#4f46e5;text-decoration:none;cursor:pointer">${icon('mail',16)} Work inbox (informedventures)</a>
       </div>
     </div>
-    <div class="card" style="padding:12px 16px;text-align:center;color:#6b7280;font-size:12px;margin-top:12px">
-      Email accounts: davidyin.sg@gmail.com \u00b7 davidyin@informedventures.com
+    <div class="card" style="padding:16px;margin-bottom:12px">
+      <p style="font-size:13px;font-weight:600;margin-bottom:10px">Ask your EA in Cowork:</p>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:13px;color:#6b7280;cursor:pointer">\u2022 "Triage my emails"</div>
+        <div style="font-size:13px;color:#6b7280;cursor:pointer">\u2022 "Summarize unread from today"</div>
+        <div style="font-size:13px;color:#6b7280;cursor:pointer">\u2022 "Draft a reply to [person]"</div>
+        <div style="font-size:13px;color:#6b7280;cursor:pointer">\u2022 "Find emails about [deal name]"</div>
+      </div>
     </div>
   </div>`;
   return h;
