@@ -1,10 +1,178 @@
-âââââââââââââââââââââââââââââââââââââââââââââ
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#fafafa">
+<title>Dave's EA</title>
+<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiRGF2ZSdzIEVBIiwic2hvcnRfbmFtZSI6IkVBIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiI2ZhZmFmYSIsInRoZW1lX2NvbG9yIjoiIzRmNDZlNSJ9">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  ::-webkit-scrollbar { display: none; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro", "Segoe UI", Roboto, sans-serif;
+    background: #fafafa; color: #111827;
+    max-width: 480px; margin: 0 auto;
+    min-height: 100vh; min-height: 100dvh;
+    padding-bottom: 72px;
+    overflow-x: hidden;
+  }
+  .card { background: #fff; border-radius: 14px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+  .text-sec { color: #6b7280; }
+  .accent { color: #4f46e5; }
+  .btn { background: none; border: none; cursor: pointer; font-family: inherit; }
+
+  /* Toast */
+  .toast { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); background: #111827; color: #fff; padding: 10px 20px; border-radius: 12px; font-size: 14px; z-index: 100; max-width: 90vw; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,.2); animation: slideDown .3s ease; }
+  @keyframes slideDown { from { opacity:0; transform: translate(-50%,-20px); } to { opacity:1; transform: translate(-50%,0); } }
+
+  /* Voice modal */
+  .voice-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 99; display: flex; align-items: center; justify-content: center; }
+  .voice-modal { background: #fff; border-radius: 24px; padding: 40px; text-align: center; width: 300px; box-shadow: 0 24px 48px rgba(0,0,0,.15); }
+  .mic-circle { width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+  .mic-circle.listening { background: #ef4444; animation: pulse 1.5s infinite; }
+  .mic-circle.idle { background: #4f46e5; }
+  @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+
+  /* Header */
+  .header { padding: 20px 20px 0; display: flex; justify-content: space-between; align-items: center; }
+  .mic-btn { width: 44px; height: 44px; border-radius: 50%; border: none; background: #4f46e5; color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(79,70,229,.3); }
+
+  /* Summary grid */
+  .summary-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+  .summary-card { padding: 14px 12px; text-align: center; cursor: pointer; transition: transform .1s; }
+  .summary-card:active { transform: scale(.97); }
+  .summary-card .num { font-size: 22px; font-weight: 700; }
+  .summary-card .lbl { font-size: 11px; color: #6b7280; }
+  .summary-card .sub { font-size: 10px; color: #9ca3af; margin-top: 2px; }
+
+  /* Quick actions */
+  .quick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .quick-btn { display: flex; align-items: center; gap: 10px; padding: 14px 12px; text-align: left; font-size: 13px; font-weight: 500; }
+  .quick-icon { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+
+  /* Event card */
+  .evt-card { padding: 12px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background .15s; }
+  .evt-card:hover { background: #f9fafb; }
+  .evt-card .icon { font-size: 18px; flex-shrink: 0; }
+  .evt-card .title { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .evt-card .meta { font-size: 11px; color: #6b7280; margin-top: 2px; }
+  .evt-now { border-left: 3px solid #4f46e5; background: #faf5ff; }
+  .evt-past { opacity: 0.55; }
+
+  /* Schedule full */
+  .evt-full { padding: 14px 16px; margin-bottom: 10px; cursor: pointer; transition: background .15s; }
+  .evt-full:hover { background: #f9fafb; }
+  .evt-full .icon { font-size: 20px; margin-top: 2px; flex-shrink: 0; }
+  .evt-full .title { font-size: 14px; font-weight: 600; }
+  .evt-full .detail { display: flex; align-items: center; gap: 6px; margin-top: 4px; font-size: 12px; color: #6b7280; }
+
+  /* Meeting prep modal */
+  .prep-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 80; display: flex; align-items: flex-end; justify-content: center; }
+  .prep-modal { background: #fff; border-radius: 20px 20px 0 0; width: 100%; max-width: 480px; max-height: 80vh; overflow-y: auto; padding: 24px 20px 40px; box-shadow: 0 -8px 32px rgba(0,0,0,.15); animation: slideUp .3s ease; }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .prep-modal h2 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .prep-modal .sub { font-size: 13px; color: #6b7280; margin-bottom: 16px; }
+  .prep-section { margin-bottom: 16px; }
+  .prep-section h3 { font-size: 13px; font-weight: 600; color: #4f46e5; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .prep-section p { font-size: 13px; color: #374151; line-height: 1.5; }
+  .prep-section ul { font-size: 13px; color: #374151; padding-left: 18px; line-height: 1.7; }
+  .prep-action { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+  .prep-action button { padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1.5px solid #e5e7eb; background: #fff; transition: all .15s; }
+  .prep-action button:hover { background: #f3f4f6; }
+  .prep-action .primary { background: #4f46e5; color: #fff; border-color: #4f46e5; }
+  .prep-action .primary:hover { background: #4338ca; }
+
+  /* Todo */
+  .todo-item { padding: 12px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
+  .todo-item.high { border-left: 3px solid #ef4444; }
+  .todo-item.medium { border-left: 3px solid #f59e0b; }
+  .todo-item.low { border-left: 3px solid #6b7280; }
+  .todo-text { font-size: 13px; flex: 1; }
+  .todo-meta { font-size: 11px; color: #6b7280; display: flex; gap: 8px; margin-top: 2px; }
+  .todo-done { opacity: 0.5; }
+  .todo-done .todo-text { text-decoration: line-through; }
+
+  /* Add todo */
+  .add-form { padding: 16px; margin-bottom: 16px; border-color: #4f46e5 !important; box-shadow: 0 4px 16px rgba(79,70,229,.1); }
+  .add-form input { width: 100%; border: none; outline: none; font-size: 14px; background: transparent; margin-bottom: 12px; font-family: inherit; }
+  .priority-btns { display: flex; gap: 8px; align-items: center; }
+  .pri-btn { padding: 4px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; text-transform: capitalize; }
+  .add-btn { padding: 6px 16px; border-radius: 8px; border: none; background: #4f46e5; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; margin-left: auto; }
+
+  /* Email */
+  .email-card { padding: 14px 16px; margin-bottom: 10px; }
+  .email-card.important { border-left: 3px solid #6366f1; }
+
+  /* Bottom nav */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 480px; background: #fff;
+    border-top: 1px solid #e5e7eb; display: flex; justify-content: space-around;
+    padding: 8px 0; padding-bottom: max(8px, env(safe-area-inset-bottom));
+    z-index: 50;
+  }
+  .nav-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 10px; padding: 4px 12px; color: #6b7280; font-weight: 400; }
+  .nav-btn.active { color: #4f46e5; font-weight: 600; }
+
+  /* Section */
+  .section { padding: 12px 20px; }
+  .section-title { font-size: 14px; font-weight: 600; margin-bottom: 10px; }
+  .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+
+  /* Time indicator */
+  .time-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 4px; }
+  .time-dot.live { background: #22c55e; animation: blink 2s infinite; }
+  .time-dot.upcoming { background: #f59e0b; }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+
+  .icon-sm { width: 12px; height: 12px; }
+  .icon-md { width: 16px; height: 16px; }
+  .icon-lg { width: 20px; height: 20px; }
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<script>
+// ─── Live Data (updated 2026-03-13) ─────────────────────────────────────────
+const TODAY_EVENTS = [
+  { time: "7:40 AM", end: "8:00 AM", title: "David / Dennis - Trovy sync", icon: "\ud83d\udcde", location: "Zoom", id: "trovy-dennis", person: "Dennis Cong", company: "Trovy", type: "deal" },
+  { time: "8:00 AM", end: "8:45 AM", title: "Trovy <> Informed Ventures", icon: "\ud83d\udcde", location: "Zoom", id: "trovy-iv", person: "Trovy team", company: "Trovy", type: "deal" },
+  { time: "9:00 AM", end: "9:30 AM", title: "US Investment Check-in", icon: "\ud83d\udcca", location: "Zoom", id: "us-invest", person: "IV Team", company: "Informed Ventures", type: "internal" },
+  { time: "11:00 AM", end: "12:30 PM", title: "Travel", icon: "\ud83d\ude97", id: "travel-1", type: "travel" },
+  { time: "12:30 PM", end: "1:00 PM", title: "EWB lunch with CEO Dominic Ng", icon: "\ud83c\udf7d\ufe0f", id: "ewb-lunch", person: "Dominic Ng", company: "East West Bank", type: "networking" },
+  { time: "1:00 PM", end: "2:00 PM", title: "David <> Ryan (Fusion Fund)", icon: "\ud83d\udcde", location: "Zoom", id: "ryan-fusion", person: "Ryan", company: "Fusion Fund", type: "deal" },
+  { time: "2:00 PM", end: "4:00 PM", title: "Travel", icon: "\ud83d\ude97", id: "travel-2", type: "travel" },
+  { time: "4:00 PM", end: "5:00 PM", title: "Yu Kuai / David @ near Salesforce", icon: "\ud83e\udd1d", location: "Near Salesforce Tower", id: "yu-kuai", person: "Yu Kuai", type: "networking" },
+  { time: "5:00 PM", end: "5:30 PM", title: "David <> Linda", icon: "\ud83e\udd1d", location: "FiDi", id: "linda", person: "Linda", type: "networking" },
+  { time: "5:30 PM", end: "6:00 PM", title: "Under Pressure: Mandy Wen", icon: "\ud83c\udf89", location: "AngelList", id: "mandy-wen", person: "Mandy Wen", company: "AngelList", type: "event" },
+  { time: "6:00 PM", end: "6:30 PM", title: "Mithra Office Warming", icon: "\ud83c\udf89", location: "410 Townsend St", id: "mithra", company: "Mithra", type: "event" },
+  { time: "6:30 PM", end: "7:00 PM", title: "David / Olga weekly dinner", icon: "\ud83c\udf7d\ufe0f", id: "olga-dinner", person: "Olga", type: "personal" },
+  { time: "7:00 PM", end: "9:00 PM", title: "Private Dinner: amber.ac & Pantera", icon: "\ud83c\udf7e", location: "PABU Izakaya", id: "pantera-dinner", person: "amber.ac & Pantera", type: "networking" },
+];
+
+const TOMORROW_EVENTS = [
+  { time: "10:30 AM", end: "11:00 AM", title: "Dennis Cong & Wasi/Brandon (Maven)", icon: "\ud83d\udcde", location: "Zoom", id: "maven-call", person: "Dennis, Wasi, Brandon", company: "Maven", type: "deal" },
+  { time: "1:30 PM", end: "3:00 PM", title: "Builders & Backers Mixer", icon: "\ud83c\udf89", location: "Los Altos", id: "builders-mixer", type: "event" },
+  { time: "3:00 PM", end: "4:00 PM", title: "Dentist - xray and cleaning", icon: "\ud83e\udeb7", id: "dentist", type: "personal" },
+  { time: "7:00 PM", end: "9:00 PM", title: "SG Networking Dinner", icon: "\ud83c\udf7d\ufe0f", location: "Tamarine, Palo Alto", id: "sg-dinner", type: "networking" },
+  { time: "8:45 PM", end: "9:30 PM", title: "Caltrain return", icon: "\ud83d\ude86", id: "caltrain", type: "travel" },
+];
+
+const REMINDERS = [];
+
+// ─── Meeting prep data ───────────────────────────────────────────────────────
 const PREP_DATA = {
   "trovy-dennis": {
     headline: "Trovy Sync with Dennis Cong",
     context: "Pre-meeting sync with Dennis before the full Trovy <> IV call. Dennis is your co-investor/collaborator on this deal.",
-    talkingPoints: ["Align on key questions for the Trovy team call right after", "Discuss any updates from Trouy since last check-in", "Review Bento / Trovy thesis (on your to-do list)"],
-    research: "Trouy is in your active deal pipeline. You have a to-do to 'Review Bento / Trouy' flagged for today.",
+    talkingPoints: ["Align on key questions for the Trovy team call right after", "Discuss any updates from Trovy since last check-in", "Review Bento / Trovy thesis (on your to-do list)"],
+    research: "Trovy is in your active deal pipeline. You have a to-do to 'Review Bento / Trovy' flagged for today.",
     action: "Use this sync to get on the same page before the 8 AM team call."
   },
   "trovy-iv": {
@@ -79,7 +247,7 @@ const PREP_DATA = {
   }
 };
 
-// âââ State âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ─── State ───────────────────────────────────────────────────────────────────
 let state = {
   tab: "home",
   toast: "",
@@ -92,7 +260,7 @@ let state = {
   newPriority: "medium",
 };
 
-// âââ To-do list integration (loads from same localStorage as todo.html) ââââââ
+// ─── To-do list integration (loads from same localStorage as todo.html) ──────
 const TODO_STORAGE_KEY = "dave_todos_v6";
 
 const SEED_TODOS = [
@@ -137,12 +305,12 @@ const SEED_TODOS = [
   {id:65,text:"BeFreed cofounder msg",category:"networking",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"linkedin",nextStepNote:""},
   {id:70,text:"Reschedule Skywalk",category:"admin",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"schedule",nextStepNote:""},
   {id:71,text:"Hyperliquid hire",category:"networking",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"linkedin",nextStepNote:""},
-  {id:72,text:"Roy China",category:"i" priority:"medium",done:false,parentId:null,person:"Roy",deadline:"",nextStep:"email",nextStepNote:""},
+  {id:72,text:"Roy China",category:"iv",priority:"medium",done:false,parentId:null,person:"Roy",deadline:"",nextStep:"email",nextStepNote:""},
   {id:9,text:"Reach out to Qi Wang / Mia",category:"networking",priority:"low",done:false,parentId:null,person:"",deadline:"",nextStep:"",nextStepNote:""},
   {id:10,text:"Connect with Yu Hang",category:"networking",priority:"low",done:false,parentId:null,person:"",deadline:"",nextStep:"",nextStepNote:""},
-  {id:11,text:"Tiantong Zhou LinkedIn review",category:"networking",priority:"low",done:false,parentId:null,person:"",deadline:"",nextStep:"",adline:"",nextStepNote:""},
+  {id:11,text:"Tiantong Zhou LinkedIn review",category:"networking",priority:"low",done:false,parentId:null,person:"",deadline:"",nextStep:"",nextStepNote:""},
   {id:12,text:"Yu Wang LinkedIn review",category:"networking",priority:"low",done:false,parentId:null,person:"",deadline:"",nextStep:"",nextStepNote:""},
-  {id:63,text:"May Allen event",category:"networking",priority:"low",done:false,parentId:null,person:"Allen",deadline:"",nextStep:"schedule",nextStepNote:""},
+  {id:62,text:"May Allen event",category:"networking",priority:"low",done:false,parentId:null,person:"Allen",deadline:"",nextStep:"schedule",nextStepNote:""},
   {id:63,text:"May Jefferson / fintech events",category:"networking",priority:"low",done:false,parentId:null,person:"",deadline:"",nextStep:"schedule",nextStepNote:""},
   {id:64,text:"Ramon GSB MBA3",category:"networking",priority:"low",done:false,parentId:null,person:"Ramon",deadline:"",nextStep:"email",nextStepNote:""},
 ];
@@ -156,3 +324,560 @@ function loadTodos() {
   localStorage.setItem(TODO_STORAGE_KEY, JSON.stringify(SEED_TODOS));
   return SEED_TODOS;
 }
+
+function getTodos() {
+  const data = loadTodos();
+  if (!data) return [];
+  return data.filter(t => !t.done && !t.parentId).sort((a,b) => {
+    const o = { high: 0, medium: 1, low: 2 };
+    return (o[a.priority]||2) - (o[b.priority]||2);
+  });
+}
+
+function getHighPriorityTodos() {
+  return getTodos().filter(t => t.priority === "high").slice(0, 5);
+}
+
+function getAllPendingCount() {
+  const data = loadTodos();
+  if (!data) return 0;
+  return data.filter(t => !t.done).length;
+}
+
+function getOverdueCount() {
+  const data = loadTodos();
+  if (!data) return 0;
+  const today = new Date().toISOString().slice(0, 10);
+  return data.filter(t => !t.done && t.deadline && t.deadline < today).length;
+}
+
+// ─── Time helpers ────────────────────────────────────────────────────────────
+function now() {
+  return new Date(new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" }));
+}
+
+function greeting() {
+  const h = now().getHours();
+  return h < 12 ? "morning" : h < 18 ? "afternoon" : "evening";
+}
+
+function dateStr() {
+  return now().toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" });
+}
+
+function shortDate() {
+  return now().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+}
+
+function parseTime(timeStr) {
+  const m = timeStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
+  if (!m) return 0;
+  let h = parseInt(m[1]); const min = parseInt(m[2]); const ap = m[3].toUpperCase();
+  if (ap === "PM" && h !== 12) h += 12;
+  if (ap === "AM" && h === 12) h = 0;
+  return h * 60 + min;
+}
+
+function getEventStatus(evt) {
+  const n = now();
+  const nowMin = n.getHours() * 60 + n.getMinutes();
+  const start = parseTime(evt.time);
+  const end = evt.end ? parseTime(evt.end) : start + 60;
+  if (nowMin >= start && nowMin < end) return "now";
+  if (nowMin < start) return "upcoming";
+  return "past";
+}
+
+function getNextEvent() {
+  const n = now();
+  const nowMin = n.getHours() * 60 + n.getMinutes();
+  for (const evt of TODAY_EVENTS) {
+    const start = parseTime(evt.time);
+    if (start > nowMin) return evt;
+    const end = evt.end ? parseTime(evt.end) : start + 60;
+    if (nowMin >= start && nowMin < end) return evt;
+  }
+  return null;
+}
+
+function timeUntil(evt) {
+  const n = now();
+  const nowMin = n.getHours() * 60 + n.getMinutes();
+  const start = parseTime(evt.time);
+  const diff = start - nowMin;
+  if (diff <= 0) return "Now";
+  if (diff < 60) return `in ${diff}m`;
+  return `in ${Math.floor(diff/60)}h ${diff%60}m`;
+}
+
+const priColor = p => p === "high" ? "#ef4444" : p === "medium" ? "#f59e0b" : "#6b7280";
+const priBg = p => p === "high" ? "#fef2f2" : p === "medium" ? "#fffbeb" : "#f9fafb";
+const typeIcon = t => ({ deal: "\ud83d\udcbc", networking: "\ud83e\udd1d", internal: "\ud83d\udcca", event: "\ud83c\udf89", travel: "\ud83d\ude97", personal: "\ud83d\udc9c" }[t] || "\ud83d\udcc5");
+
+// ─── SVG Icons ───────────────────────────────────────────────────────────────
+const icons = {
+  mic: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>',
+  home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+  cal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>',
+  list: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="6" height="6" rx="1"/><path d="m3 17 2 2 4-4"/><line x1="13" x2="21" y1="6" y2="6"/><line x1="13" x2="21" y1="12" y2="12"/><line x1="13" x2="21" y1="18" y2="18"/></svg>',
+  inbox: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>',
+  clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+  pin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>',
+  circle: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+  plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>',
+  trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
+  mail: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>',
+  checksq: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
+  search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>',
+  zap: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+  brain: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg>',
+  ext: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>',
+};
+
+function icon(name, size=20, color="currentColor") {
+  return `<span style="display:inline-flex;width:${size}px;height:${size}px;color:${color}">${icons[name]||""}</span>`;
+}
+
+// ─── Voice ───────────────────────────────────────────────────────────────────
+let recognition = null;
+
+function startVoice() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { showToast("Voice not supported. Try Chrome."); return; }
+  recognition = new SR();
+  recognition.continuous = false;
+  recognition.interimResults = true;
+  recognition.lang = "en-US";
+  let gotResult = false;
+  let voiceTimeout = null;
+  recognition.onstart = () => { state.listening = true; state.voiceModal = true; state.voiceText = ""; gotResult = false; render();
+    voiceTimeout = setTimeout(() => { if (!gotResult) { recognition.stop(); state.listening = false; state.voiceModal = false; showToast("No speech detected. Tap the mic to try again."); render(); } }, 8000);
+  };
+  recognition.onresult = (e) => {
+    gotResult = true;
+    state.voiceText = Array.from(e.results).map(r => r[0].transcript).join("");
+    render();
+    if (e.results[0].isFinal) { clearTimeout(voiceTimeout); processVoice(state.voiceText); }
+  };
+  recognition.onerror = (e) => { clearTimeout(voiceTimeout); state.listening = false; state.voiceModal = false;
+    if (e.error === 'not-allowed') showToast("Microphone access denied. Check browser permissions.");
+    else showToast("Voice error. Try again.");
+    render();
+  };
+  recognition.onend = () => { clearTimeout(voiceTimeout); state.listening = false;
+    if (!gotResult) { state.voiceModal = false; showToast("No speech detected. Tap the mic to try again."); }
+    render();
+  };
+  recognition.start();
+}
+
+function stopVoice() {
+  if (recognition) recognition.stop();
+  state.listening = false; state.voiceModal = false; render();
+}
+
+function processVoice(text) {
+  const l = text.toLowerCase();
+  setTimeout(() => {
+    if (l.includes("add todo") || l.includes("add task") || l.includes("remind me")) {
+      const task = text.replace(/add (todo|task)|remind me (to)?/gi, "").trim();
+      if (task) {
+        addTodoToStorage(task, "medium");
+        showToast(`Added: "${task}"`);
+      }
+    } else if (l.includes("what's next") || l.includes("next meeting")) {
+      const next = getNextEvent();
+      if (next) showToast(`Next: ${next.title} at ${next.time}`);
+      else showToast("No more meetings today!");
+    } else if (l.includes("inbox") || l.includes("email")) {
+      state.tab = "inbox"; showToast("Here's your inbox.");
+    } else if (l.includes("briefing") || l.includes("my day") || l.includes("what's today")) {
+      state.tab = "home"; showToast(`${TODAY_EVENTS.length} events today. ${getAllPendingCount()} open tasks.`);
+    } else if (l.includes("show task") || l.includes("show todo")) {
+      state.tab = "todos"; showToast("Here are your tasks.");
+    } else if (l.includes("prep")) {
+      const next = getNextEvent();
+      if (next && PREP_DATA[next.id]) { state.prepModal = next.id; showToast("Meeting prep loaded."); }
+      else showToast("No prep available for the next meeting.");
+    } else {
+      showToast(`Heard: "${text}". Try "add task...", "what's next", "prep", or "briefing".`);
+    }
+    state.voiceModal = false; render();
+  }, 400);
+}
+
+function showToast(msg) {
+  state.toast = msg; render();
+  setTimeout(() => { state.toast = ""; render(); }, 3500);
+}
+
+// ─── Todo Storage Integration ────────────────────────────────────────────────
+function addTodoToStorage(text, priority) {
+  let todos = loadTodos() || [];
+  const maxId = todos.reduce((m, t) => Math.max(m, t.id || 0), 200);
+  todos.push({
+    id: maxId + 1,
+    text: text,
+    category: "deals",
+    priority: priority,
+    done: false,
+    parentId: null,
+    person: "",
+    deadline: "",
+    nextStep: "",
+    nextStepNote: ""
+  });
+  localStorage.setItem(TODO_STORAGE_KEY, JSON.stringify(todos));
+}
+
+// ─── Actions ─────────────────────────────────────────────────────────────────
+function setTab(t) { state.tab = t; render(); }
+function openPrep(evtId) { state.prepModal = evtId; render(); }
+function closePrep() { state.prepModal = null; render(); }
+
+function openTodoApp() {
+  // Open the standalone todo app in a new tab
+  window.open('https://dvdydvdy.github.io/dave-ea/todo.html', '_blank');
+}
+
+// ─── Render ──────────────────────────────────────────────────────────────────
+function render() {
+  const app = document.getElementById("app");
+  let html = "";
+
+  // Toast
+  if (state.toast) html += `<div class="toast">${esc(state.toast)}</div>`;
+
+  // Voice modal
+  if (state.voiceModal) {
+    html += `<div class="voice-overlay" onclick="stopVoice()">
+      <div class="voice-modal" onclick="event.stopPropagation()">
+        <div class="mic-circle ${state.listening?'listening':'idle'}">${icon('mic',32,'#fff')}</div>
+        <p style="font-size:16px;font-weight:600;margin-bottom:8px">${state.listening?'Listening...':'Processing...'}</p>
+        <p style="font-size:14px;color:#6b7280;min-height:40px">${esc(state.voiceText) || 'Try: "Add task review deck", "What\'s next?", or "Prep"'}</p>
+        <button class="btn" onclick="stopVoice()" style="margin-top:16px;padding:8px 24px;border-radius:8px;border:1px solid #e5e7eb;font-size:14px">Cancel</button>
+      </div>
+    </div>`;
+  }
+
+  // Meeting prep modal
+  if (state.prepModal && PREP_DATA[state.prepModal]) {
+    const prep = PREP_DATA[state.prepModal];
+    const evt = TODAY_EVENTS.concat(TOMORROW_EVENTS).find(e => e.id === state.prepModal);
+    html += `<div class="prep-overlay" onclick="closePrep()">
+      <div class="prep-modal" onclick="event.stopPropagation()">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
+          <h2>${esc(prep.headline)}</h2>
+          <button class="btn" onclick="closePrep()" style="font-size:20px;padding:0 4px;color:#6b7280">&times;</button>
+        </div>
+        ${evt ? `<p class="sub">${esc(evt.time)}${evt.location ? ' \u00b7 ' + esc(evt.location) : ''}</p>` : ''}
+
+        <div class="prep-section">
+          <h3>${icon('brain',14,'#4f46e5')} Context</h3>
+          <p>${esc(prep.context)}</p>
+        </div>
+
+        <div class="prep-section">
+          <h3>${icon('zap',14,'#4f46e5')} Talking Points</h3>
+          <ul>${prep.talkingPoints.map(p => `<li>${esc(p)}</li>`).join('')}</ul>
+        </div>
+
+        <div class="prep-section">
+          <h3>${icon('search',14,'#4f46e5')} Research Notes</h3>
+          <p>${esc(prep.research)}</p>
+        </div>
+
+        <div class="prep-section">
+          <h3>${icon('checksq',14,'#4f46e5')} Recommended Action</h3>
+          <p>${esc(prep.action)}</p>
+        </div>
+
+        <div class="prep-action">
+          <button class="primary" onclick="showToast('Ask in Cowork: research ${evt?esc(evt.person||evt.title):'this person'}');closePrep()">Deep Research</button>
+          <button onclick="showToast('Ask in Cowork: pull previous context');closePrep()">Past Context</button>
+          <button onclick="closePrep()">Done</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // Header
+  html += `<div class="header">
+    <div>
+      <p style="font-size:13px;color:#6b7280">${dateStr()}</p>
+      <h1 style="font-size:26px;font-weight:700;margin:2px 0 0">Good ${greeting()}, Dave</h1>
+    </div>
+    <button class="mic-btn" onclick="startVoice()">${icon('mic',20,'#fff')}</button>
+  </div>`;
+
+  // Tabs
+  if (state.tab === "home") html += renderHome();
+  else if (state.tab === "schedule") html += renderSchedule();
+  else if (state.tab === "todos") html += renderTodos();
+  else if (state.tab === "inbox") html += renderInbox();
+
+  // Bottom nav
+  html += `<div class="bottom-nav">
+    ${navBtn("home","Home","home")}
+    ${navBtn("schedule","Schedule","cal")}
+    ${navBtn("todos","To-Do","list")}
+    ${navBtn("inbox","Inbox","inbox")}
+  </div>`;
+
+  app.innerHTML = html;
+}
+
+function navBtn(id, label, ic) {
+  return `<button class="btn nav-btn ${state.tab===id?'active':''}" onclick="setTab('${id}')">
+    ${icon(ic,20)} ${label}
+  </button>`;
+}
+
+// ─── Home Tab ────────────────────────────────────────────────────────────────
+function renderHome() {
+  const todoCount = getAllPendingCount();
+  const overdueCount = getOverdueCount();
+  const nextEvt = getNextEvent();
+  let h = `<div class="section">`;
+
+  // Summary cards - Now with useful info
+  h += `<div class="summary-grid">
+    <div class="card summary-card" onclick="setTab('schedule')">
+      <div style="display:flex;justify-content:center;margin-bottom:6px;color:#6366f1">${icon('cal',16)}</div>
+      <div class="num">${TODAY_EVENTS.length}</div>
+      <div class="lbl">Meetings</div>
+      <div class="sub">${nextEvt ? timeUntil(nextEvt) : 'Done!'}</div>
+    </div>
+    <div class="card summary-card" onclick="setTab('todos')">
+      <div style="display:flex;justify-content:center;margin-bottom:6px;color:#f59e0b">${icon('checksq',16)}</div>
+      <div class="num">${todoCount}</div>
+      <div class="lbl">Open Tasks</div>
+      <div class="sub">${overdueCount > 0 ? overdueCount + ' overdue' : 'on track'}</div>
+    </div>
+    <div class="card summary-card" onclick="setTab('inbox')">
+      <div style="display:flex;justify-content:center;margin-bottom:6px;color:#ef4444">${icon('mail',16)}</div>
+      <div class="num">201</div>
+      <div class="lbl">Unread</div>
+      <div class="sub">triage in Cowork</div>
+    </div>
+  </div>`;
+
+  // Next up - contextual card
+  if (nextEvt) {
+    const status = getEventStatus(nextEvt);
+    const statusLabel = status === "now" ? "Happening now" : "Up next";
+    const dotClass = status === "now" ? "live" : "upcoming";
+    h += `<div class="card" style="padding:16px;margin-bottom:20px;${status==='now'?'border-left:3px solid #4f46e5;background:#faf5ff;':'border-left:3px solid #f59e0b;background:#fffbeb;'}">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+        <span class="time-dot ${dotClass}"></span>
+        <span style="font-size:11px;font-weight:600;color:${status==='now'?'#4f46e5':'#d97706'};text-transform:uppercase;letter-spacing:.5px">${statusLabel}</span>
+        <span style="font-size:11px;color:#6b7280;margin-left:auto">${timeUntil(nextEvt)}</span>
+      </div>
+      <p style="font-size:15px;font-weight:700">${nextEvt.icon} ${esc(nextEvt.title)}</p>
+      <p style="font-size:12px;color:#6b7280;margin-top:4px">${esc(nextEvt.time)}${nextEvt.location?' \u00b7 '+esc(nextEvt.location):''}</p>
+      ${PREP_DATA[nextEvt.id] ? `<button class="btn" onclick="openPrep('${nextEvt.id}')" style="margin-top:10px;padding:6px 14px;border-radius:8px;border:1.5px solid #4f46e5;color:#4f46e5;font-size:12px;font-weight:600">${icon('brain',14,'#4f46e5')} Meeting Prep</button>` : ''}
+    </div>`;
+  }
+
+  // Quick actions - now functional
+  h += `<div style="margin-bottom:20px">
+    <h3 class="section-title">Quick Actions</h3>
+    <div class="quick-grid">
+      <button class="btn card quick-btn" onclick="startVoice()"><div class="quick-icon" style="background:#6366f115;color:#6366f1">${icon('mic',18)}</div>Voice Command</button>
+      <button class="btn card quick-btn" onclick="state.tab='todos';state.showAdd=true;render()"><div class="quick-icon" style="background:#10b98115;color:#10b981">${icon('plus',18)}</div>Add Task</button>
+      <button class="btn card quick-btn" onclick="setTab('schedule')"><div class="quick-icon" style="background:#8b5cf615;color:#8b5cf6">${icon('cal',18)}</div>Full Schedule</button>
+      <button class="btn card quick-btn" onclick="setTab('inbox')"><div class="quick-icon" style="background:#3b82f615;color:#3b82f6">${icon('mail',18)}</div>Check Inbox</button>
+    </div>
+  </div>`;
+
+  // Today schedule preview
+  h += `<div style="margin-bottom:20px"><div class="section-header"><h3 style="font-size:14px;font-weight:600">Today's Schedule</h3><span class="accent" style="font-size:12px;cursor:pointer" onclick="setTab('schedule')">See all \u2192</span></div>`;
+  // Find first non-past event index so we show current/upcoming first
+  let startIdx = TODAY_EVENTS.findIndex(e => getEventStatus(e) !== "past");
+  if (startIdx < 0) startIdx = Math.max(0, TODAY_EVENTS.length - 4); // all past: show last few
+  TODAY_EVENTS.slice(startIdx, startIdx + 4).forEach(e => {
+    const status = getEventStatus(e);
+    const cls = status === "now" ? "evt-now" : status === "past" ? "evt-past" : "";
+    h += `<div class="card evt-card ${cls}" onclick="${PREP_DATA[e.id]?`openPrep('${e.id}')`:''}">
+      <span class="icon">${e.icon}</span>
+      <div style="flex:1;min-width:0">
+        <p class="title">${esc(e.title)}</p>
+        <p class="meta">${esc(e.time)}${e.location?' \u00b7 '+esc(e.location):''}</p>
+      </div>
+      ${PREP_DATA[e.id] ? `<span style="color:#4f46e5;opacity:.6">${icon('brain',16)}</span>` : ''}
+    </div>`;
+  });
+  h += `</div>`;
+
+  // To-do list preview (high priority)
+  const highTodos = getHighPriorityTodos();
+  h += `<div><div class="section-header"><h3 style="font-size:14px;font-weight:600">To-Do List</h3><span class="accent" style="font-size:12px;cursor:pointer" onclick="setTab('todos')">See all \u2192</span></div>`;
+  if (highTodos.length === 0) {
+    h += `<div class="card" style="padding:16px;text-align:center;color:#6b7280;font-size:13px">No high-priority tasks. Open the full to-do list to see all items.</div>`;
+  } else {
+    highTodos.forEach(t => {
+      h += `<div class="card evt-card" style="border-left:3px solid ${priColor(t.priority)}">
+        <span style="color:${priColor(t.priority)}">${icon('circle',18)}</span>
+        <div style="flex:1;min-width:0">
+          <span style="font-size:13px">${esc(t.text)}</span>
+          ${t.person || t.nextStep ? `<div class="todo-meta">${t.person ? '<span>'+esc(t.person)+'</span>' : ''}${t.nextStep ? '<span>'+esc(t.nextStep)+'</span>' : ''}</div>` : ''}
+        </div>
+      </div>`;
+    });
+  }
+  h += `</div>`;
+
+  // Reminders
+  if (REMINDERS.length > 0) {
+    h += `<div style="margin-top:20px"><p style="font-size:12px;color:#6b7280;margin-bottom:6px">\ud83d\udccc All-day reminders</p>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">${REMINDERS.map(r => `<span style="background:#fef3c7;color:#92400e;padding:4px 10px;border-radius:8px;font-size:12px">${esc(r)}</span>`).join('')}</div></div>`;
+  }
+
+  h += `</div>`;
+  return h;
+}
+
+// ─── Schedule Tab ────────────────────────────────────────────────────────────
+function renderSchedule() {
+  let h = `<div class="section">
+    <h3 style="font-size:16px;font-weight:600;margin-bottom:4px">Today, ${shortDate()}</h3>
+    <p style="font-size:12px;color:#6b7280;margin-bottom:16px">${TODAY_EVENTS.length} events \u00b7 PDT</p>`;
+
+  TODAY_EVENTS.forEach(e => {
+    const status = getEventStatus(e);
+    const cls = status === "now" ? "evt-now" : status === "past" ? "evt-past" : "";
+    h += `<div class="card evt-full ${cls}" onclick="${PREP_DATA[e.id]?`openPrep('${e.id}')`:''}">
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <span class="icon">${e.icon}</span>
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:6px">
+            <p class="title" style="flex:1">${esc(e.title)}</p>
+            ${status === "now" ? '<span class="time-dot live"></span>' : ''}
+            ${PREP_DATA[e.id] ? `<span style="color:#4f46e5;opacity:.6">${icon('brain',16)}</span>` : ''}
+          </div>
+          <div class="detail">${icon('clock',12,'#6b7280')} ${esc(e.time)} \u2013 ${esc(e.end || '')}</div>
+          ${e.location?`<div class="detail">${icon('pin',12,'#6b7280')} ${esc(e.location)}</div>`:''}
+          ${e.person?`<div class="detail" style="color:#4f46e5">\ud83d\udc64 ${esc(e.person)}</div>`:''}
+        </div>
+      </div>
+    </div>`;
+  });
+
+  h += `<h3 style="font-size:16px;font-weight:600;margin:24px 0 4px">Tomorrow, Sat Mar 14</h3>
+    <p style="font-size:12px;color:#6b7280;margin-bottom:16px">${TOMORROW_EVENTS.length} events</p>`;
+  TOMORROW_EVENTS.forEach(e => {
+    h += `<div class="card evt-full" onclick="${PREP_DATA[e.id]?`openPrep('${e.id}')`:''}">
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <span class="icon">${e.icon}</span>
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:6px">
+            <p class="title" style="flex:1">${esc(e.title)}</p>
+            ${PREP_DATA[e.id] ? `<span style="color:#4f46e5;opacity:.6">${icon('brain',16)}</span>` : ''}
+          </div>
+          <div class="detail">${icon('clock',12,'#6b7280')} ${esc(e.time)}</div>
+          ${e.location?`<div class="detail">${icon('pin',12,'#6b7280')} ${esc(e.location)}</div>`:''}
+        </div>
+      </div>
+    </div>`;
+  });
+  h += `</div>`;
+  return h;
+}
+
+// ─── Todos Tab ───────────────────────────────────────────────────────────────
+function renderTodos() {
+  const todos = getTodos();
+  const pendingCount = getAllPendingCount();
+  let h = `<div class="section">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <h3 style="font-size:16px;font-weight:600">To-Do List (${pendingCount})</h3>
+      <div style="display:flex;gap:8px">
+        <button class="btn" onclick="state.showAdd=!state.showAdd;render()" style="width:36px;height:36px;border-radius:50%;background:#4f46e5;color:#fff;display:flex;align-items:center;justify-content:center">${icon('plus',18,'#fff')}</button>
+      </div>
+    </div>`;
+
+  if (state.showAdd) {
+    h += `<div class="card add-form">
+      <input id="new-todo-input" placeholder="What needs to be done?" value="${esc(state.newTodo)}" onkeydown="if(event.key==='Enter')addNewTodo()" oninput="state.newTodo=this.value" autofocus>
+      <div class="priority-btns">
+        ${['high','medium','low'].map(p => `<button class="btn pri-btn" onclick="state.newPriority='${p}';render()" style="border:${state.newPriority===p?'2px':'1px'} solid ${priColor(p)};background:${state.newPriority===p?priBg(p):'transparent'};color:${priColor(p)}">${p}</button>`).join('')}
+        <button class="add-btn" onclick="addNewTodo()">Add</button>
+      </div>
+    </div>`;
+  }
+
+  // Show tip about full todo app
+  h += `<div class="card" style="padding:12px 16px;margin-bottom:16px;background:#eef2ff;border-color:#c7d2fe">
+    <p style="font-size:12px;color:#4f46e5;font-weight:500">This syncs with your full To-Do app. For advanced features (person, deadline, next steps, focus mode), open the full app.</p>
+  </div>`;
+
+  if (todos.length === 0) {
+    h += `<div class="card" style="padding:24px;text-align:center;color:#6b7280;font-size:13px">No pending tasks found. Add one above or use the full to-do app.</div>`;
+  } else {
+    todos.slice(0, 20).forEach(t => {
+      h += `<div class="card todo-item ${t.priority || 'medium'}">
+        <span style="color:${priColor(t.priority||'medium')}">${icon('circle',18)}</span>
+        <div style="flex:1;min-width:0">
+          <span class="todo-text">${esc(t.text)}</span>
+          <div class="todo-meta">
+            ${t.person ? `<span>\ud83d\udc64 ${esc(t.person)}</span>` : ''}
+            ${t.deadline ? `<span>\ud83d\udcc5 ${esc(t.deadline)}</span>` : ''}
+            ${t.nextStep ? `<span>\u26a1 ${esc(t.nextStep)}</span>` : ''}
+            ${t.category ? `<span style="text-transform:uppercase;font-size:10px;color:#9ca3af">${esc(t.category)}</span>` : ''}
+          </div>
+        </div>
+      </div>`;
+    });
+    if (todos.length > 20) {
+      h += `<p style="text-align:center;font-size:12px;color:#6b7280;margin-top:8px">+ ${todos.length - 20} more tasks. Open full app to see all.</p>`;
+    }
+  }
+
+  h += `</div>`;
+  return h;
+}
+
+function addNewTodo() {
+  const inp = document.getElementById("new-todo-input");
+  if (!inp || !inp.value.trim()) return;
+  addTodoToStorage(inp.value.trim(), state.newPriority);
+  state.newTodo = ""; state.showAdd = false;
+  showToast("Task added to your to-do list!");
+  render();
+}
+
+// ─── Inbox Tab ───────────────────────────────────────────────────────────────
+function renderInbox() {
+  let h = `<div class="section">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <h3 style="font-size:16px;font-weight:600">Inbox</h3>
+      <span style="font-size:12px;color:#ef4444;font-weight:600;background:#fef2f2;padding:4px 10px;border-radius:8px">~201 unread</span>
+    </div>
+    <div class="card" style="padding:16px;margin-bottom:16px;background:#eef2ff;border-color:#c7d2fe">
+      <p style="font-size:13px;font-weight:600;color:#4f46e5">Inbox triage works best in Cowork</p>
+      <p style="font-size:12px;color:#6b7280;margin-top:4px">Ask your EA in Cowork to triage emails, draft replies, or summarize threads.</p>
+    </div>
+    <div class="card" style="padding:16px;margin-bottom:12px">
+      <p style="font-size:13px;font-weight:600;margin-bottom:8px">Quick actions you can ask:</p>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:13px;color:#4f46e5;cursor:pointer">\u2022 "Triage my emails"</div>
+        <div style="font-size:13px;color:#4f46e5;cursor:pointer">\u2022 "Summarize unread from today"</div>
+        <div style="font-size:13px;color:#4f46e5;cursor:pointer">\u2022 "Draft a reply to [person]"</div>
+        <div style="font-size:13px;color:#4f46e5;cursor:pointer">\u2022 "Find emails about [deal name]"</div>
+      </div>
+    </div>
+    <div class="card" style="padding:12px 16px;text-align:center;color:#6b7280;font-size:12px;margin-top:12px">
+      Email accounts: davidyin.sg@gmail.com \u00b7 davidyin@informedventures.com
+    </div>
+  </div>`;
+  return h;
+}
+
+function esc(s) { if (!s) return ''; const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+// Initial render
+render();
+</script>
+</body>
+</html>
