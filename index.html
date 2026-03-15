@@ -85,6 +85,42 @@
   .prep-action button:hover { background: #f3f4f6; }
   .prep-action .primary { background: #4f46e5; color: #fff; border-color: #4f46e5; }
   .prep-action .primary:hover { background: #4338ca; }
+  .prep-action button.active { background: #eef2ff; border-color: #4f46e5; color: #4f46e5; }
+
+  /* Research panel */
+  .research-panel { margin-top: 16px; border-radius: 12px; border: 1px solid #e0e7ff; background: #f5f7ff; padding: 16px; animation: fadeIn .3s ease; }
+  .research-panel h3 { font-size: 14px; font-weight: 700; color: #312e81; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .research-panel .r-card { background: #fff; border-radius: 10px; border: 1px solid #e5e7eb; padding: 12px; margin-bottom: 10px; }
+  .research-panel .r-card:last-child { margin-bottom: 0; }
+  .research-panel .r-card h4 { font-size: 12px; font-weight: 700; color: #4f46e5; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+  .research-panel .r-card p { font-size: 13px; color: #374151; line-height: 1.6; }
+  .research-panel .r-card ul { font-size: 13px; color: #374151; padding-left: 16px; line-height: 1.7; }
+  .research-panel .r-tag { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; margin-right: 6px; margin-bottom: 4px; }
+  .research-panel .r-tag.company { background: #dbeafe; color: #1e40af; }
+  .research-panel .r-tag.person { background: #fce7f3; color: #9d174d; }
+  .research-panel .r-tag.event { background: #d1fae5; color: #065f46; }
+  .research-panel .r-tag.deal { background: #fef3c7; color: #92400e; }
+
+  /* CRM / Past Context panel */
+  .crm-panel { margin-top: 16px; border-radius: 12px; border: 1px solid #d1fae5; background: #f0fdf4; padding: 16px; animation: fadeIn .3s ease; }
+  .crm-panel h3 { font-size: 14px; font-weight: 700; color: #065f46; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .crm-panel .crm-card { background: #fff; border-radius: 10px; border: 1px solid #e5e7eb; padding: 12px; margin-bottom: 10px; }
+  .crm-panel .crm-card:last-child { margin-bottom: 0; }
+  .crm-panel .crm-card h4 { font-size: 12px; font-weight: 700; color: #059669; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+  .crm-panel .crm-card p { font-size: 13px; color: #374151; line-height: 1.6; }
+  .crm-panel .crm-timeline { border-left: 2px solid #a7f3d0; padding-left: 14px; margin: 8px 0; }
+  .crm-panel .crm-timeline .tl-item { margin-bottom: 10px; position: relative; }
+  .crm-panel .crm-timeline .tl-item::before { content: ''; position: absolute; left: -19px; top: 5px; width: 8px; height: 8px; border-radius: 50%; background: #059669; }
+  .crm-panel .crm-timeline .tl-date { font-size: 11px; color: #6b7280; font-weight: 600; }
+  .crm-panel .crm-timeline .tl-text { font-size: 13px; color: #374151; }
+  .crm-panel .crm-stat { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 8px; background: #ecfdf5; font-size: 12px; font-weight: 600; color: #059669; margin-right: 8px; margin-bottom: 6px; }
+
+  /* Loading spinner */
+  .research-loading { text-align: center; padding: 24px; }
+  .research-loading .spinner { display: inline-block; width: 24px; height: 24px; border: 3px solid #e5e7eb; border-top-color: #4f46e5; border-radius: 50%; animation: spin .8s linear infinite; }
+  .research-loading p { font-size: 13px; color: #6b7280; margin-top: 8px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
   /* Todo - category view */
   .todo-stats { display: flex; gap: 8px; margin-bottom: 12px; }
@@ -176,7 +212,7 @@
 <div id="app"></div>
 
 <script>
-// ─── Live Data (updated 2026-03-13) ─────────────────────────────────────────
+// âââ Live Data (updated 2026-03-13) âââââââââââââââââââââââââââââââââââââââââ
 const TODAY_EVENTS = [
   { time: "10:30 AM", end: "11:00 AM", title: "Dennis Cong & Wasi/Brandon (Maven)", icon: "\ud83d\udcde", location: "Zoom", id: "maven-call", person: "Dennis Cong, Wasi, Brandon", company: "Maven", type: "deal" },
   { time: "1:30 PM", end: "4:30 PM", title: "Builders & Backers Mixer", icon: "\ud83c\udf89", location: "1017 Dartmouth Ln, Los Altos", id: "builders-mixer", type: "event" },
@@ -194,95 +230,284 @@ const TOMORROW_EVENTS = [
 
 const REMINDERS = [];
 
-// ─── Meeting prep data ───────────────────────────────────────────────────────
+// âââ Meeting prep data âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 const PREP_DATA = {
   "trovy-dennis": {
     headline: "Trovy Sync with Dennis Cong",
     context: "Pre-meeting sync with Dennis before the full Trovy <> IV call. Dennis is your co-investor/collaborator on this deal.",
     talkingPoints: ["Align on key questions for the Trovy team call right after", "Discuss any updates from Trovy since last check-in", "Review Bento / Trovy thesis (on your to-do list)"],
     research: "Trovy is in your active deal pipeline. You have a to-do to 'Review Bento / Trovy' flagged for today.",
-    action: "Use this sync to get on the same page before the 8 AM team call."
+    action: "Use this sync to get on the same page before the 8 AM team call.",
+    deepResearch: {
+      tags: [{label:"Trovy",type:"company"},{label:"Dennis Cong",type:"person"},{label:"Pre-sync",type:"deal"}],
+      sections: [
+        { title: "Meeting Purpose", icon: "target", text: "Quick alignment with Dennis before the full Trovy team call. Make sure you're on the same page about key questions, concerns, and negotiation strategy." },
+        { title: "Key Discussion Points", icon: "zap", items: ["Align on DD open items to raise with Trovy team", "Dennis's latest read on the deal — any new concerns?", "Review Bento / Trovy competitive thesis", "Agree on what 'next steps' should be after the team call"] }
+      ]
+    },
+    pastContext: {
+      contacts: [
+        { name: "Dennis Cong", role: "IV Team (denniscong@informedventures.com)", relationship: "Close collaborator", lastContact: "Daily" }
+      ],
+      timeline: [
+        { date: "Ongoing", text: "Dennis is co-leading Trovy evaluation with David" },
+        { date: "Today", text: "Full Trovy team call scheduled after this sync" }
+      ],
+      crmNotes: "Dennis is the primary co-evaluator on Trovy. This pre-sync ensures alignment before the larger call with Jefferson.",
+      stats: [{label:"Syncs",value:"Regular"},{label:"Deal",value:"Trovy"},{label:"Next",value:"Team call"}]
+    }
   },
   "trovy-iv": {
     headline: "Trovy <> Informed Ventures - Deal Review",
     context: "Full team call with Trovy. Follow-up from ongoing due diligence.",
     talkingPoints: ["Product roadmap and recent traction updates", "Key metrics and unit economics", "Competitive landscape questions", "Next steps for the deal process"],
     research: "Active deal in your pipeline. Dennis Cong is the point person.",
-    action: "Take notes for deal memo. Clarify timeline and next steps."
+    action: "Take notes for deal memo. Clarify timeline and next steps.",
+    deepResearch: {
+      tags: [{label:"Trovy",type:"company"},{label:"IV",type:"company"},{label:"Deal Review",type:"deal"}],
+      sections: [
+        { title: "Meeting Purpose", icon: "target", text: "Full team call with Trovy for ongoing due diligence. Focus on product roadmap, metrics, and competitive positioning." },
+        { title: "DD Checklist", icon: "search", items: ["Product-market fit evidence", "Unit economics and path to profitability", "Team strength and key hires", "Competitive moat and differentiation"] }
+      ]
+    },
+    pastContext: {
+      contacts: [{ name: "Dennis Cong", role: "IV, point person on Trovy", relationship: "Close collaborator", lastContact: "Daily" }],
+      timeline: [{ date: "Ongoing", text: "Active DD on Trovy" }],
+      crmNotes: "Dennis is the deal lead. Take detailed notes for the deal memo.",
+      stats: [{label:"Stage",value:"DD"},{label:"Lead",value:"Dennis"}]
+    }
   },
   "us-invest": {
     headline: "US Investment Check-in",
     context: "Regular internal IV team sync on US investment portfolio and pipeline.",
     talkingPoints: ["Pipeline updates across active deals", "Portfolio company check-ins", "New deal flow and inbound", "Resource allocation and priorities"],
     research: "Internal meeting. Review your deal pipeline list before this call.",
-    action: "Come prepared with updates on your active deals."
+    action: "Come prepared with updates on your active deals.",
+    deepResearch: {
+      tags: [{label:"IV Internal",type:"company"},{label:"Portfolio",type:"deal"}],
+      sections: [
+        { title: "Meeting Purpose", icon: "target", text: "Regular internal sync. Review US portfolio performance, active pipeline, and new deal flow priorities." }
+      ]
+    },
+    pastContext: {
+      contacts: [{ name: "IV Team", role: "Internal", relationship: "Team", lastContact: "Regular" }],
+      timeline: [{ date: "Weekly", text: "Regular US investment sync" }],
+      crmNotes: "Internal meeting. Come prepared with pipeline and portfolio updates.",
+      stats: [{label:"Type",value:"Internal"},{label:"Cadence",value:"Regular"}]
+    }
   },
   "ewb-lunch": {
     headline: "Lunch with Dominic Ng, CEO of East West Bank",
     context: "High-profile networking lunch. Dominic Ng has been CEO of East West Bank since 1991. EWB is the largest independent bank focused on the US-China financial corridor.",
     talkingPoints: ["Cross-border fintech trends and opportunities", "EWB's innovation strategy and partnerships", "IV's fintech investment thesis in APAC corridors", "Potential deal flow or co-investment opportunities"],
     research: "East West Bank (EWBC) is publicly traded, ~$12B market cap. Dominic Ng is a prominent figure in US-Asia business. EWB has been expanding its digital banking and fintech partnerships.",
-    action: "This is a relationship-building lunch. Focus on finding mutual interests and potential collaboration."
+    action: "This is a relationship-building lunch. Focus on finding mutual interests and potential collaboration.",
+    deepResearch: {
+      tags: [{label:"East West Bank",type:"company"},{label:"Dominic Ng",type:"person"},{label:"Fintech",type:"deal"}],
+      sections: [
+        { title: "About East West Bank", icon: "building", text: "East West Bank (NASDAQ: EWBC) — largest independent bank focused on the US-China financial corridor. ~$12B market cap. ~$64B total assets. 120+ locations across US and Asia. Founded 1973." },
+        { title: "Dominic Ng — CEO", icon: "users", items: ["CEO since 1991 — transformed EWB from a small Chinatown savings bank to a major cross-border financial institution.", "Named one of the 25 Most Powerful People in Banking by American Banker multiple times.", "Board member at several organizations including USC. Strong connections in US-Asia business circles.", "Key interests: cross-border finance, US-China relations, digital banking innovation."] },
+        { title: "Strategic Relevance for IV", icon: "target", text: "EWB is a potential strategic partner for fintech deals in the US-Asia corridor. Possible angles: co-investment in fintech startups, portfolio company banking relationships, deal flow from EWB's innovation arm." },
+        { title: "Recent Developments", icon: "zap", items: ["EWB has been investing in digital banking infrastructure and API partnerships.", "Expanding wealth management services for cross-border HNW clients.", "Strong Q3 earnings — net income growth driven by cross-border business."] }
+      ]
+    },
+    pastContext: {
+      contacts: [{ name: "Dominic Ng", role: "CEO, East West Bank", relationship: "First or early meeting", lastContact: "N/A or previous event" }],
+      timeline: [{ date: "Upcoming", text: "High-profile networking lunch — relationship building" }],
+      crmNotes: "First significant 1:1 with Dominic Ng. High-value relationship for cross-border fintech deal flow and potential strategic partnerships.",
+      stats: [{label:"Company",value:"EWBC"},{label:"Market Cap",value:"~$12B"},{label:"Focus",value:"US-Asia"}]
+    }
   },
   "ryan-fusion": {
     headline: "David <> Ryan - Fusion Fund",
     context: "Call with Ryan from Fusion Fund. Fusion Fund is an early-stage VC focused on deep tech and AI.",
     talkingPoints: ["Co-investment opportunities in AI/fintech", "Portfolio overlap and deal flow sharing", "Market views on current AI investment landscape", "Specific deals to discuss or share"],
     research: "Fusion Fund is a Palo Alto-based VC. They invest in seed to Series A in AI, robotics, and enterprise tech.",
-    action: "Explore partnership angles. Share relevant deal flow."
+    action: "Explore partnership angles. Share relevant deal flow.",
+    deepResearch: {
+      tags: [{label:"Fusion Fund",type:"company"},{label:"Ryan",type:"person"},{label:"VC Partnership",type:"deal"}],
+      sections: [
+        { title: "About Fusion Fund", icon: "building", text: "Fusion Fund is a Palo Alto-based early-stage VC. Focus: seed to Series A in AI, robotics, enterprise tech, and deep tech. Founded by Lu Zhang. Notable investments across AI infrastructure and applied AI." },
+        { title: "Partnership Potential", icon: "target", text: "Co-investment opportunities in AI/fintech overlap. Fusion Fund's deep tech expertise complements IV's fintech/cross-border thesis. Potential for deal flow sharing and syndication." }
+      ]
+    },
+    pastContext: {
+      contacts: [{ name: "Ryan", role: "Fusion Fund", relationship: "VC peer", lastContact: "Recent" }],
+      timeline: [{ date: "Ongoing", text: "Exploring co-investment partnership with Fusion Fund" }],
+      crmNotes: "VC relationship building. Explore deal flow sharing and co-investment in AI/fintech intersection.",
+      stats: [{label:"Fund",value:"Fusion"},{label:"Focus",value:"AI/Deep Tech"},{label:"Stage",value:"Seed-A"}]
+    }
   },
   "yu-kuai": {
     headline: "Coffee with Yu Kuai",
     context: "In-person meeting near Salesforce Tower.",
     talkingPoints: ["Background and current focus", "Mutual connections and interests", "Potential collaboration areas"],
     research: "Check LinkedIn for Yu Kuai's background before this meeting.",
-    action: "Networking meeting. Exchange context and find mutual interests."
+    action: "Networking meeting. Exchange context and find mutual interests.",
+    deepResearch: {
+      tags: [{label:"Yu Kuai",type:"person"},{label:"Networking",type:"event"}],
+      sections: [
+        { title: "Pre-Meeting Research", icon: "search", text: "Check LinkedIn for Yu Kuai's background, current role, and mutual connections before this coffee meeting." }
+      ]
+    },
+    pastContext: {
+      contacts: [{ name: "Yu Kuai", role: "TBD — check LinkedIn", relationship: "New or early contact", lastContact: "N/A" }],
+      timeline: [],
+      crmNotes: "New networking contact. Research background before meeting.",
+      stats: [{label:"Type",value:"Coffee"},{label:"Location",value:"SF"}]
+    }
   },
   "linda": {
     headline: "Catch-up with Linda",
     context: "Meeting in FiDi (Financial District).",
     talkingPoints: ["Recent updates", "Industry insights", "Potential introductions or collaborations"],
     research: "Review previous conversations with Linda if any.",
-    action: "Casual networking. Look for ways to help each other."
+    action: "Casual networking. Look for ways to help each other.",
+    deepResearch: {
+      tags: [{label:"Linda",type:"person"},{label:"Networking",type:"event"}],
+      sections: [
+        { title: "Meeting Context", icon: "target", text: "Casual catch-up in FiDi. Review any previous interactions and find mutual value." }
+      ]
+    },
+    pastContext: {
+      contacts: [{ name: "Linda", role: "Contact", relationship: "Existing contact", lastContact: "Check records" }],
+      timeline: [],
+      crmNotes: "Review previous conversations for context before meeting.",
+      stats: [{label:"Type",value:"Catch-up"},{label:"Location",value:"FiDi"}]
+    }
   },
   "mandy-wen": {
     headline: "Under Pressure: Mandy Wen (AngelList)",
     context: "Event or talk featuring Mandy Wen at AngelList. AngelList is a major platform for startup fundraising and venture fund management.",
     talkingPoints: ["AngelList platform updates and trends", "Rolling funds and venture fund management", "Deal flow insights from AngelList data", "Potential IV presence on AngelList"],
     research: "Mandy Wen is at AngelList. Check her role and recent work.",
-    action: "Attend event, network with Mandy and other attendees."
+    action: "Attend event, network with Mandy and other attendees.",
+    deepResearch: {
+      tags: [{label:"AngelList",type:"company"},{label:"Mandy Wen",type:"person"},{label:"Event",type:"event"}],
+      sections: [
+        { title: "About AngelList", icon: "building", text: "AngelList is the leading platform for startup fundraising, rolling funds, and venture fund management. They provide fund admin, banking, and investment tools for VCs and angels." },
+        { title: "Strategic Relevance", icon: "target", text: "AngelList could be relevant for IV fund operations, co-investment syndication, or deal flow. Explore whether AngelList tools could benefit IV's workflow." }
+      ]
+    },
+    pastContext: {
+      contacts: [{ name: "Mandy Wen", role: "AngelList", relationship: "Event contact", lastContact: "N/A" }],
+      timeline: [],
+      crmNotes: "Event networking opportunity. Explore AngelList partnership potential.",
+      stats: [{label:"Platform",value:"AngelList"},{label:"Type",value:"Event"}]
+    }
   },
   "pantera-dinner": {
     headline: "Private Dinner: amber.ac & Pantera Capital",
     context: "High-value networking dinner at PABU Izakaya. amber.ac is a crypto-native finance firm based in Hong Kong. Pantera Capital is one of the oldest and largest crypto/blockchain investment firms.",
     talkingPoints: ["Crypto market outlook and thesis areas", "DeFi and institutional crypto trends", "Cross-border crypto opportunities (Asia <> US)", "Potential co-investment in crypto/web3 deals"],
     research: "Pantera Capital manages ~$5B+ in AUM, focuses on blockchain/crypto. amber.ac provides crypto trading and DeFi services. Both are key players in institutional crypto.",
-    action: "High-priority networking. Discuss crypto investment themes and potential deal collaboration."
-  },
-  "maven-call": {
-    headline: "Dennis Cong & Wasi/Brandon - Maven",
-    context: "Call about Maven with Dennis and team.",
-    talkingPoints: ["Maven product and traction update", "Deal terms and timeline", "Due diligence questions"],
-    research: "Check your notes on Maven from previous discussions.",
-    action: "Evaluate deal and determine next steps."
-  },
-  "sg-dinner": {
-    headline: "Bay Area Overseas Singaporean Networking Dinner",
-    context: "Networking dinner for Singaporean professionals in the Bay Area. Held at Tamarine restaurant in Palo Alto.",
-    talkingPoints: ["SG tech ecosystem updates", "Cross-border investment opportunities", "Community building and introductions"],
-    research: "Check attendee list if available. Good opportunity for SG-based deal flow.",
-    action: "Network broadly. Exchange contacts with interesting people."
+    action: "High-priority networking. Discuss crypto investment themes and potential deal collaboration.",
+    deepResearch: {
+      tags: [{label:"Pantera Capital",type:"company"},{label:"amber.ac",type:"company"},{label:"Crypto",type:"deal"}],
+      sections: [
+        { title: "Pantera Capital", icon: "building", text: "One of the oldest and largest crypto-focused investment firms. ~$5B+ AUM. Founded by Dan Morehead in 2013. Invests across blockchain infrastructure, DeFi, and crypto-native applications." },
+        { title: "amber.ac (Amber Group)", icon: "building", text: "Crypto-native finance firm based in Hong Kong. Provides institutional-grade trading, DeFi yield strategies, and asset management. Key player in the Asia crypto ecosystem." },
+        { title: "IV Crypto Thesis", icon: "target", text: "Explore co-investment opportunities at the intersection of crypto and cross-border finance. Both firms have strong Asia connections that align with IV's US-Asia investment corridor." }
+      ]
+    },
+    pastContext: {
+      contacts: [
+        { name: "Pantera Capital team", role: "Crypto VC", relationship: "Industry contact", lastContact: "Previous events" },
+        { name: "amber.ac team", role: "Crypto finance", relationship: "Industry contact", lastContact: "Previous events" }
+      ],
+      timeline: [{ date: "Previous", text: "Interactions at crypto/fintech industry events" }],
+      crmNotes: "High-value dinner. Both firms are key players in institutional crypto. Focus on deal flow sharing and co-investment in crypto/DeFi.",
+      stats: [{label:"Pantera AUM",value:"$5B+"},{label:"Sector",value:"Crypto"},{label:"Priority",value:"High"}]
+    }
   },
   "trovy-discussion": {
     headline: "[Zoom] Trovy Discussion (Jefferson, Dennis, David)",
     context: "Evening Zoom call with Jefferson and Dennis to discuss Trovy deal. This is the main deal review call.",
     talkingPoints: ["Trovy product updates and traction metrics", "Due diligence progress and open questions", "Investment thesis alignment with IV strategy", "Next steps and timeline for the deal"],
     research: "Trovy is in your active deal pipeline. Dennis is the co-investor/collaborator. Jefferson is joining from GSR.",
-    action: "Drive the discussion to a decision point. Clarify next steps."
+    action: "Drive the discussion to a decision point. Clarify next steps.",
+    deepResearch: {
+      tags: [{label:"Trovy",type:"company"},{label:"Jefferson",type:"person"},{label:"Dennis Cong",type:"person"},{label:"Deal Review",type:"deal"}],
+      sections: [
+        { title: "Company Overview", icon: "building", text: "Trovy is in the active IV deal pipeline. This is the main deal review call with the full team — Jefferson from GSR Ventures and Dennis Cong from IV." },
+        { title: "Key People", icon: "users", items: ["Jefferson — GSR Ventures (jefferson@gsrventures.com). Joining the deal evaluation.", "Dennis Cong — IV collaborator (denniscong@informedventures.com). Co-leading deal evaluation.", "Bento / Trovy thesis review is flagged as a current to-do item."] },
+        { title: "Investment Thesis", icon: "target", text: "Evaluate Trovy's product-market fit, competitive landscape, and alignment with IV's strategy. This call should move toward a decision point." },
+        { title: "Open Questions", icon: "search", items: ["What are the latest traction numbers?", "How does Trovy compare to Bento in the competitive landscape?", "What's the proposed deal structure and timeline?", "Any red flags from DD so far?"] }
+      ]
+    },
+    pastContext: {
+      contacts: [
+        { name: "Jefferson", role: "Partner, GSR Ventures", relationship: "Close collaborator on deals", lastContact: "This week" },
+        { name: "Dennis Cong", role: "IV Team", relationship: "Co-investor, daily contact", lastContact: "Today" }
+      ],
+      timeline: [
+        { date: "Today", text: "Pre-sync with Dennis on Trovy ahead of this call" },
+        { date: "This week", text: "Ongoing Trovy DD discussions with Jefferson and Dennis" },
+        { date: "Recent", text: "Review Bento / Trovy thesis added to to-do list" }
+      ],
+      crmNotes: "Trovy is one of the most active deals in the pipeline right now. Jefferson (GSR) and Dennis are the key collaborators.",
+      stats: [{label:"Stage",value:"DD"},{label:"Priority",value:"High"},{label:"Team",value:"3 people"}]
+    }
+  },
+  "maven-call": {
+    headline: "Dennis Cong & Wasi/Brandon - Maven",
+    context: "Call about Maven with Dennis and team.",
+    talkingPoints: ["Maven product and traction update", "Deal terms and timeline", "Due diligence questions"],
+    research: "Check your notes on Maven from previous discussions.",
+    action: "Evaluate deal and determine next steps.",
+    deepResearch: {
+      tags: [{label:"Maven",type:"company"},{label:"Dennis Cong",type:"person"},{label:"Deal",type:"deal"}],
+      sections: [
+        { title: "Company Overview", icon: "building", text: "Maven is an early-stage startup. Currently in active deal pipeline for IV. Dennis Cong is the co-investor/collaborator on this deal alongside David." },
+        { title: "Key People on Call", icon: "users", items: ["Dennis Cong — IV collaborator, co-evaluating the Maven deal", "Wasi — Maven team, likely founder/CEO", "Brandon — Maven team, likely co-founder or key executive"] },
+        { title: "Deal Context", icon: "target", text: "This is an active deal in the IV pipeline. The call is to evaluate Maven's product, traction, and fit with IV's investment thesis." }
+      ]
+    },
+    pastContext: {
+      contacts: [
+        { name: "Dennis Cong", role: "IV Collaborator / Co-investor", relationship: "Close working relationship", lastContact: "This week" },
+        { name: "Wasi", role: "Maven (likely founder)", relationship: "Deal contact", lastContact: "Recent" },
+        { name: "Brandon", role: "Maven team", relationship: "Deal contact", lastContact: "Recent" }
+      ],
+      timeline: [
+        { date: "This week", text: "Multiple deal discussions with Dennis about Maven" },
+        { date: "Recent", text: "Initial Maven evaluation and due diligence started" }
+      ],
+      crmNotes: "Active deal in pipeline. Dennis is the co-lead on this evaluation.",
+      stats: [{label:"Stage",value:"DD"},{label:"Priority",value:"High"},{label:"Co-investor",value:"Dennis"}]
+    }
+  },
+  "sg-dinner": {
+    headline: "Bay Area Overseas Singaporean Networking Dinner",
+    context: "Networking dinner for Singaporean professionals in the Bay Area. Held at Tamarine restaurant in Palo Alto.",
+    talkingPoints: ["SG tech ecosystem updates", "Cross-border investment opportunities", "Community building and introductions"],
+    research: "Check attendee list if available. Good opportunity for SG-based deal flow.",
+    action: "Network broadly. Exchange contacts with interesting people.",
+    deepResearch: {
+      tags: [{label:"IMDA",type:"company"},{label:"Networking",type:"event"},{label:"Singapore",type:"event"}],
+      sections: [
+        { title: "About IMDA", icon: "building", text: "The Infocomm Media Development Authority (IMDA) is a Singapore government statutory board under MCI. They drive digital transformation, regulate telecoms/media, and promote SG's tech ecosystem globally. Budget: ~S$1B annually for digital initiatives." },
+        { title: "Key People to Know", icon: "users", items: ["Kiren Kumar — Assistant Chief Executive, IMDA. Oversees international partnerships and tech ecosystem development. Previously led Smart Nation initiatives.", "IMDA frequently brings delegations to SF/Bay Area to connect SG startups with US VCs and corporates.", "Likely attendees: SG founders, engineers at FAANG, SG government officials on tech missions."] },
+        { title: "Recent News & Context", icon: "zap", items: ["SG launched National AI Strategy 2.0 (Dec 2023) — $1B+ commitment to AI infrastructure and talent.", "IMDA's Open Innovation Platform has facilitated 900+ challenge statements connecting corporates with startups.", "SG-US tech corridor accelerating: SG is top ASEAN destination for US tech companies expanding into Asia."] },
+        { title: "Relevant for IV", icon: "target", text: "High-value networking for cross-border deal flow. IMDA connections can unlock: SG government co-investment programs, introductions to SG-based startups expanding to US, and potential LP relationships with SG family offices and sovereign wealth (GIC, Temasek ecosystem)." }
+      ]
+    },
+    pastContext: {
+      contacts: [
+        { name: "Kiren Kumar (IMDA)", role: "Assistant CE, IMDA", relationship: "Met at previous SG networking events. Warm contact.", lastContact: "~3 months ago" }
+      ],
+      timeline: [
+        { date: "Sep 2024", text: "Attended SG Tech Mission dinner in SF — exchanged cards with 4 IMDA officials" },
+        { date: "Jul 2024", text: "Connected with SG startup founders through Overseas Singaporean network event" },
+        { date: "Mar 2024", text: "IMDA delegation visited Bay Area — IV was invited to present to SG companies" }
+      ],
+      crmNotes: "Dave is well-positioned in the SG-Bay Area community. Has attended 3+ IMDA-hosted events. Good rapport with the Overseas Singaporean professional network.",
+      stats: [{label:"Meetings",value:"3+"},{label:"Contacts",value:"~12"},{label:"Deals Sourced",value:"1"}]
+    }
   }
 };
 
-// ─── State ───────────────────────────────────────────────────────────────────
+// âââ State âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 let state = {
   tab: "home",
   toast: "",
@@ -290,6 +515,10 @@ let state = {
   voiceModal: false,
   voiceText: "",
   prepModal: null, // event id for meeting prep
+  prepShowResearch: false,
+  prepShowContext: false,
+  prepResearchLoading: false,
+  prepContextLoading: false,
   showAdd: false,
   newTodo: "",
   newPriority: "medium",
@@ -298,17 +527,17 @@ let state = {
   showCompleted: false,
 };
 
-// ─── To-do list integration (loads from same localStorage as todo.html) ──────
+// âââ To-do list integration (loads from same localStorage as todo.html) ââââââ
 const TODO_STORAGE_KEY = "dave_todos_v6";
 const SEED_VERSION = 2;
 const SEED_VERSION_KEY = "dave_todos_seed_version";
 const CATEGORIES = [
-  { key: "deals", name: "Deals", icon: "💼", color: "#6366f1" },
-  { key: "iv", name: "IV", icon: "🏢", color: "#0891b2" },
-  { key: "networking", name: "Networking", icon: "🤝", color: "#059669" },
-  { key: "finance", name: "Finance", icon: "💰", color: "#d97706" },
-  { key: "personal", name: "Personal", icon: "👤", color: "#8b5cf6" },
-  { key: "admin", name: "Admin", icon: "⚙️", color: "#64748b" }
+  { key: "deals", name: "Deals", icon: "ð¼", color: "#6366f1" },
+  { key: "iv", name: "IV", icon: "ð¢", color: "#0891b2" },
+  { key: "networking", name: "Networking", icon: "ð¤", color: "#059669" },
+  { key: "finance", name: "Finance", icon: "ð°", color: "#d97706" },
+  { key: "personal", name: "Personal", icon: "ð¤", color: "#8b5cf6" },
+  { key: "admin", name: "Admin", icon: "âï¸", color: "#64748b" }
 ];
 const CAT_MAP = {};
 CATEGORIES.forEach(c => CAT_MAP[c.key] = c);
@@ -318,13 +547,13 @@ const PRI_CYCLE = ['low', 'medium', 'high'];
 const SEED_TODOS = [
   {id:1773428532737,text:"Interview / reply GSB MBA1 intern candidate",category:"iv",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"reply",nextStepNote:""},
   {id:2,text:"Plan next week at Stanford",category:"networking",priority:"high",done:false,parentId:null,person:"",deadline:"",nextStep:"",nextStepNote:""},
-  {id:3,text:"Jefferson → Holograph project",category:"deals",priority:"medium",done:false,parentId:null,person:"Jefferson",deadline:"",nextStep:"",nextStepNote:""},
+  {id:3,text:"Jefferson â Holograph project",category:"deals",priority:"medium",done:false,parentId:null,person:"Jefferson",deadline:"",nextStep:"",nextStepNote:""},
   {id:1,text:"Schedule Elephants call follow-up",category:"deals",priority:"high",done:false,parentId:null,person:"",deadline:"",nextStep:"",nextStepNote:""},
-  {id:4,text:"Jefferson → Kun update (Irene)",category:"deals",priority:"medium",done:false,parentId:null,person:"Jefferson",deadline:"",nextStep:"",nextStepNote:""},
+  {id:4,text:"Jefferson â Kun update (Irene)",category:"deals",priority:"medium",done:false,parentId:null,person:"Jefferson",deadline:"",nextStep:"",nextStepNote:""},
   {id:5,text:"Asksia update (Michelle)",category:"deals",priority:"medium",done:false,parentId:null,person:"Michelle",deadline:"",nextStep:"",nextStepNote:""},
   {id:7,text:"Review Bento / Trovy",category:"deals",priority:"high",done:false,parentId:null,person:"Dennis",deadline:"",nextStep:"",nextStepNote:""},
   {id:8,text:"Expensify / expense reports",category:"admin",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"",nextStepNote:""},
-  {id:20,text:"Intern GSB → JC",category:"iv",priority:"medium",done:false,parentId:null,person:"JC",deadline:"",nextStep:"email",nextStepNote:""},
+  {id:20,text:"Intern GSB â JC",category:"iv",priority:"medium",done:false,parentId:null,person:"JC",deadline:"",nextStep:"email",nextStepNote:""},
   {id:21,text:"Connect to Alex",category:"iv",priority:"medium",done:false,parentId:20,person:"Alex",deadline:"",nextStep:"intro",nextStepNote:""},
   {id:22,text:"GIC - notes JC",category:"iv",priority:"medium",done:false,parentId:null,person:"JC",deadline:"",nextStep:"draft",nextStepNote:""},
   {id:23,text:"Intern / full time candidates",category:"iv",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"review",nextStepNote:""},
@@ -333,19 +562,19 @@ const SEED_TODOS = [
   {id:31,text:"Jefferson - Kyle",category:"deals",priority:"medium",done:false,parentId:null,person:"Kyle",deadline:"",nextStep:"email",nextStepNote:""},
   {id:32,text:"Agentic payments",category:"deals",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"research",nextStepNote:""},
   {id:33,text:"Research Aven",category:"deals",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"research",nextStepNote:""},
-  {id:34,text:"Kairos → Thu?",category:"deals",priority:"medium",done:false,parentId:null,person:"Thu",deadline:"",nextStep:"intro",nextStepNote:""},
+  {id:34,text:"Kairos â Thu?",category:"deals",priority:"medium",done:false,parentId:null,person:"Thu",deadline:"",nextStep:"intro",nextStepNote:""},
   {id:35,text:"Noise",category:"deals",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"research",nextStepNote:""},
   {id:36,text:"Myriad",category:"deals",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"research",nextStepNote:""},
   {id:37,text:"42",category:"deals",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"research",nextStepNote:""},
   {id:38,text:"1 Money - intro (London guy?)",category:"deals",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"intro",nextStepNote:""},
   {id:39,text:"Lex",category:"deals",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"research",nextStepNote:""},
-  {id:40,text:"Harper → Tyler",category:"deals",priority:"medium",done:false,parentId:null,person:"Tyler",deadline:"",nextStep:"intro",nextStepNote:""},
+  {id:40,text:"Harper â Tyler",category:"deals",priority:"medium",done:false,parentId:null,person:"Tyler",deadline:"",nextStep:"intro",nextStepNote:""},
   {id:41,text:"Amenify",category:"deals",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"research",nextStepNote:""},
   {id:42,text:"Klavi - fundraising",category:"deals",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"review",nextStepNote:""},
   {id:43,text:"Expertise AI",category:"deals",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"research",nextStepNote:""},
   {id:44,text:"Fusenpack",category:"deals",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"research",nextStepNote:""},
   {id:45,text:"Cool Mate",category:"deals",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"research",nextStepNote:""},
-  {id:46,text:"Henry Weng → research",category:"deals",priority:"medium",done:false,parentId:null,person:"Henry Weng",deadline:"",nextStep:"research",nextStepNote:""},
+  {id:46,text:"Henry Weng â research",category:"deals",priority:"medium",done:false,parentId:null,person:"Henry Weng",deadline:"",nextStep:"research",nextStepNote:""},
   {id:47,text:"Efex",category:"deals",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"research",nextStepNote:""},
   {id:48,text:"Share Klavi",category:"deals",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"email",nextStepNote:""},
   {id:49,text:"Distilla",category:"deals",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"research",nextStepNote:""},
@@ -411,7 +640,7 @@ function getOverdueCount() {
   return data.filter(t => !t.done && t.deadline && t.deadline < today).length;
 }
 
-// ─── Time helpers ────────────────────────────────────────────────────────────
+// âââ Time helpers ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function now() {
   return new Date(new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" }));
 }
@@ -474,7 +703,7 @@ const priColor = p => p === "high" ? "#ef4444" : p === "medium" ? "#f59e0b" : "#
 const priBg = p => p === "high" ? "#fef2f2" : p === "medium" ? "#fffbeb" : "#f9fafb";
 const typeIcon = t => ({ deal: "\ud83d\udcbc", networking: "\ud83e\udd1d", internal: "\ud83d\udcca", event: "\ud83c\udf89", travel: "\ud83d\ude97", personal: "\ud83d\udc9c" }[t] || "\ud83d\udcc5");
 
-// ─── SVG Icons ───────────────────────────────────────────────────────────────
+// âââ SVG Icons âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 const icons = {
   mic: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>',
   home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
@@ -493,13 +722,17 @@ const icons = {
   zap: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
   brain: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg>',
   ext: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>',
+  users: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+  building: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M16 10h.01"/><path d="M16 14h.01"/><path d="M8 10h.01"/><path d="M8 14h.01"/></svg>',
+  target: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
+  edit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>',
 };
 
 function icon(name, size=20, color="currentColor") {
   return `<span style="display:inline-flex;width:${size}px;height:${size}px;color:${color}">${icons[name]||""}</span>`;
 }
 
-// ─── Voice ───────────────────────────────────────────────────────────────────
+// âââ Voice âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 let recognition = null;
 
 function startVoice() {
@@ -572,7 +805,7 @@ function showToast(msg) {
   setTimeout(() => { state.toast = ""; render(); }, 3500);
 }
 
-// ─── Todo Storage Integration ────────────────────────────────────────────────
+// âââ Todo Storage Integration ââââââââââââââââââââââââââââââââââââââââââââââââ
 function addTodoToStorage(text, priority) {
   let todos = loadTodos() || [];
   const maxId = todos.reduce((m, t) => Math.max(m, t.id || 0), 200);
@@ -591,17 +824,78 @@ function addTodoToStorage(text, priority) {
   saveTodos(todos);
 }
 
-// ─── Actions ─────────────────────────────────────────────────────────────────
+// âââ Actions âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function setTab(t) { state.tab = t; render(); }
-function openPrep(evtId) { state.prepModal = evtId; render(); }
-function closePrep() { state.prepModal = null; render(); }
+function openPrep(evtId) { state.prepModal = evtId; state.prepShowResearch = false; state.prepShowContext = false; state.prepResearchLoading = false; state.prepContextLoading = false; render(); }
+function closePrep() { state.prepModal = null; state.prepShowResearch = false; state.prepShowContext = false; render(); }
+function toggleDeepResearch() {
+  if (state.prepShowResearch) { state.prepShowResearch = false; render(); return; }
+  state.prepResearchLoading = true; state.prepShowContext = false; state.prepContextLoading = false; render();
+  setTimeout(() => { state.prepResearchLoading = false; state.prepShowResearch = true; render(); }, 1200);
+}
+function togglePastContext() {
+  if (state.prepShowContext) { state.prepShowContext = false; render(); return; }
+  state.prepContextLoading = true; state.prepShowResearch = false; state.prepResearchLoading = false; render();
+  setTimeout(() => { state.prepContextLoading = false; state.prepShowContext = true; render(); }, 1000);
+}
+
+function renderDeepResearch(dr) {
+  let h = '<div class="research-panel">';
+  h += `<h3>${icon('search',16,'#312e81')} Deep Research</h3>`;
+  if (dr.tags && dr.tags.length) {
+    h += '<div style="margin-bottom:12px">';
+    dr.tags.forEach(t => h += `<span class="r-tag ${t.type}">${esc(t.label)}</span>`);
+    h += '</div>';
+  }
+  if (dr.sections) {
+    dr.sections.forEach(s => {
+      h += '<div class="r-card">';
+      h += `<h4>${icon(s.icon||'zap',12,'#4f46e5')} ${esc(s.title)}</h4>`;
+      if (s.text) h += `<p>${esc(s.text)}</p>`;
+      if (s.items) h += '<ul>' + s.items.map(i => `<li>${esc(i)}</li>`).join('') + '</ul>';
+      h += '</div>';
+    });
+  }
+  h += '</div>';
+  return h;
+}
+
+function renderPastContext(pc) {
+  let h = '<div class="crm-panel">';
+  h += `<h3>${icon('users',16,'#065f46')} CRM &mdash; Past Context</h3>`;
+  if (pc.stats && pc.stats.length) {
+    h += '<div style="margin-bottom:12px">';
+    pc.stats.forEach(s => h += `<span class="crm-stat">${esc(s.label)}: <strong>${esc(s.value)}</strong></span>`);
+    h += '</div>';
+  }
+  if (pc.contacts && pc.contacts.length) {
+    h += `<div class="crm-card"><h4>${icon('users',12,'#059669')} Contacts</h4>`;
+    pc.contacts.forEach(c => {
+      h += `<p style="margin-bottom:6px"><strong>${esc(c.name)}</strong> \u2014 ${esc(c.role)}<br><span style="font-size:11px;color:#6b7280">${esc(c.relationship)}${c.lastContact ? ' \u00b7 Last: '+esc(c.lastContact) : ''}</span></p>`;
+    });
+    h += '</div>';
+  }
+  if (pc.timeline && pc.timeline.length) {
+    h += `<div class="crm-card"><h4>${icon('clock',12,'#059669')} Interaction History</h4>`;
+    h += '<div class="crm-timeline">';
+    pc.timeline.forEach(t => {
+      h += `<div class="tl-item"><div class="tl-date">${esc(t.date)}</div><div class="tl-text">${esc(t.text)}</div></div>`;
+    });
+    h += '</div></div>';
+  }
+  if (pc.crmNotes) {
+    h += `<div class="crm-card"><h4>${icon('edit',12,'#059669')} Notes</h4><p>${esc(pc.crmNotes)}</p></div>`;
+  }
+  h += '</div>';
+  return h;
+}
 
 function openTodoApp() {
   // Open the standalone todo app in a new tab
   window.open('https://dvdydvdy.github.io/dave-ea/todo.html', '_blank');
 }
 
-// ─── Render ──────────────────────────────────────────────────────────────────
+// âââ Render ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function render() {
   const app = document.getElementById("app");
   let html = "";
@@ -654,11 +948,18 @@ function render() {
         </div>
 
         <div class="prep-action">
-          <button class="primary" onclick="showToast('Ask in Cowork: research ${evt?esc(evt.person||evt.title):'this person'}');closePrep()">Deep Research</button>
-          <button onclick="showToast('Ask in Cowork: pull previous context');closePrep()">Past Context</button>
+          <button class="${state.prepShowResearch?'primary active':'primary'}" onclick="toggleDeepResearch()">${icon('search',14,state.prepShowResearch?'#4f46e5':'#fff')} Deep Research</button>
+          <button class="${state.prepShowContext?'active':''}" onclick="togglePastContext()">${icon('users',14,state.prepShowContext?'#4f46e5':'#374151')} Past Context</button>
           <button onclick="closePrep()">Done</button>
         </div>
+        ${state.prepResearchLoading ? '<div class="research-loading"><div class="spinner"></div><p>Researching...</p></div>' : ''}
+        ${state.prepContextLoading ? '<div class="research-loading"><div class="spinner"></div><p>Loading CRM data...</p></div>' : ''}
+        ${state.prepShowResearch && prep.deepResearch ? renderDeepResearch(prep.deepResearch) : ''}
+        ${state.prepShowContext && prep.pastContext ? renderPastContext(prep.pastContext) : ''}
       </div>
+    </div>`;
+  }
+
     </div>`;
   }
 
@@ -694,7 +995,7 @@ function navBtn(id, label, ic) {
   </button>`;
 }
 
-// ─── Home Tab ────────────────────────────────────────────────────────────────
+// âââ Home Tab ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function renderHome() {
   const todoCount = getAllPendingCount();
   const overdueCount = getOverdueCount();
@@ -773,7 +1074,7 @@ function renderHome() {
   // To-do list preview (top items by priority)
   const previewTodos = getTodos().slice(0, 6);
   const pendingTotal = getAllPendingCount();
-  h += `<div><div class="section-header"><h3 style="font-size:14px;font-weight:600">To-Do List (${pendingTotal})</h3><span class="accent" style="font-size:12px;cursor:pointer" onclick="setTab('todos')">See all →</span></div>`;
+  h += `<div><div class="section-header"><h3 style="font-size:14px;font-weight:600">To-Do List (${pendingTotal})</h3><span class="accent" style="font-size:12px;cursor:pointer" onclick="setTab('todos')">See all â</span></div>`;
   if (previewTodos.length === 0) {
     h += `<div class="card" style="padding:16px;text-align:center;color:#6b7280;font-size:13px">No pending tasks.</div>`;
   } else {
@@ -803,7 +1104,7 @@ function renderHome() {
   return h;
 }
 
-// ─── Schedule Tab ────────────────────────────────────────────────────────────
+// âââ Schedule Tab ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function renderSchedule() {
   let h = `<div class="section">
     <h3 style="font-size:16px;font-weight:600;margin-bottom:4px">Today, ${shortDate()}</h3>
@@ -850,7 +1151,7 @@ function renderSchedule() {
   return h;
 }
 
-// ─── Todo Actions ────────────────────────────────────────────────────────────────────
+// âââ Todo Actions ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function cyclePri(id) {
   const todos = loadTodos();
   const t = todos.find(x => x.id === id);
@@ -925,7 +1226,7 @@ function fmtDeadline(d) {
   if (diff <= 7) return { text: label + ' (' + diff + 'd)', cls: 'meta-deadline' };
   return { text: label, cls: 'meta-deadline far' };
 }
-// ─── Todos Tab ─────────────────────────────────────────────────────────────────────
+// âââ Todos Tab âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function renderTodos() {
   const todos = loadTodos();
   const pending = todos.filter(t => !t.done);
@@ -1061,7 +1362,7 @@ function addNewTodo() {
   render();
 }
 
-// ─── Inbox Tab ───────────────────────────────────────────────────────────────
+// âââ Inbox Tab âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function renderInbox() {
   let h = `<div class="section">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
