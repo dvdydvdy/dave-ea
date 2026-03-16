@@ -210,6 +210,31 @@
   .icon-sm { width: 12px; height: 12px; }
   .icon-md { width: 16px; height: 16px; }
   .icon-lg { width: 20px; height: 20px; }
+  /* Suggested Actions */
+  .suggestions-section { margin-bottom: 16px; }
+  .suggestions-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .suggestions-header h4 { font-size: 13px; font-weight: 700; color: #7c3aed; text-transform: uppercase; letter-spacing: .5px; }
+  .suggestions-badge { background: #7c3aed; color: #fff; font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 10px; }
+  .suggestions-pulse { animation: blink 2s infinite; }
+  .suggestion-item { background: #faf5ff; border: 1px solid #e9d5ff; border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; position: relative; transition: all .2s; }
+  .suggestion-item:hover { border-color: #c4b5fd; box-shadow: 0 2px 8px rgba(124,58,237,.08); }
+  .suggestion-source { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; padding: 2px 8px; border-radius: 6px; margin-bottom: 6px; }
+  .suggestion-source.teams { background: #dbeafe; color: #1e40af; }
+  .suggestion-source.gmail { background: #fce7f3; color: #9d174d; }
+  .suggestion-source.whatsapp { background: #d1fae5; color: #065f46; }
+  .suggestion-source.slack { background: #fef3c7; color: #92400e; }
+  .suggestion-text { font-size: 13px; font-weight: 600; color: #1f2937; line-height: 1.4; margin-bottom: 4px; }
+  .suggestion-context { font-size: 11px; color: #6b7280; line-height: 1.4; margin-bottom: 8px; }
+  .suggestion-tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 5px; }
+  .suggestion-tag.type-outreach { background: #dbeafe; color: #1e40af; }
+  .suggestion-tag.type-research { background: #fef3c7; color: #92400e; }
+  .suggestion-tag.type-calendar { background: #d1fae5; color: #065f46; }
+  .suggestion-tag.type-followup { background: #fce7f3; color: #9d174d; }
+  .suggestion-approve { padding: 5px 14px; border-radius: 8px; border: none; background: #7c3aed; color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: background .15s; }
+  .suggestion-approve:hover { background: #6d28d9; }
+  .suggestion-dismiss { padding: 5px 14px; border-radius: 8px; border: 1px solid #e5e7eb; background: #fff; color: #6b7280; font-size: 12px; font-weight: 500; cursor: pointer; transition: all .15s; }
+  .suggestion-dismiss:hover { background: #f3f4f6; color: #374151; }
+  .suggestion-time { font-size: 10px; color: #9ca3af; margin-left: auto; }
 </style>
 </head>
 <body>
@@ -538,7 +563,7 @@ let state = {
 
 // âââ To-do list integration (loads from same localStorage as todo.html) ââââââ
 const TODO_STORAGE_KEY = "dave_todos_v6";
-const SEED_VERSION = 2;
+const SEED_VERSION = 3;
 const SEED_VERSION_KEY = "dave_todos_seed_version";
 const CATEGORIES = [
     { key: "deals", name: "Deals", icon: "ICON_DEALS", color: "#6366f1" },
@@ -641,6 +666,162 @@ function loadTodos() {
   return JSON.parse(JSON.stringify(SEED_TODOS));
 }
 function saveTodos(todos) { localStorage.setItem(TODO_STORAGE_KEY, JSON.stringify(todos)); }
+
+// ─── Suggested Actions (AI-generated from messages) ─────────────────────────
+const SUGGESTIONS_STORAGE_KEY = "dave_suggestions_v1";
+const SUGGESTIONS_URL = "suggestions.json";
+
+const SEED_SUGGESTIONS = [
+  {
+    id: "sug_1", text: "Reach out to 3 YC founders doing prediction markets (Owen Botkin @ Forum, Valence, Axis)",
+    source: "teams", sourceContext: "Dennis Cong flagged prediction markets are hot this YC batch (5/50 companies). Forum is oversubscribed but good to know for breakout. Valence and Axis also interesting.",
+    actionType: "outreach", priority: "high", category: "deals",
+    person: "Dennis Cong", company: "Forum / Valence / Axis",
+    timestamp: "2026-03-15T11:33:00", status: "pending"
+  },
+  {
+    id: "sug_2", text: "Reply to Vincent Chen (Panta Insure) — wants to meet again today 8:30 PM PT",
+    source: "gmail", sourceContext: "Vincent emailed: 'Great meeting with you! Any chance you're available to meet again later today around 8:30 PM PT?'",
+    actionType: "calendar", priority: "high", category: "deals",
+    person: "Vincent Chen", company: "Panta Insure",
+    timestamp: "2026-03-15T18:52:00", status: "pending"
+  },
+  {
+    id: "sug_3", text: "Get Crossmint's latest financial metrics for Jefferson Chen (GSR Ventures)",
+    source: "teams", sourceContext: "Jefferson Chen (GSR Ventures) tagged you: 'let's try and get some data point on crossmint's latest financial metrics, if possible?'",
+    actionType: "research", priority: "medium", category: "deals",
+    person: "Jefferson Chen", company: "Crossmint",
+    timestamp: "2026-03-12T19:57:00", status: "pending"
+  },
+  {
+    id: "sug_4", text: "Research Axis — AI trading system for commodities (YC W26, from Yale)",
+    source: "teams", sourceContext: "Dennis shared Axis profile: AI system for institutional trading desks, commodities focus. Founders Ian Wang & Eric Zhu from Yale. Team size 2.",
+    actionType: "research", priority: "medium", category: "deals",
+    person: "Dennis Cong", company: "Axis",
+    timestamp: "2026-03-15T11:33:00", status: "pending"
+  },
+  {
+    id: "sug_5", text: "Check YC investor portal for prediction market deal flow",
+    source: "teams", sourceContext: "Dennis shared investors.ycombinator.com/feed link for contacting prediction market companies directly.",
+    actionType: "research", priority: "low", category: "deals",
+    person: "", company: "Y Combinator",
+    timestamp: "2026-03-15T10:43:00", status: "pending"
+  }
+];
+
+function loadSuggestions() {
+  try { const raw = localStorage.getItem(SUGGESTIONS_STORAGE_KEY); if (raw) return JSON.parse(raw); } catch(e) {}
+  saveSuggestions(SEED_SUGGESTIONS);
+  return JSON.parse(JSON.stringify(SEED_SUGGESTIONS));
+}
+function saveSuggestions(s) { localStorage.setItem(SUGGESTIONS_STORAGE_KEY, JSON.stringify(s)); }
+
+function approveSuggestion(sugId) {
+  const suggestions = loadSuggestions();
+  const sug = suggestions.find(s => s.id === sugId);
+  if (!sug) return;
+  const todos = loadTodos();
+  const maxId = todos.reduce((m, t) => Math.max(m, t.id || 0), 200);
+  todos.push({
+    id: maxId + 1, text: sug.text, category: sug.category || 'deals',
+    priority: sug.priority || 'medium', done: false, parentId: null,
+    person: sug.person || '', deadline: '',
+    nextStep: sug.actionType === 'outreach' ? 'email' : sug.actionType === 'calendar' ? 'schedule' : '',
+    nextStepNote: '', created: new Date().toISOString(), fromSuggestion: true
+  });
+  saveTodos(todos);
+  sug.status = 'approved';
+  saveSuggestions(suggestions);
+  showToast('Added to your to-do list');
+  render();
+}
+
+function dismissSuggestion(sugId) {
+  const suggestions = loadSuggestions();
+  const sug = suggestions.find(s => s.id === sugId);
+  if (!sug) return;
+  sug.status = 'dismissed';
+  saveSuggestions(suggestions);
+  render();
+}
+
+async function fetchSuggestions() {
+  try {
+    const resp = await fetch(SUGGESTIONS_URL + '?t=' + Date.now());
+    if (!resp.ok) return;
+    const remote = await resp.json();
+    if (!Array.isArray(remote) || remote.length === 0) return;
+    const local = loadSuggestions();
+    const localIds = new Set(local.map(s => s.id));
+    let added = 0;
+    remote.forEach(s => { if (!localIds.has(s.id)) { s.status = 'pending'; local.push(s); added++; } });
+    if (added > 0) { saveSuggestions(local); render(); }
+  } catch(e) {}
+}
+
+function renderSuggestedActions() {
+  const suggestions = loadSuggestions();
+  const pending = suggestions.filter(s => s.status === 'pending');
+  if (pending.length === 0) return '';
+
+  const sourceIcon = (src) => {
+    if (src === 'teams') return icon('users', 12, '#1e40af');
+    if (src === 'gmail') return icon('mail', 12, '#9d174d');
+    if (src === 'whatsapp') return icon('mic', 12, '#065f46');
+    return icon('inbox', 12, '#92400e');
+  };
+  const typeLabel = (t) => {
+    if (t === 'outreach') return 'Outreach';
+    if (t === 'research') return 'Research';
+    if (t === 'calendar') return 'Schedule';
+    if (t === 'followup') return 'Follow-up';
+    return t;
+  };
+  const timeAgo = (ts) => {
+    const diff = Date.now() - new Date(ts).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 60) return mins + 'm ago';
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return hrs + 'h ago';
+    return Math.floor(hrs / 24) + 'd ago';
+  };
+
+  let h = '<div class="suggestions-section">';
+  h += '<div class="suggestions-header">';
+  h += '<span class="suggestions-pulse" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#7c3aed"></span>';
+  h += '<h4>Suggested Actions</h4>';
+  h += '<span class="suggestions-badge">' + pending.length + '</span>';
+  h += '<span style="font-size:10px;color:#9ca3af;margin-left:auto">from your messages</span>';
+  h += '</div>';
+
+  pending.sort((a, b) => {
+    const po = { high: 0, medium: 1, low: 2 };
+    return (po[a.priority] || 2) - (po[b.priority] || 2);
+  });
+
+  pending.forEach(sug => {
+    h += '<div class="suggestion-item">';
+    h += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">';
+    h += '<span class="suggestion-source ' + sug.source + '">' + sourceIcon(sug.source) + ' ' + sug.source + '</span>';
+    h += '<span class="suggestion-tag type-' + sug.actionType + '">' + typeLabel(sug.actionType) + '</span>';
+    if (sug.priority === 'high') h += '<span class="suggestion-tag" style="background:#fef2f2;color:#dc2626">Urgent</span>';
+    h += '<span class="suggestion-time">' + timeAgo(sug.timestamp) + '</span>';
+    h += '</div>';
+    h += '<div class="suggestion-text">' + esc(sug.text) + '</div>';
+    h += '<div class="suggestion-context">' + esc(sug.sourceContext) + '</div>';
+    h += '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">';
+    if (sug.person) h += '<span style="font-size:10px;color:#6b7280">&#x1F464; ' + esc(sug.person) + '</span>';
+    if (sug.company) h += '<span style="font-size:10px;color:#6b7280">&#x1F3E2; ' + esc(sug.company) + '</span>';
+    h += '</div>';
+    h += '<div style="display:flex;gap:8px;margin-top:8px">';
+    h += '<button class="suggestion-approve" onclick="approveSuggestion(\'' + sug.id + '\')">' + icon('plus', 12, '#fff') + ' Add to Todos</button>';
+    h += '<button class="suggestion-dismiss" onclick="dismissSuggestion(\'' + sug.id + '\')">Dismiss</button>';
+    h += '</div></div>';
+  });
+
+  h += '</div>';
+  return h;
+}
 
 const CRM_STORAGE_KEY = "dave_crm_contacts_v1";
 
@@ -1497,6 +1678,10 @@ function renderTodos() {
     <div class="todo-stat"><div class="todo-stat-n" style="color:#f59e0b">${pending.filter(t=>t.priority==='medium').length}</div><div class="todo-stat-l">Med</div></div>
     <div class="todo-stat"><div class="todo-stat-n" style="color:#16a34a">${completed.length}</div><div class="todo-stat-l">Done</div></div>
   </div>`;
+
+  // Suggested Actions (AI-generated from messages)
+  h += renderSuggestedActions();
+
   CATEGORIES.forEach(cat => {
     const items = groups[cat.key];
     if (items.length === 0 && state.todoSearch) return;
@@ -1819,6 +2004,8 @@ function esc(s) { if (!s) return ''; const d=document.createElement('div'); d.te
 // Initial render
 initCategoryIcons();
 render();
+fetchSuggestions();
+setInterval(fetchSuggestions, 5 * 60 * 1000);
 </script>
 </body>
 </html>
