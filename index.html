@@ -1553,6 +1553,24 @@ function onDrop(e, targetId, targetCat) {
   saveTodos(todos); render();
 }
 
+function onDropCat(e, targetCat) {
+  e.preventDefault();
+  e.stopPropagation();
+  document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+  const srcId = dragState.id;
+  if (srcId === null) return;
+  const todos = loadTodos();
+  const src = todos.find(t => t.id === srcId);
+  if (!src) return;
+  src.category = targetCat;
+  saveTodos(todos); render();
+  showToast('Moved to ' + (CAT_MAP[targetCat] ? CAT_MAP[targetCat].name : targetCat));
+}
+function onDragOverCat(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+}
+
 let touchDrag = { el: null, id: null, cat: null, clone: null, startY: 0 };
 
 function onTouchDragStart(e, id, cat) {
@@ -1713,16 +1731,16 @@ function renderTodos() {
     if (items.length === 0 && state.todoSearch) return;
     const collapsed = state.collapsedCats[cat.key];
     h += `<div class="cat-section">`;
-    h += `<div class="cat-header ${collapsed ? 'collapsed' : ''}" onclick="state.collapsedCats['${cat.key}']=!state.collapsedCats['${cat.key}'];render()">
+    h += `<div class="cat-header ${collapsed ? 'collapsed' : ''}" onclick="state.collapsedCats['${cat.key}']=!state.collapsedCats['${cat.key}'];render()" ondragover="onDragOverCat(event)" ondrop="onDropCat(event,'${cat.key}')">
       <span class="cat-icon">${cat.icon}</span>
       <span class="cat-name" style="color:${cat.color}">${cat.name}</span>
       <span class="cat-count">${items.length}</span>
       <span class="cat-chevron">\u25bc</span>
     </div>`;
     if (!collapsed) {
-      h += `<div class="cat-body">`;
+      h += `<div class="cat-body" ondragover="onDragOverCat(event)" ondrop="onDropCat(event,'${cat.key}')">`;
       if (items.length === 0) {
-        h += `<div style="padding:20px;text-align:center;color:#9ca3af;font-size:13px">No tasks</div>`;
+        h += `<div style="padding:20px;text-align:center;color:#9ca3af;font-size:13px" ondragover="onDragOverCat(event)" ondrop="onDropCat(event,'${cat.key}')">No tasks — drop here to move</div>`;
       } else {
         items.forEach(t => {
           const isNested = !!t.parentId;
