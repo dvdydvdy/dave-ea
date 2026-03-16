@@ -1611,7 +1611,7 @@ function renderInbox() {
 
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px">
       ${['Triage my emails','Summarize unread','Draft a reply','Find deal emails','Check follow-ups'].map(cmd =>
-        \`<button onclick="state.inboxCmd='${cmd}';runInboxCmd()" style="padding:6px 12px;border-radius:20px;border:1px solid #e5e7eb;background:${state.inboxCmd===cmd?'#eef2ff':'#fff'};font-size:12px;font-family:inherit;color:#374151;cursor:pointer;white-space:nowrap;transition:all .15s">${cmd}</button>\`
+        `<button onclick="state.inboxCmd='${cmd}';runInboxCmd()" style="padding:6px 12px;border-radius:20px;border:1px solid #e5e7eb;background:${state.inboxCmd===cmd?'#eef2ff':'#fff'};font-size:12px;font-family:inherit;color:#374151;cursor:pointer;white-space:nowrap;transition:all .15s">${cmd}</button>`
       ).join('')}
     </div>`;
 
@@ -1647,7 +1647,7 @@ function renderInbox() {
       h += `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #f3f4f6">
         <div>
           <span style="font-size:13px;font-weight:500">${esc(c.name)}</span>
-          ${c.company ? \`<span style="font-size:11px;color:#9ca3af;margin-left:6px">${esc(c.company)}</span>\` : ''}
+          ${c.company ? `<span style="font-size:11px;color:#9ca3af;margin-left:6px">${esc(c.company)}</span>` : ''}
         </div>
         <span style="font-size:11px;color:#9ca3af">${c.relationship||''}</span>
       </div>`;
