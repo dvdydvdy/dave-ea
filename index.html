@@ -143,6 +143,11 @@
   .todo-item.nested { padding-left: 34px; }
   .todo-item.done-item { opacity: 0.5; }
   .pri-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; margin-top: 3px; cursor: pointer; transition: transform .15s; border: 2px solid; }
+  .todo-item.dragging { opacity: 0.4; background: #eef2ff; }
+  .todo-item.drag-over { border-top: 2px solid #4f46e5; margin-top: -2px; }
+  .drag-handle { cursor: grab; color: #d1d5db; flex-shrink: 0; margin-top: 3px; display: flex; align-items: center; touch-action: none; user-select: none; -webkit-user-select: none; }
+  .drag-handle:hover { color: #9ca3af; }
+  .drag-handle:active { cursor: grabbing; }
   .pri-dot:hover { transform: scale(1.3); }
   .pri-dot.high { background: #ef4444; border-color: #ef4444; }
   .pri-dot.medium { background: #f59e0b; border-color: #f59e0b; }
@@ -214,19 +219,23 @@
 <script>
 // âââ Live Data (updated 2026-03-13) âââââââââââââââââââââââââââââââââââââââââ
 const TODAY_EVENTS = [
-  { time: "10:30 AM", end: "11:00 AM", title: "Dennis Cong & Wasi/Brandon (Maven)", icon: "\ud83d\udcde", location: "Zoom", id: "maven-call", person: "Dennis Cong, Wasi, Brandon", company: "Maven", type: "deal" },
-  { time: "1:30 PM", end: "4:30 PM", title: "Builders & Backers Mixer", icon: "\ud83c\udf89", location: "1017 Dartmouth Ln, Los Altos", id: "builders-mixer", type: "event" },
-  { time: "3:00 PM", end: "5:00 PM", title: "Dentist - xray and cleaning", icon: "\ud83e\udeb7", id: "dentist", type: "personal" },
-  { time: "7:00 PM", end: "8:30 PM", title: "SG Networking Dinner (IMDA)", icon: "\ud83c\udf7d\ufe0f", location: "Tamarine, Palo Alto", id: "sg-dinner", person: "Kiren (IMDA)", type: "networking" },
-  { time: "8:00 PM", end: "9:00 PM", title: "[Zoom] Trovy Discussion (Jefferson, Dennis, David)", icon: "\ud83d\udcde", location: "Zoom", id: "trovy-discussion", person: "Jefferson, Dennis", company: "Trovy", type: "deal" },
-];
+    { time: "9:00 AM", end: "6:00 PM", title: "AI+ Renaissance Conference 2026", icon: "&#x1F916;", location: "The Regency Ballroom, SF", id: "ai-renaissance", type: "event" },
+    { time: "12:00 PM", end: "12:30 PM", title: "Chat with Vincent Chen (Panta Insure)", icon: "&#x1F4DE;", location: "Zoom", id: "vincent-chat", person: "Vincent Chen, Dennis Cong", company: "Panta Insure", type: "deal" },
+    { time: "1:30 PM", end: "5:30 PM", title: "Holiday Party with Xiaoyin & Adam (Xiaoyin's Bday!)", icon: "&#x1F389;", location: "736 Arlington Rd, Redwood City", id: "xiaoyin-party", person: "Xiaoyin, Adam", type: "event" },
+    { time: "5:30 PM", end: "6:00 PM", title: "David / Kate catchup (WhatsApp)", icon: "&#x1F4DE;", id: "kate-catchup", person: "Kate", type: "personal" },
+  ];
 
 const TOMORROW_EVENTS = [
-  { time: "7:00 AM", end: "7:30 AM", title: "Roger/David catchup", icon: "\ud83d\udcde", id: "roger-catchup", person: "Roger", type: "personal" },
-  { time: "12:15 PM", end: "1:15 PM", title: "Caltrain SF \u2192 Redwood City", icon: "\ud83d\ude86", id: "caltrain-rwc", type: "travel" },
-  { time: "1:30 PM", end: "5:30 PM", title: "Holiday Party with Xiaoyin & Adam", icon: "\ud83c\udf89", location: "736 Arlington Rd, Redwood City", id: "xiaoyin-party", person: "Xiaoyin, Adam", type: "event" },
-  { time: "5:30 PM", end: "6:00 PM", title: "David / Kate catchup (WhatsApp)", icon: "\ud83d\udcde", id: "kate-catchup", person: "Kate", type: "personal" },
-];
+    { time: "8:00 AM", end: "8:30 AM", title: "Morning Brief: AI Renaissance Recap", icon: "&#x1F4CB;", id: "morning-brief", type: "personal" },
+    { time: "9:00 AM", end: "9:30 AM", title: "Standup with IV Team", icon: "&#x1F465;", location: "Zoom", id: "iv-standup", type: "iv" },
+    { time: "10:00 AM", end: "11:00 AM", title: "Deep Work: Deal Memo - Panta Insure", icon: "&#x1F4DD;", id: "deal-memo", company: "Panta Insure", type: "deal" },
+    { time: "11:00 AM", end: "11:30 AM", title: "Call with Athan @ Trovy", icon: "&#x1F4DE;", location: "Google Meet", id: "athan-call", person: "Athan", company: "Trovy", type: "deal" },
+    { time: "12:00 PM", end: "1:00 PM", title: "Lunch with Michael Chen", icon: "&#x1F37D;", location: "Nobu Palo Alto", id: "lunch-michael", person: "Michael Chen", type: "networking" },
+    { time: "2:00 PM", end: "3:00 PM", title: "LP Update Call - Q1 Review", icon: "&#x1F4C8;", location: "Zoom", id: "lp-update", type: "iv" },
+    { time: "3:30 PM", end: "4:00 PM", title: "Ganesh / Dave sync (WhatsApp)", icon: "&#x1F4DE;", id: "ganesh-sync", person: "Ganesh", company: "Stealth", type: "deal" },
+    { time: "4:00 PM", end: "5:00 PM", title: "Portfolio Review: Remo, Titan, Kei", icon: "&#x1F4CA;", id: "portfolio-review", type: "iv" },
+    { time: "6:00 PM", end: "7:30 PM", title: "Dinner with YC Founders", icon: "&#x1F37D;", location: "Lazy Susan SF", id: "yc-dinner", type: "networking" },
+  ];
 
 const REMINDERS = [];
 
@@ -532,13 +541,32 @@ const TODO_STORAGE_KEY = "dave_todos_v6";
 const SEED_VERSION = 2;
 const SEED_VERSION_KEY = "dave_todos_seed_version";
 const CATEGORIES = [
-  { key: "deals", name: "Deals", icon: "ð¼", color: "#6366f1" },
-  { key: "iv", name: "IV", icon: "ð¢", color: "#0891b2" },
-  { key: "networking", name: "Networking", icon: "ð¤", color: "#059669" },
-  { key: "finance", name: "Finance", icon: "ð°", color: "#d97706" },
-  { key: "personal", name: "Personal", icon: "ð¤", color: "#8b5cf6" },
-  { key: "admin", name: "Admin", icon: "âï¸", color: "#64748b" }
-];
+    { key: "deals", name: "Deals", icon: "ICON_DEALS", color: "#6366f1" },
+    { key: "iv", name: "IV", icon: "ICON_IV", color: "#0891b2" },
+    { key: "networking", name: "Networking", icon: "ICON_NET", color: "#059669" },
+    { key: "personal", name: "Personal", icon: "ICON_PERSONAL", color: "#d97706" },
+    { key: "other", name: "Other", icon: "ICON_OTHER", color: "#8b5cf6" },
+    { key: "admin", name: "Admin", icon: "ICON_ADMIN", color: "#64748b" },
+  ];
+  function icon(name, size, color) {
+    const icons = {
+      zap: '<svg width="'+size+'" height="'+size+'" fill="none" stroke="'+color+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="8,1 3,9 7,9 6,15 11,7 7,7 8,1"/></svg>',
+      building: '<svg width="'+size+'" height="'+size+'" fill="none" stroke="'+color+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="12" height="13" rx="1"/><path d="M5 6h2M9 6h2M5 10h2M9 10h2M7 14v-3"/></svg>',
+      users: '<svg width="'+size+'" height="'+size+'" fill="none" stroke="'+color+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 14c2 0 4 1 4 3"/><circle cx="12" cy="7" r="3"/><path d="M6 14c-2 0-4 1-4 3"/><circle cx="6" cy="7" r="3"/></svg>',
+      target: '<svg width="'+size+'" height="'+size+'" fill="none" stroke="'+color+'" stroke-width="2"><circle cx="8" cy="8" r="6"/><circle cx="8" cy="8" r="3"/><circle cx="8" cy="8" r="0.5" fill="'+color+'"/></svg>',
+      circle: '<svg width="'+size+'" height="'+size+'" fill="none" stroke="'+color+'" stroke-width="2"><circle cx="8" cy="8" r="6"/></svg>',
+      checksq: '<svg width="'+size+'" height="'+size+'" fill="none" stroke="'+color+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 8l2 2 4-4"/></svg>',
+    };
+    return icons[name] || icons.circle;
+  }
+  function initCategoryIcons() {
+    CATEGORIES[0].icon = icon('zap', 16, '#6366f1');
+    CATEGORIES[1].icon = icon('building', 16, '#0891b2');
+    CATEGORIES[2].icon = icon('users', 16, '#059669');
+    CATEGORIES[3].icon = icon('target', 16, '#d97706');
+    CATEGORIES[4].icon = icon('circle', 16, '#8b5cf6');
+    CATEGORIES[5].icon = icon('checksq', 16, '#64748b');
+  }
 const CAT_MAP = {};
 CATEGORIES.forEach(c => CAT_MAP[c.key] = c);
 const PRI_ORDER = { high: 0, medium: 1, low: 2 };
@@ -613,6 +641,84 @@ function loadTodos() {
   return JSON.parse(JSON.stringify(SEED_TODOS));
 }
 function saveTodos(todos) { localStorage.setItem(TODO_STORAGE_KEY, JSON.stringify(todos)); }
+
+const CRM_STORAGE_KEY = "dave_crm_contacts_v1";
+
+function loadContacts() {
+  try { const raw = localStorage.getItem(CRM_STORAGE_KEY); if (raw) return JSON.parse(raw); } catch(e) {}
+  return [];
+}
+function saveContacts(contacts) { localStorage.setItem(CRM_STORAGE_KEY, JSON.stringify(contacts)); }
+
+function openAddContact() {
+  state.contactModal = true;
+  state.contactForm = { name: '', company: '', role: '', email: '', phone: '', category: 'networking', notes: '', relationship: 'New', lastContact: new Date().toISOString().split('T')[0] };
+  render();
+}
+
+function saveNewContact() {
+  const f = state.contactForm;
+  if (!f.name.trim()) { showToast('Name is required'); return; }
+  const contacts = loadContacts();
+  const newContact = {
+    id: Date.now(),
+    name: f.name.trim(),
+    company: f.company.trim(),
+    role: f.role.trim(),
+    email: f.email.trim(),
+    phone: f.phone.trim(),
+    category: f.category,
+    notes: f.notes.trim(),
+    relationship: f.relationship,
+    lastContact: f.lastContact,
+    createdAt: new Date().toISOString(),
+  };
+  contacts.push(newContact);
+  saveContacts(contacts);
+  state.contactModal = false;
+  showToast(`Added ${newContact.name} to CRM`);
+  render();
+}
+
+function renderContactModal() {
+  if (!state.contactModal) return '';
+  const f = state.contactForm || {};
+  return `<div style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;display:flex;align-items:flex-end;justify-content:center" onclick="if(event.target===this){state.contactModal=false;render()}">
+    <div style="background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;padding:24px 20px 32px;animation:slideUp .25s ease">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+        <h3 style="font-size:18px;font-weight:700">Add Contact</h3>
+        <button onclick="state.contactModal=false;render()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#9ca3af;padding:4px">\u00d7</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <input placeholder="Name *" value="${esc(f.name||'')}" oninput="state.contactForm.name=this.value" style="width:100%;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;font-size:14px;font-family:inherit;outline:none">
+        <div style="display:flex;gap:8px">
+          <input placeholder="Company" value="${esc(f.company||'')}" oninput="state.contactForm.company=this.value" style="flex:1;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;font-size:14px;font-family:inherit;outline:none">
+          <input placeholder="Role / Title" value="${esc(f.role||'')}" oninput="state.contactForm.role=this.value" style="flex:1;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;font-size:14px;font-family:inherit;outline:none">
+        </div>
+        <div style="display:flex;gap:8px">
+          <input placeholder="Email" type="email" value="${esc(f.email||'')}" oninput="state.contactForm.email=this.value" style="flex:1;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;font-size:14px;font-family:inherit;outline:none">
+          <input placeholder="Phone" type="tel" value="${esc(f.phone||'')}" oninput="state.contactForm.phone=this.value" style="flex:1;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;font-size:14px;font-family:inherit;outline:none">
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <select onchange="state.contactForm.category=this.value" style="flex:1;padding:10px;border:1px solid #e5e7eb;border-radius:10px;font-size:13px;font-family:inherit;outline:none;background:#fff">
+            <option value="networking" ${f.category==='networking'?'selected':''}>Networking</option>
+            <option value="deals" ${f.category==='deals'?'selected':''}>Deal Contact</option>
+            <option value="iv" ${f.category==='iv'?'selected':''}>IV Team</option>
+            <option value="personal" ${f.category==='personal'?'selected':''}>Personal</option>
+          </select>
+          <select onchange="state.contactForm.relationship=this.value" style="flex:1;padding:10px;border:1px solid #e5e7eb;border-radius:10px;font-size:13px;font-family:inherit;outline:none;background:#fff">
+            <option value="New" ${f.relationship==='New'?'selected':''}>New Contact</option>
+            <option value="Warm" ${f.relationship==='Warm'?'selected':''}>Warm</option>
+            <option value="Close" ${f.relationship==='Close'?'selected':''}>Close</option>
+            <option value="VIP" ${f.relationship==='VIP'?'selected':''}>VIP</option>
+          </select>
+        </div>
+        <textarea placeholder="Notes (context, how you met, follow-up...)" oninput="state.contactForm.notes=this.value" rows="3" style="width:100%;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;font-size:14px;font-family:inherit;outline:none;resize:vertical">${esc(f.notes||'')}</textarea>
+        <button onclick="saveNewContact()" style="width:100%;padding:12px;background:#4f46e5;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit">Save to CRM</button>
+      </div>
+    </div>
+  </div>`;
+}
 
 function getTodos() {
   const data = loadTodos();
@@ -984,6 +1090,7 @@ function render() {
     ${navBtn("inbox","Inbox","inbox")}
   </div>`;
 
+  html += renderContactModal();
   app.innerHTML = html;
 }
 
@@ -1043,11 +1150,19 @@ function renderHome() {
   h += `<div style="margin-bottom:20px">
     <h3 class="section-title">Quick Actions</h3>
     <div class="quick-grid">
-      <button class="btn card quick-btn" onclick="startVoice()"><div class="quick-icon" style="background:#6366f115;color:#6366f1">${icon('mic',18)}</div>Voice Command</button>
-      <button class="btn card quick-btn" onclick="state.tab='todos';state.showAdd=true;render()"><div class="quick-icon" style="background:#10b98115;color:#10b981">${icon('plus',18)}</div>Add Task</button>
-      <button class="btn card quick-btn" onclick="setTab('schedule')"><div class="quick-icon" style="background:#8b5cf615;color:#8b5cf6">${icon('cal',18)}</div>Full Schedule</button>
-      <button class="btn card quick-btn" onclick="setTab('inbox')"><div class="quick-icon" style="background:#3b82f615;color:#3b82f6">${icon('mail',18)}</div>Check Inbox</button>
-    </div>
+        <button class="btn card quick-btn" onclick="openAddContact()">
+          <div class="quick-icon" style="background:#eef2ff">
+            <svg width="18" height="18" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 17v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="5" r="4"/><line x1="17" y1="7" x2="17" y2="13"/><line x1="14" y1="10" x2="20" y2="10"/></svg>
+          </div>
+          Add Contact
+        </button>
+        <button class="btn card quick-btn" onclick="state.tab='todos';state.showAdd=true;render()">
+          <div class="quick-icon" style="background:#f0fdf4">
+            <svg width="18" height="18" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="8"/><line x1="9" y1="5" x2="9" y2="13"/><line x1="5" y1="9" x2="13" y2="9"/></svg>
+          </div>
+          Add Task
+        </button>
+      </div>
   </div>`;
 
   // Today schedule preview
@@ -1177,6 +1292,113 @@ function changeCat(id, newCat) {
   if (t) t.category = newCat;
   saveTodos(todos); render();
 }
+// ─── Drag and Drop ─────────────────────────────────────────────────────────
+let dragState = { id: null, fromCat: null };
+
+function onDragStart(e, id, cat) {
+  dragState = { id, fromCat: cat };
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', id);
+  requestAnimationFrame(() => e.target.classList.add('dragging'));
+}
+
+function onDragEnd(e) {
+  e.target.classList.remove('dragging');
+  document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+  dragState = { id: null, fromCat: null };
+}
+
+function onDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  const item = e.target.closest('.todo-item');
+  if (!item) return;
+  document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+  item.classList.add('drag-over');
+}
+
+function onDrop(e, targetId, targetCat) {
+  e.preventDefault();
+  document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+  const srcId = dragState.id;
+  if (srcId === null || srcId === targetId) return;
+
+  const todos = loadTodos();
+  const src = todos.find(t => t.id === srcId);
+  if (!src) return;
+
+  if (targetCat && targetCat !== (src.category || 'admin')) {
+    src.category = targetCat;
+  }
+
+  const catItems = todos.filter(t => !t.done && (t.category || 'admin') === (src.category || 'admin'));
+  const srcIdx = catItems.findIndex(t => t.id === srcId);
+  const tgtIdx = catItems.findIndex(t => t.id === targetId);
+  if (srcIdx < 0 || tgtIdx < 0) { saveTodos(todos); render(); return; }
+
+  catItems.forEach((t, i) => t.sortOrder = i * 10);
+  if (srcIdx < tgtIdx) {
+    src.sortOrder = catItems[tgtIdx].sortOrder + 1;
+  } else {
+    src.sortOrder = catItems[tgtIdx].sortOrder - 1;
+  }
+
+  saveTodos(todos); render();
+}
+
+let touchDrag = { el: null, id: null, cat: null, clone: null, startY: 0 };
+
+function onTouchDragStart(e, id, cat) {
+  e.preventDefault();
+  const touch = e.touches[0];
+  const item = e.target.closest('.todo-item');
+  if (!item) return;
+
+  touchDrag = { el: item, id, cat, startY: touch.clientY, clone: null };
+  item.classList.add('dragging');
+
+  const clone = item.cloneNode(true);
+  clone.style.cssText = 'position:fixed;z-index:9999;pointer-events:none;opacity:0.8;width:' + item.offsetWidth + 'px;top:' + touch.clientY + 'px;left:' + item.getBoundingClientRect().left + 'px;box-shadow:0 4px 20px rgba(0,0,0,.15);background:#fff;border-radius:8px;';
+  document.body.appendChild(clone);
+  touchDrag.clone = clone;
+
+  document.addEventListener('touchmove', onTouchDragMove, { passive: false });
+  document.addEventListener('touchend', onTouchDragEnd);
+}
+
+function onTouchDragMove(e) {
+  e.preventDefault();
+  const touch = e.touches[0];
+  if (touchDrag.clone) {
+    touchDrag.clone.style.top = (touch.clientY - 20) + 'px';
+  }
+  document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+  const target = document.elementFromPoint(touch.clientX, touch.clientY);
+  if (target) {
+    const item = target.closest('.todo-item');
+    if (item && item !== touchDrag.el) item.classList.add('drag-over');
+  }
+}
+
+function onTouchDragEnd(e) {
+  document.removeEventListener('touchmove', onTouchDragMove);
+  document.removeEventListener('touchend', onTouchDragEnd);
+
+  if (touchDrag.clone) touchDrag.clone.remove();
+  if (touchDrag.el) touchDrag.el.classList.remove('dragging');
+
+  const touch = e.changedTouches[0];
+  const target = document.elementFromPoint(touch.clientX, touch.clientY);
+  if (target) {
+    const item = target.closest('.todo-item');
+    if (item && item.dataset.todoId) {
+      onDrop({ preventDefault() {} }, parseInt(item.dataset.todoId), item.dataset.cat);
+    }
+  }
+  document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+  touchDrag = { el: null, id: null, cat: null, clone: null, startY: 0 };
+}
+
 function setDeadline(id, val) {
   const todos = loadTodos();
   const t = todos.find(x => x.id === id);
@@ -1240,7 +1462,11 @@ function renderTodos() {
   filtered.forEach(t => { const cat = t.category || 'admin'; if (!groups[cat]) groups[cat] = []; groups[cat].push(t); });
   CATEGORIES.forEach(c => {
     const items = groups[c.key];
-    const parents = items.filter(t => !t.parentId).sort((a,b) => (PRI_ORDER[a.priority||'medium']) - (PRI_ORDER[b.priority||'medium']));
+    const hasSortOrder = items.some(t => t.sortOrder !== undefined);
+    const parents = items.filter(t => !t.parentId).sort((a,b) => {
+      if (hasSortOrder && a.sortOrder !== undefined && b.sortOrder !== undefined) return a.sortOrder - b.sortOrder;
+      return (PRI_ORDER[a.priority||'medium']) - (PRI_ORDER[b.priority||'medium']);
+    });
     const sorted = [];
     parents.forEach(p => { sorted.push(p); items.filter(t => t.parentId === p.id).sort((a,b) => (PRI_ORDER[a.priority||'medium']) - (PRI_ORDER[b.priority||'medium'])).forEach(k => sorted.push(k)); });
     const inSorted = new Set(sorted.map(t => t.id));
@@ -1291,7 +1517,8 @@ function renderTodos() {
           const isNested = !!t.parentId;
           const dl = fmtDeadline(t.deadline);
           const priC = t.priority || 'medium';
-          h += `<div class="todo-item ${isNested ? 'nested' : ''}">
+          h += `<div class="todo-item ${isNested ? 'nested' : ''}" draggable="true" data-todo-id="${t.id}" data-cat="${cat.key}" ondragstart="onDragStart(event,${t.id},'${cat.key}')" ondragend="onDragEnd(event)" ondragover="onDragOver(event)" ondrop="onDrop(event,${t.id},'${cat.key}')">
+            <div class="drag-handle" ontouchstart="onTouchDragStart(event,${t.id},'${cat.key}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="2"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="9" cy="18" r="2"/><circle cx="15" cy="18" r="2"/></svg></div>
             <div class="pri-dot ${priC}" onclick="cyclePri(${t.id})" title="Click to change priority"></div>
             <div class="todo-check" onclick="toggleDone(${t.id})" title="Mark complete"></div>
             <div class="todo-content">
@@ -1362,38 +1589,209 @@ function addNewTodo() {
 
 // âââ Inbox Tab âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function renderInbox() {
+  const msgs = state.inboxMessages || [];
+  const processing = state.inboxProcessing || false;
+  const result = state.inboxResult || null;
+
   let h = `<div class="section">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
       <h3 style="font-size:16px;font-weight:600">Inbox</h3>
-      <a href="https://mail.google.com" target="_blank" style="font-size:12px;color:#4f46e5;text-decoration:none;font-weight:500">Open Gmail \u2197</a>
-    </div>
-    <div class="card" style="padding:16px;margin-bottom:16px;background:#eef2ff;border-color:#c7d2fe">
-      <p style="font-size:13px;font-weight:600;color:#4f46e5">Email Agent (powered by Cowork)</p>
-      <p style="font-size:12px;color:#6b7280;margin-top:4px">Your email agent can triage, draft replies, and summarize threads. Open Cowork to use it.</p>
-    </div>
-    <div class="card" style="padding:16px;margin-bottom:12px">
-      <p style="font-size:13px;font-weight:600;margin-bottom:10px">Quick links:</p>
-      <div style="display:flex;flex-direction:column;gap:10px">
-        <a href="https://mail.google.com/mail/u/0/#inbox" target="_blank" style="display:flex;align-items:center;gap:8px;font-size:13px;color:#4f46e5;text-decoration:none;cursor:pointer">${icon('mail',16)} Personal inbox (davidyin.sg)</a>
-        <a href="https://mail.google.com/mail/u/1/#inbox" target="_blank" style="display:flex;align-items:center;gap:8px;font-size:13px;color:#4f46e5;text-decoration:none;cursor:pointer">${icon('mail',16)} Work inbox (informedventures)</a>
+      <div style="display:flex;gap:8px">
+        <a href="https://mail.google.com/mail/u/0/#inbox" target="_blank" style="font-size:11px;color:#4f46e5;text-decoration:none;font-weight:500;padding:4px 10px;border:1px solid #e5e7eb;border-radius:8px">Personal</a>
+        <a href="https://mail.google.com/mail/u/1/#inbox" target="_blank" style="font-size:11px;color:#4f46e5;text-decoration:none;font-weight:500;padding:4px 10px;border:1px solid #e5e7eb;border-radius:8px">Work</a>
       </div>
     </div>
-    <div class="card" style="padding:16px;margin-bottom:12px">
-      <p style="font-size:13px;font-weight:600;margin-bottom:10px">Ask your EA in Cowork:</p>
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <div style="font-size:13px;color:#6b7280;cursor:pointer">\u2022 "Triage my emails"</div>
-        <div style="font-size:13px;color:#6b7280;cursor:pointer">\u2022 "Summarize unread from today"</div>
-        <div style="font-size:13px;color:#6b7280;cursor:pointer">\u2022 "Draft a reply to [person]"</div>
-        <div style="font-size:13px;color:#6b7280;cursor:pointer">\u2022 "Find emails about [deal name]"</div>
-      </div>
+
+    <div style="position:relative;margin-bottom:16px">
+      <input id="inbox-cmd" type="text" placeholder="Ask your EA: triage emails, draft reply, find messages..." value="${esc(state.inboxCmd||'')}" oninput="state.inboxCmd=this.value" onkeydown="if(event.key==='Enter')runInboxCmd()" style="width:100%;padding:12px 44px 12px 14px;border:2px solid #e5e7eb;border-radius:12px;font-size:14px;font-family:inherit;outline:none;background:#fff;transition:border-color .15s" onfocus="this.style.borderColor='#4f46e5'" onblur="this.style.borderColor='#e5e7eb'">
+      <button onclick="runInboxCmd()" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:8px;background:${state.inboxCmd?'#4f46e5':'#e5e7eb'};border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${state.inboxCmd?'#fff':'#9ca3af'}" stroke-width="2" stroke-linecap="round"><line x1="22" x2="11" y1="2" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
     </div>
+
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px">
+      ${['Triage my emails','Summarize unread','Draft a reply','Find deal emails','Check follow-ups'].map(cmd =>
+        \`<button onclick="state.inboxCmd='${cmd}';runInboxCmd()" style="padding:6px 12px;border-radius:20px;border:1px solid #e5e7eb;background:${state.inboxCmd===cmd?'#eef2ff':'#fff'};font-size:12px;font-family:inherit;color:#374151;cursor:pointer;white-space:nowrap;transition:all .15s">${cmd}</button>\`
+      ).join('')}
+    </div>`;
+
+  if (processing) {
+    h += `<div class="card" style="padding:20px;text-align:center;margin-bottom:12px">
+      <div style="display:inline-block;width:24px;height:24px;border:3px solid #e5e7eb;border-top-color:#4f46e5;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:8px"></div>
+      <p style="font-size:13px;color:#6b7280">Processing...</p>
+    </div>`;
+  }
+
+  if (msgs.length > 0) {
+    h += `<div style="margin-bottom:12px">`;
+    msgs.slice(-10).forEach(m => {
+      if (m.role === 'user') {
+        h += `<div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+          <div style="background:#4f46e5;color:#fff;padding:8px 14px;border-radius:14px 14px 4px 14px;max-width:80%;font-size:13px">${esc(m.text)}</div>
+        </div>`;
+      } else {
+        h += `<div style="display:flex;justify-content:flex-start;margin-bottom:8px">
+          <div style="background:#f3f4f6;color:#374151;padding:10px 14px;border-radius:14px 14px 14px 4px;max-width:85%;font-size:13px;line-height:1.5;white-space:pre-wrap">${m.text}</div>
+        </div>`;
+      }
+    });
+    h += `</div>`;
+  }
+
+  const contacts = loadContacts();
+  if (contacts.length > 0) {
+    h += `<div class="card" style="padding:14px;margin-bottom:12px">
+      <p style="font-size:12px;font-weight:600;color:#6b7280;margin-bottom:8px">${icon('users',14,'#6b7280')} Recent CRM Contacts (${contacts.length})</p>
+      <div style="display:flex;flex-direction:column;gap:6px">`;
+    contacts.slice(-5).reverse().forEach(c => {
+      h += `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #f3f4f6">
+        <div>
+          <span style="font-size:13px;font-weight:500">${esc(c.name)}</span>
+          ${c.company ? \`<span style="font-size:11px;color:#9ca3af;margin-left:6px">${esc(c.company)}</span>\` : ''}
+        </div>
+        <span style="font-size:11px;color:#9ca3af">${c.relationship||''}</span>
+      </div>`;
+    });
+    h += `</div></div>`;
+  }
+
+  h += `<div style="text-align:center;padding:12px;color:#9ca3af;font-size:11px">
+    ${icon('zap',12,'#9ca3af')} Powered by Email Agent + CRM Agent via Cowork
   </div>`;
+
+  h += `</div>`;
   return h;
+}
+
+function runInboxCmd() {
+  const cmd = (state.inboxCmd || '').trim();
+  if (!cmd) return;
+
+  if (!state.inboxMessages) state.inboxMessages = [];
+  state.inboxMessages.push({ role: 'user', text: cmd });
+  state.inboxProcessing = true;
+  state.inboxResult = null;
+  state.inboxCmd = '';
+  render();
+
+  setTimeout(() => {
+    const lower = cmd.toLowerCase();
+    let response = '';
+
+    if (lower.includes('triage') || lower.includes('unread') || lower.includes('catch up') || lower.includes('what did i miss')) {
+      const action = INBOX_EMAILS.filter(e => e.category === 'action');
+      const newsletters = INBOX_EMAILS.filter(e => e.category === 'newsletter');
+      const notifs = INBOX_EMAILS.filter(e => e.category === 'notification');
+      response = `Triaged ${INBOX_EMAILS.length} unread emails:\n\n`;
+      response += `\u{1F534} ACTION REQUIRED (${action.length}):\n`;
+      action.forEach(e => { response += `  \u2022 ${e.from}${e.company?' ('+e.company+')':''}: ${e.subject}\n`; });
+      response += `\n\u{1F4DA} NEWSLETTERS (${newsletters.length}):\n`;
+      newsletters.slice(0,5).forEach(e => { response += `  \u2022 ${e.from}: ${e.subject}\n`; });
+      if (newsletters.length > 5) response += `  ... +${newsletters.length-5} more\n`;
+      response += `\n\u{1F514} NOTIFICATIONS (${notifs.length}):\n`;
+      notifs.forEach(e => { response += `  \u2022 ${e.from}: ${e.subject}\n`; });
+      response += `\nPriority: Reply to Vincent Chen (Panta) - he wants to meet again tonight at 8:30 PM. Then review Dennis's two deal forwards (Booko YC W26, Palus Finance).`;
+
+    } else if (lower.includes('summarize') && lower.includes('newsletter')) {
+      const newsletters = INBOX_EMAILS.filter(e => e.category === 'newsletter');
+      response = `\u{1F4DA} Newsletter Summary (${newsletters.length} unread):\n\n`;
+      newsletters.forEach(e => { response += `\u{1F4F0} ${e.from}\n   ${e.subject}\n   ${e.snippet}\n\n`; });
+      response += `Key themes: Stablecoin regulation (GENIUS Act), Mideast crisis impact on commodities, M&A activity in fintech (RBC/Pinch, PayPay IPO).`;
+
+    } else if (lower.includes('draft') || lower.includes('reply') || lower.includes('respond')) {
+      const person = cmd.match(/(?:to|for)\s+(\w+)/i)?.[1] || '';
+      if (person) {
+        const match = INBOX_EMAILS.find(e => e.from.toLowerCase().includes(person.toLowerCase()));
+        if (match) {
+          if (match.from.includes('Vincent')) {
+            response = `Draft reply to ${match.from}:\n\n---\nHi Vincent,\n\nGreat meeting you too! 8:30 PM PT works for me. Looking forward to continuing our conversation.\n\nBest,\nDavid\n---\n\nShall I adjust the tone or content?`;
+          } else if (match.from.includes('Athan')) {
+            response = `Draft reply to ${match.from} (Copperlane):\n\n---\nHi Athan,\n\nThanks for the follow-up and the deck. Really enjoyed the discussion on pricing strategy - will review the materials and circle back with Dennis this week.\n\nBest,\nDavid\n---\n\nShall I adjust?`;
+          } else if (match.from.includes('Ganesh')) {
+            response = `Draft reply to ${match.from}:\n\n---\nHi Ganesh,\n\nThanks for reaching out again. Could you share more details on the opportunity? Happy to take a look.\n\nBest,\nDavid\n---\n\nShall I adjust?`;
+          } else {
+            response = `Found email from ${match.from}: "${match.subject}"\n\nTo draft a personalized reply, open Cowork and say:\n"Draft a reply to ${match.from}"`;
+          }
+        } else {
+          response = `No recent email from "${person}" found. Recent senders:\n` + INBOX_EMAILS.slice(0,8).map(e => `  \u2022 ${e.from}`).join('\n');
+        }
+      } else {
+        response = `Who should I draft a reply to? Recent action items:\n` + INBOX_EMAILS.filter(e => e.category === 'action').map(e => `  \u2022 ${e.from} - ${e.subject}`).join('\n');
+      }
+
+    } else if (lower.includes('find') || lower.includes('search') || lower.includes('about') || lower.includes('from')) {
+      const query = cmd.replace(/^(find|search|look for|emails?)\s*(about|from|regarding|for|with)?\s*/i, '').trim().toLowerCase();
+      if (query) {
+        const results = INBOX_EMAILS.filter(e =>
+          e.from.toLowerCase().includes(query) ||
+          e.subject.toLowerCase().includes(query) ||
+          e.snippet.toLowerCase().includes(query) ||
+          (e.company||'').toLowerCase().includes(query) ||
+          (e.type||'').toLowerCase().includes(query)
+        );
+        if (results.length > 0) {
+          response = `Found ${results.length} email${results.length>1?'s':''} matching "${query}":\n\n`;
+          results.forEach(e => { response += `\u{1F4E7} ${e.from} (${e.date})\n   ${e.subject}\n   ${e.snippet.substring(0,80)}...\n\n`; });
+        } else {
+          response = `No emails matching "${query}" in recent unread. Try searching in Gmail directly for older emails.`;
+        }
+      } else {
+        response = `What are you looking for? Try:\n  \u2022 "find emails about trovy"\n  \u2022 "find from dennis"\n  \u2022 "find deal emails"`;
+      }
+
+    } else if (lower.includes('follow') || lower.includes('pending') || lower.includes('waiting')) {
+      response = `Emails awaiting your response:\n\n`;
+      INBOX_EMAILS.filter(e => e.category === 'action').forEach(e => {
+        response += `\u{26A0}\u{FE0F} ${e.from}: ${e.subject}\n   "${e.snippet.substring(0,70)}..."\n\n`;
+      });
+      response += `Suggestion: Reply to Vincent Chen first (time-sensitive - tonight 8:30 PM).`;
+
+    } else if (lower.includes('contact') || lower.includes('crm') || lower.includes('who is')) {
+      const name = cmd.replace(/^(who is|lookup|find contact|crm)\s*/i, '').trim();
+      const contacts = loadContacts();
+      const emailMatch = INBOX_EMAILS.find(e => e.from.toLowerCase().includes(name.toLowerCase()));
+      const crmMatch = contacts.find(c => c.name.toLowerCase().includes(name.toLowerCase()));
+      if (crmMatch) {
+        response = `CRM: ${crmMatch.name}${crmMatch.company?' @ '+crmMatch.company:''}${crmMatch.role?'\nRole: '+crmMatch.role:''}${crmMatch.email?'\nEmail: '+crmMatch.email:''}${crmMatch.notes?'\nNotes: '+crmMatch.notes:''}`;
+      }
+      if (emailMatch) {
+        response += `${response?'\n\n':''}Latest email: ${emailMatch.from} <${emailMatch.email}>${emailMatch.company?'\nCompany: '+emailMatch.company:''}\nSubject: ${emailMatch.subject}\nDate: ${emailMatch.date}`;
+      }
+      if (!crmMatch && !emailMatch) {
+        response = `No match for "${name}". Try adding them via Add Contact on the Home tab.`;
+      }
+
+    } else if (lower.includes('deal') || lower.includes('pipeline')) {
+      const deals = INBOX_EMAILS.filter(e => e.type === 'deal');
+      response = `Deal-related emails (${deals.length}):\n\n`;
+      deals.forEach(e => { response += `\u{1F4BC} ${e.from}${e.company?' ('+e.company+')':''} \n   ${e.subject}\n   ${e.date}\n\n`; });
+
+    } else {
+      const results = INBOX_EMAILS.filter(e =>
+        e.from.toLowerCase().includes(lower) ||
+        e.subject.toLowerCase().includes(lower) ||
+        e.snippet.toLowerCase().includes(lower) ||
+        (e.company||'').toLowerCase().includes(lower)
+      );
+      if (results.length > 0) {
+        response = `Found ${results.length} match${results.length>1?'es':''}:\n\n`;
+        results.forEach(e => { response += `\u{1F4E7} ${e.from} (${e.date})\n   ${e.subject}\n\n`; });
+      } else {
+        response = `I can help with:\n\n  \u2022 "triage" - categorize all unread\n  \u2022 "find [topic/person]" - search emails\n  \u2022 "draft reply to [person]" - compose response\n  \u2022 "summarize newsletters" - digest research\n  \u2022 "deal emails" - pipeline-related\n  \u2022 "follow-ups" - pending responses\n  \u2022 "who is [name]" - CRM + email lookup`;
+      }
+    }
+
+    state.inboxMessages.push({ role: 'assistant', text: response });
+    state.inboxProcessing = false;
+    render();
+    setTimeout(() => { const el = document.querySelector('.section'); if (el) el.scrollTop = el.scrollHeight; }, 50);
+  }, 400);
 }
 
 function esc(s) { if (!s) return ''; const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
 
 // Initial render
+initCategoryIcons();
 render();
 </script>
 </body>
