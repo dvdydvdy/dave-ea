@@ -1462,12 +1462,36 @@ function toggleDone(id) {
   if (t) { t.done = !t.done; t.completedAt = t.done ? new Date().toISOString() : undefined; }
   saveTodos(todos); render();
 }
+let _undoDeleteData = null;
 function deleteTodo(id) {
-  if (!confirm('Delete this task?')) return;
   let todos = loadTodos();
+  const deleted = todos.find(x => x.id === id);
+  if (!deleted) return;
+  _undoDeleteData = { todo: JSON.parse(JSON.stringify(deleted)), children: todos.filter(t => t.parentId === id).map(t => JSON.parse(JSON.stringify(t))) };
   todos.filter(t => t.parentId === id).forEach(t => t.parentId = null);
   todos = todos.filter(x => x.id !== id);
   saveTodos(todos); render();
+  showToastWithUndo('Task deleted', undoDelete);
+}
+function undoDelete() {
+  if (!_undoDeleteData) return;
+  let todos = loadTodos();
+  todos.push(_undoDeleteData.todo);
+  _undoDeleteData.children.forEach(c => { const t = todos.find(x => x.id === c.id); if (t) t.parentId = c.parentId; });
+  _undoDeleteData = null;
+  saveTodos(todos); render();
+  showToast('Task restored');
+}
+function showToastWithUndo(msg, undoFn) {
+  state.toast = ''; render();
+  const toastEl = document.createElement('div');
+  toastEl.className = 'toast';
+  toastEl.style.display = 'flex';
+  toastEl.style.alignItems = 'center';
+  toastEl.style.gap = '12px';
+  toastEl.innerHTML = msg + ' <button onclick="undoDelete()" style="background:#4f46e5;color:#fff;border:none;padding:4px 12px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer">Undo</button>';
+  document.body.appendChild(toastEl);
+  setTimeout(() => { if (toastEl.parentNode) toastEl.remove(); }, 5000);
 }
 function changeCat(id, newCat) {
   const todos = loadTodos();
