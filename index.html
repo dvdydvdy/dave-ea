@@ -804,6 +804,8 @@ function renderSuggestedActions() {
     h += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">';
     h += '<span class="suggestion-source ' + sug.source + '">' + sourceIcon(sug.source) + ' ' + sug.source + '</span>';
     h += '<span class="suggestion-tag type-' + sug.actionType + '">' + typeLabel(sug.actionType) + '</span>';
+    const catObj = CAT_MAP[sug.category || 'deals'] || CAT_MAP.deals;
+    h += '<span class="suggestion-tag" style="background:' + catObj.color + '15;color:' + catObj.color + '">' + catObj.name + '</span>';
     if (sug.priority === 'high') h += '<span class="suggestion-tag" style="background:#fef2f2;color:#dc2626">Urgent</span>';
     h += '<span class="suggestion-time">' + timeAgo(sug.timestamp) + '</span>';
     h += '</div>';
