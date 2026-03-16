@@ -570,7 +570,7 @@ const CATEGORIES = [
 const CAT_MAP = {};
 CATEGORIES.forEach(c => CAT_MAP[c.key] = c);
 const PRI_ORDER = { high: 0, medium: 1, low: 2 };
-const PRI_CYCLE = ['low', 'medium', 'high'];
+const PRI_CYCLE = ['high', 'medium', 'low'];
 
 const SEED_TODOS = [
   {id:1773428532737,text:"Interview / reply GSB MBA1 intern candidate",category:"iv",priority:"medium",done:false,parentId:null,person:"",deadline:"",nextStep:"reply",nextStepNote:""},
@@ -1662,6 +1662,32 @@ function renderInbox() {
   h += `</div>`;
   return h;
 }
+
+// ─── Email Data (fetched from Gmail) ──────────────────────────────────────────
+const INBOX_EMAILS = [
+  { id:"e1", from:"Vincent Chen", email:"vincent@pantainsure.com", subject:"Re: Panta - Informed Ventures", snippet:"Hey David, It was a great meeting with you! Any chance you're available to meet again later today around 8:30 PM PT?", date:"Mar 15, 7:37 PM", category:"action", labels:["IMPORTANT","INBOX"], company:"Panta Insure", type:"deal" },
+  { id:"e2", from:"Dennis Cong", email:"denniscong@informedventures.com", subject:"FW: Booko (YC W26) Investment Meeting", snippet:"From: Arjun Saluja. Sent: Sunday, March 15. Booko (YC W26) Investment Meeting with Dennis Cong.", date:"Mar 15, 6:36 PM", category:"action", labels:["INBOX"], company:"Booko / IV", type:"deal" },
+  { id:"e3", from:"Dennis Cong", email:"denniscong@informedventures.com", subject:"FW: Dennis Cong and Sam Lushtak", snippet:"From: Sam Lushtak (Palus Finance). Sent: Sunday, March 15. Introduction call follow-up.", date:"Mar 15, 6:35 PM", category:"action", labels:["INBOX"], company:"Palus Finance / IV", type:"deal" },
+  { id:"e4", from:"Athan Zhang", email:"athan@copperlane.ai", subject:"Copperlane - Follow Up + Deck", snippet:"Really enjoyed the conversation today. David, great questions on pricing and the long-term vision. Attaching the deck.", date:"Mar 14, 12:58 PM", category:"action", labels:["IMPORTANT","INBOX"], company:"Copperlane", type:"deal" },
+  { id:"e5", from:"Sri Ganesh", email:"sri.ganesh@oxbridgeadvisory.com", subject:"Re: ConstructionTech / Decarbonization Opportunity", snippet:"Dear David, How are you? Are you keen to look at this opportunity?", date:"Mar 15, 1:20 PM", category:"action", labels:["IMPORTANT","INBOX"], company:"Oxbridge Advisory", type:"deal" },
+  { id:"e6", from:"SSG Accelerator", email:"ssg@luma-mail.com", subject:"You've been added to SSG Spring Demo Day", snippet:"APR 9, 2:00 PM - 6:30 PM PDT. 625 2nd St, San Francisco.", date:"Mar 15, 7:11 PM", category:"action", labels:["IMPORTANT","INBOX"], type:"event" },
+  { id:"e7", from:"Zoom", email:"no-reply@zoom.us", subject:"Meeting Summary: Investor Meeting Priority Blaze", snippet:"Quick recap: Dennis and David, representatives from an early-stage VC firm focusing on fintech.", date:"Mar 14, 8:03 PM", category:"info", labels:["INBOX"], type:"meeting" },
+  { id:"e8", from:"Frontier Tower", email:"agenthack@luma-mail.com", subject:"New message in Agents That Trade", snippet:"Amazing events this weekend, an amazing hackathon. Agents That Trade, Mar 11.", date:"Mar 14, 7:23 PM", category:"info", labels:["INBOX"], type:"event" },
+  { id:"e9", from:"AllScale Weekly", email:"allscale@substack.com", subject:"The GENIUS Act: First U.S. Stablecoin Law Timeline", snippet:"Kicking off a new weekly research series covering stablecoins, payments, DeFi.", date:"Mar 15, 5:31 PM", category:"newsletter", type:"research" },
+  { id:"e10", from:"Macro Notes", email:"macronotes@substack.com", subject:"The 100 Investment Theses We're Tracking in 2026", snippet:"Full List Inside - Our Entire Research Roadmap, Open to All.", date:"Mar 15, 3:11 PM", category:"newsletter", type:"research" },
+  { id:"e11", from:"This Week in Fintech", email:"thisweekinfintech@beehiiv.com", subject:"RBC acquires Pinch Financial; PayPay IPOs (TWIF 3/15)", snippet:"Nik Milanovic. Today's newsletter.", date:"Mar 15, 1:01 PM", category:"newsletter", type:"research" },
+  { id:"e12", from:"Capital Wars", email:"capitalwars@substack.com", subject:"Oil At US$250/bbl?", snippet:"The Commodity Complex In Context.", date:"Mar 15, 8:51 AM", category:"newsletter", type:"research" },
+  { id:"e13", from:"MBI Deep Dives", email:"mbi-deep-dives@ghost.io", subject:"Veeva Model Update", snippet:"Updated Veeva model. If you are not familiar with the company, read the Deep Dive.", date:"Mar 15, 3:10 PM", category:"newsletter", type:"research" },
+  { id:"e14", from:"Financial Horse", email:"admin@financialhorse.com", subject:"If I have $1M for the Iran War Recovery: Buy S-REITs, DBS, or Gold?", snippet:"Weekly Updates.", date:"Mar 15, 4:01 AM", category:"newsletter", type:"research" },
+  { id:"e15", from:"Kristie Neo", email:"kristieneo@substack.com", subject:"Newsletter #54: Scenario planning starts now", snippet:"We're into Week 2 of Mideast crisis.", date:"Mar 15, 1:01 AM", category:"newsletter", type:"research" },
+  { id:"e16", from:"The Ken", email:"info@the-ken.com", subject:"First Principles: A game of multi-tracked moves", snippet:"A community-powered Sunday newsletter on mental models.", date:"Mar 15, 5:37 AM", category:"newsletter", type:"research" },
+  { id:"e17", from:"The Economist", email:"newsletters@economist.com", subject:"Trophy wives are out of fashion", snippet:"Also: The end of Hong Kong's coffin homes.", date:"Mar 14, 12:38 PM", category:"newsletter", type:"news" },
+  { id:"e18", from:"Amazon", email:"order-update@amazon.com", subject:"Delivered: Hatch Go Portable Sound Machine", snippet:"Your package has been delivered.", date:"Mar 15, 7:44 PM", category:"notification", type:"shopping" },
+  { id:"e19", from:"OCBC Bank", email:"documents@ocbc.com", subject:"Your Combined e-Statement for Feb 2026", snippet:"Please see attached monthly e-Statement.", date:"Mar 15, 4:53 AM", category:"notification", type:"finance" },
+  { id:"e20", from:"Robinhood", email:"noreply@robinhood.com", subject:"Your account activity report is ready", snippet:"View and download your report in the Robinhood app.", date:"Mar 15, 12:29 AM", category:"notification", type:"finance" },
+];
+
+const EMAIL_LAST_FETCHED = "Mar 15, 2026 8:46 PM PDT";
 
 function runInboxCmd() {
   const cmd = (state.inboxCmd || '').trim();
